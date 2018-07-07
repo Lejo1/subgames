@@ -1,0 +1,5 @@
+#Changes the full charge time of a bow.
+bow_full_charge_time (Bow Charge time) int 2
+
+#Changes the lifetime of a landed arrow
+bow_lifetime_arrow (Arrow Lifetime) int 60
