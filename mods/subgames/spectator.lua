@@ -6,12 +6,15 @@ function subgames.disappear(player) --  As ObjectRef
   local name = player:get_player_name()
   if not subgames_spectate[name] then
     player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
-    subgames_spectate[name]=true
-    player:set_properties({
-      visual_size = {x=0, y=0},
-      makes_footstep_sound = false,
-      collisionbox = {0}
-    })
+    subgames_spectate[name]={}
+	  subgames_spectate[name].visual_size=player:get_properties().visual_size
+	  subgames_spectate[name].textures=player:get_properties().textures
+	  player:set_properties({
+		 visual = "mesh",
+		 textures={"invisible_skin.png"},
+		 visual_size = {x=0, y=0},
+		 collisionbox = {0,0,0, 0,0,0},
+	  })
   end
 end
 
@@ -19,12 +22,17 @@ function subgames.undisappear(player) --  As ObjectRef
   local name = player:get_player_name()
   if subgames_spectate[name] then
     player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
-    player:set_properties({
-			visual_size = {x=1, y=1},
-			makes_footstep_sound = true,
-			collisionbox = {-0.3, -1, -0.3, 0.3, 1, 0.3}
-		})
+  	player:set_properties({
+		 visual = "mesh",
+	   textures=subgames_spectate[name].textures,
+		 visual_size = subgames_spectate[name].visual_size,
+		 collisionbox= {-0.3,-1,-0.3, 0.3,1,0.3},
+	  })
 	  subgames_spectate[name]=nil
+	  if subgames_spectate.armor then
+      armor:set_player_armor(player)
+		  armor:update_inventory(player)
+	  end
   end
 end
 

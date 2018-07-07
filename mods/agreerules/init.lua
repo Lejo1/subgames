@@ -83,8 +83,12 @@ arok_text={
 agreerules_form=""
 function create_agreerules_form(i)
 	local form="size[8,9;] "
-	local aot = ""
+	local aot="," .. arok_text[i][7]
 	local doacc="," .. arok_text[i][5]
+	if Enable_type_text_to_accept==true then
+		aot=aot ..",".. arok_text[i][6]
+		doacc=""
+	else aot="" end
 	form=form.."textlist[-0.1,-0.1;8,9;rules;" .. arok_text[i][13] .. ", " .. arok_text[i][16].. "," .. aot .. doacc .. "]"
 	if Enable_type_text_to_accept==true then
 	form=form.." field[0.5,7;7.5,2;text;" .. arok_text[i][8]..";]"

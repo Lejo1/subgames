@@ -15,7 +15,7 @@ if mg_params.mgname ~= "v6" and mg_params.mgname ~= "singlenode" then
 		},
 		biomes = {"grassland", "deciduous_forest", "coniferous_forest"},
 		y_min = 1,
-		y_max = 100,
+		y_max = 31000,
 		decoration = "crops:melon_plant_4"
 	})
 	minetest.register_decoration({
@@ -32,7 +32,7 @@ if mg_params.mgname ~= "v6" and mg_params.mgname ~= "singlenode" then
 		},
 		biomes = {"deciduous_forest", "coniferous_forest", "tundra"},
 		y_min = 1,
-		y_max = 100,
+		y_max = 31000,
 		decoration = "crops:pumpkin_plant_4"
 	})
 end

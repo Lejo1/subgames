@@ -33,14 +33,14 @@ local abilitys = {
 		[5] = 2
 	}
 }
-
 local input = io.open(minetest.get_worldpath() .. "/kits", "r")
 if input then
 	local input2 = minetest.deserialize(input:read("*l"))
-	kits = input2
-	io.close(input)
+	if input2 then
+		kits = input2
+		io.close(input)
+	end
 end
-if not kits then kits = {} end
 
 function mesewars.save_kits()
 	local output = io.open(minetest.get_worldpath() .. "/kits", "w")

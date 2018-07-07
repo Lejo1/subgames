@@ -49,6 +49,18 @@ minetest.register_chatcommand("mesewars", {
   end,
 })
 
+--  Add a Fix Command
+subgames.register_chatcommand("fix", {
+  params = "",
+  description = "Use it if the Game engine is buggy!",
+  privs = {shout = true},
+  lobby = "mesewars",
+  func = function(player)
+    mesewars.fix()
+    minetest.chat_send_player(player, "Tried to fix bugs!")
+  end,
+})
+
 subgames.register_chatcommand("reset", {
   params = "",
   description = "Use it to reset the full Map!",
@@ -133,7 +145,7 @@ subgames.register_chatcommand("leave", {
 
 --  Add a command to let others leave.
 subgames.register_chatcommand("letleave", {
-	privs = {kick=true},
+	privs = {ban=true},
 	params = "<name>",
 	description = "Use it ...",
   lobby = "mesewars",
@@ -147,3 +159,13 @@ subgames.register_chatcommand("letleave", {
     end
 	end,
 })
+
+--  Add a fix globalstep
+local timer = 0
+minetest.register_globalstep(function(dtime)
+	timer = timer + dtime;
+	if timer >= 60 then
+		mesewars.fix()
+    timer = 0
+	end
+end)

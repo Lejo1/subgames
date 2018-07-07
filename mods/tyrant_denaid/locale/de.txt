@@ -1,0 +1,41 @@
+#@1 is one of A,B,C,D
+Set coordinate @1=Setze Position @1
+Coordinate @1 has been set to @2
+An area with this ID does not exist, write will create it.=Dieses Gebiet existiert noch nicht, 'Schreibe' wird es erstellen.
+New Area=Neues Gebiet
+nobody=niemand
+Loaded area @1=@1 geladen
+Owner=Besitzer
+Display name=Anzeigename
+Priority=Priorität
+ID to edit/add/load=ID zum bearbeiten/laden/hinzufügen
+Write=Schreiben
+Load=Laden
+Area setup=Gebietseinstellungen
+Delete=Gebiet löschen
+Deleted @1=@1 gelöscht.
+
+#the following are the letters that are shown inside menus to notify players about their permissions.
+E=Z
+A=A
+I=I
+B=B
+
+PvP=PvP
+Allow Mob Spawning=Erlaube Mob-Spawning
+Enter Activate Inventory Build   Players=Zutritt Aktivieren Inventare Bauen   Spieler
+Add ruleset=Regelsatz hinzufügen
+Remove ruleset=Regelsatz entfernen
+
+#@1 will be replaced by @, to escape this character
+Players (separate with spaces, use @1a to address all)=Spieler (mit Leerzeichen trennen, @1a um alle zu wählen)
+Allow entering=Zutritt erlauben
+Allow right-clicking nodes=Aktivieren erlauben
+Allow modifying inventories=Inventare verändern erlauben
+Allow building=Bauen erlauben
+Save=Speichern
+behind all others=hinter alle anderen
+Double-click new position=Neue Position doppelklicken
+Double-click entry to delete=Zu löschenden Eintrag doppelklicken
+You are not allowed to do this!=Du darfst das nicht tun!
+PvP is not allowed here!=PvP ist hier nicht erlaubt!

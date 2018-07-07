@@ -1,43 +1,60 @@
 playtime = {}
 
-local storage = minetest.get_mod_storage()
-
 function playtime.get_current_playtime(name)
-  return os.time() - storage:get_int(name.."-join")
-end
-
---  Function to get playtime
-function playtime.get_total_playtime(name)
-  return storage:get_int(name) + playtime.get_current_playtime(name)
-end
-
-minetest.register_on_leaveplayer(function(player)
-  local name = player:get_player_name()
-  storage:set_int(name, storage:get_int(name) + (os.time() - storage:get_int(name.."-join")))
-end)
-
-minetest.register_on_joinplayer(function(player)
-  local name = player:get_player_name()
-  storage:set_int(name.."-join", os.time())
-end)
-
-local function SecondsToClock(seconds)
-  local seconds = tonumber(seconds)
-
-  if seconds <= 0 then
-    return "00:00:00";
-  else
-    hours = string.format("%02.f", math.floor(seconds/3600));
-    mins = string.format("%02.f", math.floor(seconds/60 - (hours*60)));
-    secs = string.format("%02.f", math.floor(seconds - hours*3600 - mins *60));
-    return hours..":"..mins..":"..secs
+  local currenttime = minetest.get_player_information(name).connection_uptime
+  if playtime then
+    return currenttime
+  else return 0
   end
 end
 
-minetest.register_chatcommand("playtime", {
-  params = "",
-  description = "Use it to get your own playtime!",
-  func = function(name)
-    minetest.chat_send_player(name, "Total: "..SecondsToClock(playtime.get_total_playtime(name)).." Current: "..SecondsToClock(playtime.get_current_playtime(name)))
-  end,
-})
+--  Load files
+local input = io.open(minetest.get_worldpath() .. "/playtime", "r")
+if input then
+	playtime.total = minetest.deserialize(input:read("*l"))
+	io.close(input)
+end
+
+--  Function to save times
+function playtime.save_times()
+	local output = io.open(minetest.get_worldpath() .. "/playtime", "w")
+	output:write(minetest.serialize(playtime.total))
+	io.close(output)
+end
+
+if not playtime.total then
+  playtime.total = {}
+  playtime.save_times()
+end
+
+--  Create player account if there is no.
+minetest.register_on_joinplayer(function(player)
+	local name = player:get_player_name()
+  if not playtime.total[name] then
+    playtime.total[name] = 0
+    playtime.save_times()
+  end
+end)
+
+--  Function to get playtime
+function playtime.get_total_playtime(name)
+  local totaltime = playtime.total[name]
+  if totaltime then
+    return totaltime
+  else return 0
+  end
+end
+
+--  Update playtime every second
+local timer = 0
+minetest.register_globalstep(function(dtime)
+	timer = timer + dtime;
+	if timer >= 1 then
+    for _,player in ipairs(minetest.get_connected_players()) do
+      local name = player:get_player_name()
+      playtime.total[name] = playtime.total[name] + 1
+    end
+    playtime.save_times()
+		timer = 0
+	end
+end)

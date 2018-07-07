@@ -5,8 +5,8 @@ player_lobby = {}
 death = {}
 areas={
   ["mesewars"] = {
-    [1] = {x=(-76), y=1158, z=154},
-    [2] = {x=266, y=948, z=(-169)}
+    [1] = {x=(-76), y=158, z=154},
+    [2] = {x=266, y=(-52), z=(-169)}
   },
   ["main"] = {
     [1] = {x=(-31), y=623, z=0},
@@ -24,9 +24,9 @@ areas={
     [1] = {x=10000, y=1900, z=10000},
     [2] = {x=(-10000), y=2900, z=(-10000)}
   },
-  ["survivalgames"] = {
-    [1] = {x=31000, y=-50, z=31000},
-    [2] = {x=(-31000), y=110, z=(-31000)}
+  ["ttt"] = {
+    [1] = {x=10000, y=1900, z=10000},
+    [2] = {x=(-10000), y=2900, z=(-10000)}
   }
 }
 
@@ -34,7 +34,6 @@ dofile(minetest.get_modpath("subgames") .."/spectator.lua")
 dofile(minetest.get_modpath("subgames") .."/hud.lua")
 dofile(minetest.get_modpath("subgames") .."/sfinv.lua")
 dofile(minetest.get_modpath("subgames") .."/functions.lua")
-dofile(minetest.get_modpath("subgames") .."/map.lua")
 
 --  Add a register on chat message
 subgames.on_chat_message = {}
@@ -221,11 +220,8 @@ function subgames.call_join_callbacks(player, lobby)
 end
 
 minetest.register_on_joinplayer(function(player)
-  player:set_properties({
-    visual_size = {x=1, y=1},
-    makes_footstep_sound = true,
-    collisionbox = {-0.3, -1, -0.3, 0.3, 1, 0.3}
-  })
+  subgames.spectate(player)
+  subgames.unspectate(player)
   minetest.chat_send_player(player:get_player_name(), minetest.get_server_status())
   subgames.call_join_callbacks(player, "main")
 end)
@@ -241,6 +237,7 @@ function subgames.call_leave_callbacks(player)
   for _,value in pairs(subgames.on_leaveplayer) do
     value(player, player_lobby[name])
   end
+  subgames.spectate(player)
   subgames.unspectate(player)
   player_lobby[name] = nil
 end
@@ -452,11 +449,14 @@ end
   Item clear fix!
   Try block while walking or special items
   maps from here https://minecraftmapsd.wixsite.com/minecraftmaps/packs
+  HELPGUID
   TODO skywars unendliche wasser quelle und blöcke
   TODO maps
   TODO may flowing liquid fix
   TODO no regen after time
+  TODO profiler
   TODO Skywars dias balanchen
+  TODO aduser
 Hide and seek map machen neue skywars submerged.
 may später shooter mod. TODO
 Mit server umleitung beschprechen.

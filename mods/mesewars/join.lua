@@ -5,15 +5,6 @@ subgames.register_on_joinplayer(function(name, lobby)
     local pname = name:get_player_name()
     name:setpos(spawn)
     subgames.chat_send_all_lobby("mesewars", "*** "..pname.." joined Mesewars.")
-    if map_must_create == true then
-      map_must_create = false
-      local param1 = "submese2"
-      local schem = minetest.get_worldpath() .. "/schems/" .. param1 .. ".mts"
-      local vm = minetest.get_voxel_manip()
-      vm:read_from_map(minetest.setting_get_pos("mappos1"), minetest.setting_get_pos("mappos2"))
-      minetest.place_schematic_on_vmanip(vm, schemp, schem)
-      vm:write_to_map()
-    end
     minetest.after(2, function()
       if player_lobby[pname] == "mesewars" then
         mesewars.color_tag(name)
@@ -32,6 +23,18 @@ subgames.register_on_joinplayer(function(name, lobby)
               mesewars.team_form(pname)
             end
             mesewars.win()
+            if map_must_create == true then
+              map_must_create = false
+              minetest.after(5, function()
+                minetest.chat_send_all("Creating Mesewars Map please don't leave!")
+                local param1 = "submese"
+                local schem = minetest.get_worldpath() .. "/schems/" .. param1 .. ".mts"
+                local vm = minetest.get_voxel_manip()
+                vm:read_from_map(minetest.setting_get_pos("mappos1"), minetest.setting_get_pos("mappos2"))
+                minetest.place_schematic_on_vmanip(vm, schemp, schem)
+                vm:write_to_map()
+              end)
+            end
           end
         end)
       end

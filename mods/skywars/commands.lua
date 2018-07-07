@@ -28,7 +28,7 @@ subgames.register_chatcommand("leave", {
 
 --  Add a command to let others leave.
 subgames.register_chatcommand("letleave", {
-	privs = {kick=true},
+	privs = {ban=true},
 	params = "<name>",
 	description = "Use it ...",
   lobby = "skywars",

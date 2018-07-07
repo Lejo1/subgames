@@ -28,7 +28,16 @@ end
 function subgames.decomma_pos(pos)
   return {x=round(pos.x), y=round(pos.y), z=round(pos.z)}
 end
-
+function SecondsToClock(seconds)
+  local seconds = tonumber(seconds)
+  if seconds <= 0 then
+    return "00:00";
+  else
+    local mins = string.format("%02.f", math.floor(seconds/60));
+    local secs = string.format("%02.f", math.floor(seconds - mins *60));
+    return mins..":"..secs
+  end
+end
 function is_inside_area(pos1, pos2, mainpos)
   if pos1.x < mainpos.x and mainpos.x < pos2.x or pos1.x > mainpos.x and mainpos.x > pos2.x then
     if pos1.y < mainpos.y and mainpos.y < pos2.y or pos1.y > mainpos.y and mainpos.y > pos2.y then

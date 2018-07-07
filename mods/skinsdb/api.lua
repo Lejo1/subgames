@@ -1,8 +1,6 @@
 -- get current skin
-local storage = minetest.get_mod_storage()
-
 function skins.get_player_skin(player)
-	local skin = storage:get_string(player:get_player_name())
+	local skin = player:get_attribute("skinsdb:skin_key")
 	return skins.get(skin) or skins.get(skins.default)
 end
 
@@ -19,13 +17,14 @@ function skins.assign_player_skin(player, skin)
 		return false
 	end
 
-	if skin_obj:is_applicable_for_player(player:get_player_name()) then
+	if skin_obj:is_applicable_for_player(player:get_player_name()) and not subgames_spectate[player:get_player_name()] then
 		local skin_key = skin_obj:get_key()
 		if skin_key == skins.default then
 			skin_key = ""
 		end
-		storage:set_string(player:get_player_name(), skin_key)
-	else return false
+		player:set_attribute("skinsdb:skin_key", skin_key)
+	else minetest.chat_send_player(player:get_player_name(), "You can't choose a skin while you are spectating.")
+		return false
 	end
 	return true
 end

@@ -1,6 +1,6 @@
 --  This is the file which manages the main lobby
 main = {}
-local mustcreate = true
+
 minetest.register_tool("main:teleporter", {
   description = "Teleporter",
 	inventory_image = "compass.png",
@@ -20,9 +20,9 @@ function main.create_teleporter_form()
   "image_button[2,0;2,2;hideandseek.png;hiddenseeker;"..#subgames.get_lobby_players("hiddenseeker").." players]" ..
   "tooltip[hiddenseeker;Hide and Seek!]" ..
   "item_image_button[0,2;2,2;bow:bow;skywars;"..#subgames.get_lobby_players("skywars").." players]" ..
-  "tooltip[skywars;Skywars!]" ..
-  "item_image_button[2,2;2,2;default:sword_steel;survivalgames;"..#subgames.get_lobby_players("survivalgames").." players]" ..
-  "tooltip[survivalgames;Survivalgames!]")
+  "tooltip[skywars;Skywars!] "..
+  "item_image_button[0,2;2,2;bow:bow;ttt;"..#subgames.get_lobby_players("ttt").." players]" ..
+  "tooltip[ttt;Troubek in Terrorist Town!]")
   return main.teleporter_form
 end
 
@@ -49,10 +49,9 @@ minetest.register_on_player_receive_fields(function(player, formname, pressed)
         subgames.change_lobby(player, "skywars")
       else minetest.chat_send_player(name, "Skywars is full!")
       end
-    elseif pressed.survivalgames then
-      if #subgames.get_lobby_players("survivalgames") < survivalgames.max_players* #survivalgames.lobbys then
-        subgames.change_lobby(player, "survivalgames")
-      else minetest.chat_send_player(name, "Ssurvivalgames is full!")
+    elseif pressed.ttt then
+      if #subgames.get_lobby_players("ttt") < ttt.max_players*#ttt.lobbys then
+        subgames.change_lobby(player, "ttt")
       end
     end
     minetest.close_formspec(name, "main:teleporter")
@@ -67,31 +66,15 @@ subgames.register_on_joinplayer(function(player, lobby)
     local inv = player:get_inventory()
     inv:add_item("main", "main:teleporter")
     sfinv.set_page(player, "subgames:lobbys")
-    local privs = minetest.get_player_privs(name)
-    privs.interact = true
-    minetest.set_player_privs(name, privs)
-    player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
-    if mustcreate == true then
-      mustcreate = false
-      local param1 = "mainlobby"
-      local schem = minetest.get_worldpath() .. "/schems/" .. param1 .. ".mts"
-      minetest.place_schematic({x=-24, y=601, z=7}, schem)
-    end
     minetest.after(1, function()
       if player:is_player_connected() and minetest.get_player_privs(name).shout then
         main.open_teleporter_form(player)
-	      subgames.clear_inv(player)
-	      local inv = player:get_inventory()
-    	  inv:add_item("main", "main:teleporter")
-   	    sfinv.set_page(player, "subgames:lobbys")
+	subgames.clear_inv(player)
+	local inv = player:get_inventory()
+    	inv:add_item("main", "main:teleporter")
+   	sfinv.set_page(player, "subgames:lobbys")
       end
     end)
-  end
-end)
-
-subgames.register_on_leaveplayer(function(player, lobby)
-  if lobby == "main" then
-    player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
   end
 end)
 
@@ -133,27 +116,11 @@ minetest.register_chatcommand("hub", {
   end,
 })
 
---  Add the lethub command
-minetest.register_chatcommand("lethub", {
-  privs = {kick=true},
-  params = "name",
-  description = "Use it to sent players in the main Lobby!",
-  func = function(name, param)
-    local player = minetest.get_player_by_name(param)
-    if player then
-      subgames.change_lobby(player, "main")
-      minetest.chat_send_player(name, "You have left the player "..param)
-    else minetest.chat_send_player(name, "The player is not online!")
-    end
-  end,
-})
-
 function minetest.get_server_status()
   local total = ""
   local skywars = ""
   local mesewars = ""
   local hiddenseeker = ""
-  local survivalgames = ""
   for name, subgame in pairs(player_lobby) do
     if total == "" then
       total = name
@@ -174,14 +141,9 @@ function minetest.get_server_status()
         skywars = name
       else skywars = skywars.. ", "..name
       end
-    elseif subgame == "survivalgames" then
-      if survivalgames == "" then
-        survivalgames = name
-      else survivalgames = survivalgames.. ", "..name
-      end
     end
   end
-   return "# Server: Total = {"..total.."} \n# Server: Mesewars = {"..mesewars.."} \n# Server: Hide and Seek = {"..hiddenseeker.."} \n# Server: Skywars = {"..skywars.."} \n# Server: Survivalgames = {"..survivalgames.."} \n# Server: "..minetest.setting_get("motd")
+   return "# Server: Total = {"..total.."} \n# Server: Mesewars = {"..mesewars.."} \n# Server: Hide and Seek = {"..hiddenseeker.."} \n# Server: Skywars = {"..skywars.."} \n# Server: "..minetest.setting_get("motd")
 end
 
 core.get_server_status = minetest.get_server_status
@@ -255,10 +217,4 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
    minetest.show_formspec(player:get_player_name(), "main:info", main.get_help_form(type))
   end
  end
-end)
-
-subgames.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage, lobby)
-  if lobby == "main" and player then
-    player:set_hp(player:get_hp()+damage)
-  end
 end)

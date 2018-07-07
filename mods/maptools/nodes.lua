@@ -54,7 +54,6 @@ minetest.register_node("maptools:playerclip", {
 	sunlight_propagates = true,
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
-	on_blast = function() end,
 })
 
 minetest.register_node("maptools:fake_walkable", {
@@ -306,7 +305,6 @@ minetest.register_node("maptools:damage_" .. damage_num, {
 	sunlight_propagates = true,
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
-	on_blast = function() end,
 })
 end
 
@@ -323,7 +321,6 @@ minetest.register_node("maptools:kill", {
 	sunlight_propagates = true,
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
-	on_blast = function() end,
 })
 
 minetest.register_node("maptools:smoke", {

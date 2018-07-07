@@ -4,12 +4,14 @@ local kits_register = {}
 local kits_all = {}
 
 local input = io.open(minetest.get_worldpath() .. "/hiddenseeker_kits", "r")
+
 if input then
 	local input2 = minetest.deserialize(input:read("*l"))
-	hiddenseeker.kits = input2
-	io.close(input)
+	if input2 then
+		hiddenseeker.kits = input2
+		io.close(input)
+	end
 end
-if not hiddenseeker.kits then hiddenseeker.kits = {} end
 
 function hiddenseeker.save_kits()
 	local output = io.open(minetest.get_worldpath() .. "/hiddenseeker_kits", "w")

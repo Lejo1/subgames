@@ -175,10 +175,7 @@ function mesewars.start_game()
   end
   local maxplayers = 1
   for _,nodepos in pairs(mapblocks) do
-    local pos = minetest.string_to_pos(nodepos)
-    if pos then
-      minetest.remove_node(pos)
-    end
+    minetest.remove_node(minetest.string_to_pos(nodepos))
   end
   mapblocks = {}
   minetest.clear_objects({mode="quick"})
@@ -266,6 +263,9 @@ function mesewars.start_game()
   spawner = true
   spawnfast = maxplayers
   starts = false
+  minetest.after(30, function()
+    mesewars.fix()
+  end)
 end
 
 local time_timer = 0
@@ -370,6 +370,8 @@ subgames.register_on_respawnplayer(function(player, lobby)
   else inv:add_item('main', 'mesewars:team')
     local spawn = minetest.setting_get_pos("spawn_lobby")
     player:setpos(spawn)
+    subgames.unspectate(player)
+    subgames.spectate(player)
     sfinv.set_page(player, "subgames:team")
   end
   mesewars.win()
@@ -514,4 +516,39 @@ function mesewars.win()
   win_player = ""
   win_team = {}
   rteam_count = 0
+end
+
+--  Add a fix function
+function mesewars.fix()
+  for _,player in ipairs(subgames.get_lobby_players("mesewars")) do
+     mesewars.color_tag(player)
+  end
+  for playernumb, playero in pairs(team1_players) do
+    local player = minetest.get_player_by_name(playero)
+    if player:is_player_connected() ~= true then
+      table.remove(team1_players, playernumb)
+      mesewars.win()
+    end
+  end
+  for playernumb, playero in pairs(team2_players) do
+    local player = minetest.get_player_by_name(playero)
+    if player:is_player_connected() ~= true then
+      table.remove(team2_players, playernumb)
+      mesewars.win()
+    end
+  end
+  for playernumb, playero in pairs(team3_players) do
+    local player = minetest.get_player_by_name(playero)
+    if player:is_player_connected() ~= true then
+      table.remove(team3_players, playernumb)
+      mesewars.win()
+    end
+  end
+  for playernumb, playero in pairs(team4_players) do
+    local player = minetest.get_player_by_name(playero)
+    if player:is_player_connected() ~= true then
+      table.remove(team4_players, playernumb)
+      mesewars.win()
+    end
+  end
 end

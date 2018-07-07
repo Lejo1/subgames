@@ -123,7 +123,6 @@ minetest.register_node("maptools:glass", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_glass_defaults(),
-	on_blast = function() end,
 })
 
 minetest.register_node("maptools:leaves", {

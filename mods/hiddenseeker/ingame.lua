@@ -1,17 +1,5 @@
 hiddenseeker.disguis = {}
 
-local function SecondsToClock(seconds)
-  local seconds = tonumber(seconds)
-
-  if seconds <= 0 then
-    return "00:00";
-  else
-    local mins = string.format("%02.f", math.floor(seconds/60));
-    local secs = string.format("%02.f", math.floor(seconds - mins *60));
-    return mins..":"..secs
-  end
-end
-
 local timer = 0
 minetest.register_globalstep(function(dtime)
 	timer = timer + dtime;
@@ -24,12 +12,12 @@ minetest.register_globalstep(function(dtime)
 					if ltable.hiddingtime <= 0 then
 						hiddenseeker.seek(lobby)
 						ltable.hidding = false
-					else for _,player in pairs(hiddenseeker.get_lobby_players(lobby)) do subgames.add_bothud(player, "Hidding time ends in "..SecondsToClock(ltable.hiddingtime), 0x0000FF, 1.1) end
+					else for _,player in pairs(hiddenseeker.get_lobby_players(lobby)) do subgames.add_bothud(player, "Hidding time ends in "..SecondsToClock(ltable.hiddingtime), 0x0000FF, 1) end
 					end
 				else ltable.timetowin = ltable.timetowin -1
 					if ltable.timetowin <= 0 then
 						hiddenseeker.win(lobby)
-					else for _,player in pairs(hiddenseeker.get_lobby_players(lobby)) do subgames.add_bothud(player, "Time until Hidders win "..SecondsToClock(ltable.timetowin), 0x0000FF, 1.1) end
+					else for _,player in pairs(hiddenseeker.get_lobby_players(lobby)) do subgames.add_bothud(player, "Time until Hidders win "..SecondsToClock(ltable.timetowin), 0x0000FF, 1) end
             if ltable.timetowin == 60 or ltable.timetowin == 120 or ltable.timetowin == 180 or ltable.timetowin == 240 or ltable.timetowin == 300 then
               for _,player in pairs(hiddenseeker.get_lobby_players(lobby)) do
                 local name = player:get_player_name()

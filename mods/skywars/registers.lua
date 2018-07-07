@@ -15,7 +15,8 @@ function skywars.create_teleporter_form()
     "image_button[0,0;2,2;tiki.jpg;map1;"..status[1].."]" ..
     "tooltip[map1;"..skywars.lobbys[1].string_name.."]" ..
     "image_button[2,0;2,2;submerged.png;map2;"..status[2].."]" ..
-    "tooltip[map2;"..skywars.lobbys[2].string_name.."]")
+    "tooltip[map2;"..skywars.lobbys[2].string_name.."]"..
+    "label[0,5;All maps from Hypixel.net]")
   return toreturn
 end
 

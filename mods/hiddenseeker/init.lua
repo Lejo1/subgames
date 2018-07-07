@@ -9,17 +9,17 @@ dofile(minetest.get_modpath("hiddenseeker") .."/commands.lua")
 hiddenseeker.lobbys = {
   [1] = {
     ["string_name"] = "Hide and Seek Karsthafen",
-    ["pos"] = {x=716, y=1012, z=732},
-    ["seekerpos"] = {x=705, y=1020.5, z=706},
+    ["pos"] = {x=716, y=12, z=732},
+    ["seekerpos"] = {x=705, y=20.5, z=706},
     ["blocks"] = {"default:bookshelf", "default:stone", "default:wood", "stairs:stair_junglewood", "default:junglewood", "default:steelblock", "stairs:stair_stone", "stairs:stair_wood"},
     ["ingame"] = false,
     ["players"] = {},
     ["hiddingtime"] = 0,
     ["timetowin"] = 0,
     ["hidding"] = false,
-    ["mustcreate"] = true,
+    ["mustcreate"] = false,
     ["schem"] = "hide1",
-    ["schempos"] = {x=700, y=1000, z=700}
+    ["schempos"] = {x=700, y=0, z=700}
   }
 }
 

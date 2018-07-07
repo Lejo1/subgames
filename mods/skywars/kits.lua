@@ -4,14 +4,14 @@ skywars_ability_form = {}
 local kits_all = {}
 local kits_register = {}
 
-
 local input = io.open(minetest.get_worldpath() .. "/skywars_kits", "r")
 if input then
 	local input2 = minetest.deserialize(input:read("*l"))
-	skywars.kits = input2
-	io.close(input)
+	if input2 then
+		skywars.kits = input2
+		io.close(input)
+	end
 end
-if not skywars.kits then skywars.kits = {} end
 
 function skywars.save_kits()
 	local output = io.open(minetest.get_worldpath() .. "/skywars_kits", "w")

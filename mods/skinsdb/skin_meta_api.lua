@@ -61,6 +61,12 @@ end
 
 function skin_class:set_skin(player)
 	player:set_properties({
+		visual_size = {
+			x = 1,
+			y = 1
+		}
+	})
+	player:set_properties({
 		textures = {self:get_texture()},
 	})
 end

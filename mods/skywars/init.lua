@@ -7,7 +7,6 @@ skywars.lobbys = {
     ["string_name"] = "Tiki",
     ["playercount"] = 12,
     ["players"] = {},
-    ["ingame"] = false,
     ["pos"] = {
       [1] = {x=1102, y=2036, z=40},
       [2] = {x=1095, y=2035, z=18},
@@ -73,16 +72,15 @@ skywars.lobbys = {
     ["specpos"] = {x=1058, y=2036, z=58},
     ["mustcreate"] = true,
     ["mapblocks"] = {},
-    ["mappos1"] = {x=999, y=1999, z=-1},
-    ["mappos2"] = {x=1119, y=2071, z=127},
+    ["mappos1"] = {x=1000, y=2000, z=0},
+    ["mappos2"] = {x=1118, y=2070, z=126},
     ["schem"] = "tiki",
-    ["schempos"] = {x=999, y=1999, z=-1}
+    ["schempos"] = {x=1000, y=2000, z=0}
   },
   [2] = {
     ["string_name"] = "Submerged",
     ["playercount"] = 12,
     ["players"] = {},
-    ["ingame"] = false,
     ["pos"] = {
       [1] = {x=11, y=2015, z=1035},
       [2] = {x=8, y=2015, z=1056},
@@ -150,10 +148,10 @@ skywars.lobbys = {
     ["specpos"] = {x=53, y=2016, z=1059},
     ["mustcreate"] = true,
     ["mapblocks"] = {},
-    ["mappos1"] = {x=-1, y=1999, z=999},
-    ["mappos2"] = {x=112, y=2039, z=1108},
+    ["mappos1"] = {x=0, y=1990, z=1000},
+    ["mappos2"] = {x=111, y=2042, z=1107},
     ["schem"] = "submerged",
-    ["schempos"] = {x=-1, y=1999, z=999}
+    ["schempos"] = {x=0, y=2000, z=1000}
   }
 }
 
@@ -185,11 +183,9 @@ end
 function skywars.join_game(player, lobby)
   local name = player:get_player_name()
   if #skywars.get_lobby_players(lobby) >= skywars.lobbys[lobby].playercount then
-    for newlobby,ldata in pairs(skywars.lobbys) do
-      if #skywars.get_lobby_players(newlobby) < ldata.playercount then
-        skywars.join_game(player, newlobby)
-        return "The lobby is full, so you joined the map "..ldata.string_name.."!"
-      end
+    local newlobby = #skywars.lobbys
+    if #skywars.get_lobby_players(newlobby) < skywars.lobbys[newlobby].playercount then
+      skywars.join_game(player, newlobby)
     end
     return "The lobby is full !"
   elseif skywars.lobbys[lobby].ingame == true then
@@ -231,7 +227,6 @@ function skywars.leave_game(player)
       local privs = minetest.get_player_privs(name)
       privs.craft = nil
       minetest.set_player_privs(name, privs)
-      subgames.add_bothud(player, "Teaming is not allowed!", 0xFF0000, 0)
     end
   end
 end

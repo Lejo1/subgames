@@ -1,51 +1,39 @@
 
 local start = {}
-
-local function start_countdown(lobby, time)
-  if not start[lobby] then
-    return -- Nothing to do, invalid call
-  end
-
-  local playercount = #hiddenseeker.get_lobby_players(lobby)
-  if playercount < 2 then
-    -- Abort: Too few players
-    start[lobby] = false
-    hiddenseeker.chat_send_all_lobby(lobby,
-      "Start sequence stopped: Not enough players.")
-    return
-  end
-
-  if time < 5 then
-    -- Start now
-    local msg = "Hide & Seek game starts now!"
-    hiddenseeker.chat_send_all_lobby(lobby,
-      core.colorize("red", msg))
-    for _,player in ipairs(hiddenseeker.get_lobby_players(lobby)) do
-      subgames.add_mithud(player, msg, 0xFF0000, 2)
-    end
-    hiddenseeker.start_game(lobby)
-    return
-  end
-
-  local msg = ("Game starts in %i seconds!"):format(time)
-  hiddenseeker.chat_send_all_lobby(lobby, msg)
-  for _,player in ipairs(hiddenseeker.get_lobby_players(lobby)) do
-    subgames.add_bothud(player, msg, 0xFFAE19, 2)
-  end
-  if time >= 5 then
-    -- Pseudo-recursive callbacks
-    minetest.after(5, start_countdown, lobby, time - 5)
-  end
-end
-
 function hiddenseeker.may_start_game(lobby)
   local playercount = #hiddenseeker.get_lobby_players(lobby)
-  if playercount >= 2 and not start[lobby] and lobby ~= 0 then
-    -- Require three players to start; one left over to stop
+  if playercount >=2 and not start[lobby] and lobby ~= 0 then
     start[lobby] = true
-    hiddenseeker.chat_send_all_lobby(0, "The game " ..
-      hiddenseeker.lobbys[lobby].string_name .. " is about to start soon!")
-    start_countdown(lobby, 15)
+    hiddenseeker.chat_send_all_lobby(0, "The Game "..hiddenseeker.lobbys[lobby].string_name.." is now starting.")
+    hiddenseeker.chat_send_all_lobby(lobby, "Game starts in 15 seconds!")
+    for _,player in ipairs(hiddenseeker.get_lobby_players(lobby)) do
+      subgames.add_bothud(player, "Game starts in 15 seconds!", 0xFFAE19, 2)
+    end
+    minetest.after(5, function()
+      hiddenseeker.chat_send_all_lobby(lobby, "Game starts in 10 seconds!")
+      for _,player in ipairs(hiddenseeker.get_lobby_players(lobby)) do
+        subgames.add_bothud(player, "Game starts in 10 seconds!", 0xFFAE19, 2)
+      end
+      minetest.after(5, function()
+        hiddenseeker.chat_send_all_lobby(lobby, "Game starts in 5 seconds!")
+        for _,player in ipairs(hiddenseeker.get_lobby_players(lobby)) do
+          subgames.add_bothud(player, "Game starts in 5 seconds!", 0xFFAE19, 2)
+        end
+        minetest.after(5, function()
+          playercount = #hiddenseeker.get_lobby_players(lobby)
+          if playercount >= 2 then
+            local msg = core.colorize("red", "Game Start now!")
+            hiddenseeker.chat_send_all_lobby(lobby, msg)
+            for _,player in ipairs(hiddenseeker.get_lobby_players(lobby)) do
+              subgames.add_mithud(player, "Game starts now!", 0xFF0000, 2)
+            end
+            hiddenseeker.start_game(lobby)
+          else start[lobby] = false
+            hiddenseeker.chat_send_all_lobby(lobby, "Game start stoped, becouse there are not enough players.")
+          end
+        end)
+      end)
+    end)
   end
 end
 
@@ -56,8 +44,7 @@ function hiddenseeker.start_game(lobby)
   if lobby == 0 then
     return
   end
-  local ldata = hiddenseeker.lobbys[lobby]
-  ldata.ingame = true
+  hiddenseeker.lobbys[lobby].ingame = true
   if playercount <= 5 then
     seekercount = 1
   else seekercount = 2
@@ -65,43 +52,40 @@ function hiddenseeker.start_game(lobby)
   while seekercount > 0 do
     local player = hiddenseeker.get_lobby_players(lobby)[math.random(#hiddenseeker.get_lobby_players(lobby))]
     local name = player:get_player_name()
-    if ldata.players[name] ~= "seeker" then
+    if hiddenseeker.lobbys[lobby].players[name] ~= "seeker" then
       seekercount = seekercount -1
-      ldata.players[name] = "seeker"
+      hiddenseeker.lobbys[lobby].players[name] = "seeker"
       minetest.chat_send_player(name, "You are a seeker, wait until the hidding time ends.")
       subgames.add_mithud(player, "You are seeker!", 0xFF0000, 3)
-      hiddenseeker.chat_send_all_lobby(lobby, name.." is seeker.")
-      player:set_pos(ldata.seekerpos)
+      hiddenseeker.chat_send_all_lobby(lobby, name.." is Seeker.")
+      player:setpos(hiddenseeker.lobbys[lobby].seekerpos)
     end
   end
-  for name in pairs(ldata.players) do
+  for name in pairs(hiddenseeker.lobbys[lobby].players) do
     local player = minetest.get_player_by_name(name)
-    if player then
-      player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
-      subgames.clear_inv(player)
-      if ldata.players[name] ~= "seeker" then
-        ldata.players[name] = hiddenseeker.get_player_block(name)
-        minetest.chat_send_player(name, "You are a hidder, hide quickly.")
-        subgames.add_mithud(player, "You are a hidder!", 0xFF0000, 3)
-        player:set_pos(ldata.pos)
-        local inv = player:get_inventory()
-        inv:add_item("main", ldata.players[name])
-        inv:add_item("main", "hiddenseeker:rotate")
-      end
+    player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
+    subgames.clear_inv(player)
+    if hiddenseeker.lobbys[lobby].players[name] ~= "seeker" then
+      hiddenseeker.lobbys[lobby].players[name] = hiddenseeker.get_player_block(name)
+      minetest.chat_send_player(name, "You are a hidder, hide quickly.")
+      subgames.add_mithud(player, "You are hidder!", 0xFF0000, 3)
+      player:setpos(hiddenseeker.lobbys[lobby].pos)
+      local inv = player:get_inventory()
+      inv:add_item("main", hiddenseeker.lobbys[lobby].players[name])
+      inv:add_item("main", "hiddenseeker:rotate")
     end
   end
-  ldata.hidding = true
-  ldata.hiddingtime = hiddenseeker.hiddingtime
+  hiddenseeker.lobbys[lobby].hidding = true
+  hiddenseeker.lobbys[lobby].hiddingtime = hiddenseeker.hiddingtime
 end
 
 function hiddenseeker.seek(lobby)
-  local ldata = hiddenseeker.lobbys[lobby]
-  ldata.timetowin = hiddenseeker.timetowin
+  hiddenseeker.lobbys[lobby].timetowin = hiddenseeker.timetowin
   for _, player in pairs(hiddenseeker.get_lobby_players(lobby)) do
     local name = player:get_player_name()
     local inv = player:get_inventory()
-    if ldata.players[name] == "seeker" then
-      player:set_pos(ldata.pos)
+    if hiddenseeker.lobbys[lobby].players[name] == "seeker" then
+      player:setpos(hiddenseeker.lobbys[lobby].pos)
       subgames.add_armor(player, ItemStack("3d_armor:helmet_cactus"), ItemStack("3d_armor:chestplate_cactus"), ItemStack("3d_armor:leggings_cactus"), ItemStack("3d_armor:boots_cactus"))
       inv:add_item("main", "default:sword_steel")
       minetest.after(5, function()
@@ -116,9 +100,8 @@ end
 
 function hiddenseeker.get_hidder_count(lobby)
   local hidder = 0
-  local ldata = hiddenseeker.lobbys[lobby]
   if lobby ~= 0 then
-    for name, role in pairs(ldata.players) do
+    for name, role in pairs(hiddenseeker.lobbys[lobby].players) do
       if role ~= "seeker" and role ~= true then
         hidder = hidder+1
       end
@@ -129,9 +112,8 @@ end
 
 function hiddenseeker.get_seeker_count(lobby)
   local seeker = 0
-  local ldata = hiddenseeker.lobbys[lobby]
   if lobby ~= 0 then
-    for name, role in pairs(ldata.players) do
+    for name, role in pairs(hiddenseeker.lobbys[lobby].players) do
       if role == "seeker" then
         seeker = seeker+1
       end
@@ -140,66 +122,75 @@ function hiddenseeker.get_seeker_count(lobby)
   return seeker
 end
 
-local function party_win_announce(party, lobby, ldata)
-  hiddenseeker.chat_send_all_lobby(lobby, party .. " win! Restart in 5 seconds.")
-  for _, player in ipairs(hiddenseeker.get_lobby_players(lobby)) do
-    player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
-    subgames.add_mithud(player, party .. " win!", 0xFF0000, 3)
-    if party ~= "Seekers" then
-      local name = player:get_player_name()
-      if ldata.players[name] ~= "seeker" and hiddenseeker.get_hidder_count(lobby) + hiddenseeker.get_seeker_count(lobby) > 1 then
-        money.set_money(name, money.get_money(name) + 30)
-        minetest.chat_send_player(name, "CoinSystem: You received 30 coins for winning!")
-      end
-    end
-  end
-  minetest.after(5, function()
-    for _, player in pairs(hiddenseeker.get_lobby_players(lobby)) do
-      subgames.clear_inv(player)
-      ldata.players[player:get_player_name()] = true
-      player:set_pos(ldata.pos)
-      sfinv.set_page(player, "subgames:kits")
-    end
-    hiddenseeker.win(lobby)
-  end)
-  ldata.ingame = false
-  ldata.hiddingtime = 0
-  ldata.timetowin = 0
-  ldata.hidding = false
-  start[lobby] = false
-end
-
 function hiddenseeker.win(lobby)
-  local ldata = hiddenseeker.lobbys[lobby]
-  if lobby == 0 or not ldata.ingame then
-    hiddenseeker.may_start_game(lobby)
-    return
-  end
-
+  if lobby ~= 0 and hiddenseeker.lobbys[lobby].ingame then
   local hidder = hiddenseeker.get_hidder_count(lobby)
   local seeker = hiddenseeker.get_seeker_count(lobby)
   if hidder == 0 then
-    party_win_announce("Seekers", lobby, ldata)
+    hiddenseeker.chat_send_all_lobby(lobby, "Seekers Win!")
+    hiddenseeker.chat_send_all_lobby(lobby, "Server Restarts in 5 sec.")
+    for _,player in ipairs(hiddenseeker.get_lobby_players(lobby)) do
+      player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
+      subgames.add_mithud(player, "Seekers Win!", 0xFF0000, 3)
+    end
+    minetest.after(5, function()
+      for _, player in pairs(hiddenseeker.get_lobby_players(lobby)) do
+        subgames.clear_inv(player)
+        hiddenseeker.lobbys[lobby].players[player:get_player_name()] = true
+        player:setpos(hiddenseeker.lobbys[lobby].pos)
+        sfinv.set_page(player, "subgames:kits")
+      end
+      hiddenseeker.win(lobby)
+    end)
+    hiddenseeker.lobbys[lobby].ingame = false
+    hiddenseeker.lobbys[lobby].hiddingtime = 0
+    hiddenseeker.lobbys[lobby].timetowin = 0
+    hiddenseeker.lobbys[lobby].hidding = false
+    start[lobby] = false
   elseif seeker == 0 and hidder >= 2 then
-    hiddenseeker.chat_send_all_lobby(lobby, "There are no seekers left over. Choosing a hidder to become a seeker...")
+    hiddenseeker.chat_send_all_lobby(lobby, "The seeker(s) left the Game so one hidder have to be chosen as a seeker.")
     local player = hiddenseeker.get_lobby_players(lobby)[math.random(#hiddenseeker.get_lobby_players(lobby))]
     local name = player:get_player_name()
     local inv = player:get_inventory()
     if hiddenseeker.disguis[name].enable then
       hiddenseeker.disguis_player(player)
     end
-    ldata.players[name] = "seeker"
+    hiddenseeker.lobbys[lobby].players[name] = "seeker"
     subgames.add_armor(player, ItemStack("3d_armor:helmet_cactus"), ItemStack("3d_armor:chestplate_cactus"), ItemStack("3d_armor:leggings_cactus"), ItemStack("3d_armor:boots_cactus"))
     inv:add_item("main", "default:sword_steel")
-    if ldata.hidding then
-      player:set_pos(ldata.seekerpos)
-    else
-	player:set_pos(ldata.pos)
+    if hiddenseeker.lobbys[lobby].hidding then
+      player:setpos(hiddenseeker.lobbys[lobby].seekerpos)
+    else player:setpos(hiddenseeker.lobbys[lobby].pos)
     end
     minetest.chat_send_player(name, "You have been chosen as the new seeker!")
     subgames.add_mithud(player, "You have been chosen as the new seeker!", 0x0000FF, 5)
     hiddenseeker.chat_send_all_lobby(lobby, name.." has been chosen as the new seeker!")
-  elseif ldata.timetowin <= 0 and not ldata.hidding or hidder + seeker <= 1 then
-    party_win_announce("Hidders", lobby, ldata)
+  elseif hiddenseeker.lobbys[lobby].timetowin <= 0 and not hiddenseeker.lobbys[lobby].hidding or hidder + seeker <= 1 then
+    hiddenseeker.chat_send_all_lobby(lobby, "Hidders win!")
+    for _,player in ipairs(hiddenseeker.get_lobby_players(lobby)) do
+      local name = player:get_player_name()
+      if hiddenseeker.lobbys[lobby].players[name] ~= "seeker" and hidder + seeker > 1 then
+        money.set_money(name, money.get_money(name)+30)
+        minetest.chat_send_player(name, "CoinSystem: You have receive 30 Coins for Winning!")
+      end
+      player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
+      subgames.add_mithud(player, "Hidders Win!", 0xFF0000, 3)
+    end
+    minetest.after(5, function()
+      for _, player in pairs(hiddenseeker.get_lobby_players(lobby)) do
+        subgames.clear_inv(player)
+        hiddenseeker.lobbys[lobby].players[player:get_player_name()] = true
+        player:setpos(hiddenseeker.lobbys[lobby].pos)
+        sfinv.set_page(player, "subgames:kits")
+      end
+      hiddenseeker.win(lobby)
+    end)
+    hiddenseeker.lobbys[lobby].ingame = false
+    hiddenseeker.lobbys[lobby].hiddingtime = 0
+    hiddenseeker.lobbys[lobby].timetowin = 0
+    hiddenseeker.lobbys[lobby].hidding = false
+    start[lobby] = false
+  end
+  else hiddenseeker.may_start_game(lobby)
   end
 end

@@ -1275,7 +1275,7 @@ minetest.register_node("default:grass_1", {
 		type = "fixed",
 		fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, -5 / 16, 6 / 16},
 	},
-	drop = "",
+
 	on_place = function(itemstack, placer, pointed_thing)
 		-- place a random grass node
 		local stack = ItemStack("default:grass_" .. math.random(1,5))

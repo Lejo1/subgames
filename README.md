@@ -16,13 +16,13 @@ License
 -------
 
 Created by [Lejo](https://github.com/Lejo1)
+Code: LGPL 2.1 or later
 Textures: CC-BY-SA 3.0
-Code(except the Mods: subgames, skywars, hiddenseeker, mesewars, main, build, survivalgames): LGPL 2.1 or later
 
-For the Mods: subgames, skywars, hiddenseeker, mesewars, main, build, survivalgames:
+For the Mods: Subgames, Skywars, Hiddenseeker, Mesewars, Main, Build:
 
-You are not allowed to distribute any copy or work based on this programm unless the copyright holder declares his consent.
-You are not allowed to use this mods on a public server.
+You are not allowed to distribute any copy or work based on this programm unless the copyright
+holder declares his consent.
 THE SOFTWARE IS PROVIDED WITHOUT WARRANTY OF ANY KIND!
 
 

@@ -68,7 +68,6 @@ function skywars.start_game(lobby)
     local privs = minetest.get_player_privs(name)
     privs.craft = true
     minetest.set_player_privs(name, privs)
-    subgames.add_bothud(player, "Teaming is not allowed!", 0xFF0000, 100000)
   end
 end
 
@@ -101,16 +100,14 @@ function skywars.win(lobby)
       end
       minetest.after(5, function()
         for _, player in pairs(skywars.get_lobby_players(lobby)) do
-          local name = player:get_player_name()
           player:setpos(skywars.lobbys[lobby].specpos)
           subgames.clear_inv(player)
           subgames.unspectate(player)
-          skywars.lobbys[lobby].players[name] = true
+          skywars.lobbys[lobby].players[player:get_player_name()] = true
           sfinv.set_page(player, "subgames:maps")
           local privs = minetest.get_player_privs(name)
           privs.craft = nil
           minetest.set_player_privs(name, privs)
-          subgames.add_bothud(player, "Teaming is not allowed!", 0xFF0000, 0)
         end
         skywars.reset_map(lobby)
         skywars.win(lobby)

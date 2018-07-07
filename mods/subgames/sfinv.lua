@@ -1,32 +1,5 @@
 --  Here are all sfinv pages controlled.
 
-sfinv.register_page("sfinv:crafting", {
-	title = "Crafting",
-	get = function(self, player, context)
-		return sfinv.make_formspec(player, context, [[
-				list[current_player;craft;1.75,0.5;3,3;]
-				list[current_player;craftpreview;5.75,1.5;1,1;]
-				image[4.75,1.5;1,1;gui_furnace_arrow_bg.png^[transformR270]
-				listring[current_player;main]
-				listring[current_player;craft]
-				image[0,4.75;1,1;gui_hb_bg.png]
-				image[1,4.75;1,1;gui_hb_bg.png]
-				image[2,4.75;1,1;gui_hb_bg.png]
-				image[3,4.75;1,1;gui_hb_bg.png]
-				image[4,4.75;1,1;gui_hb_bg.png]
-				image[5,4.75;1,1;gui_hb_bg.png]
-				image[6,4.75;1,1;gui_hb_bg.png]
-				image[7,4.75;1,1;gui_hb_bg.png]
-			]], true)
-	end,
-	is_in_nav = function(self, player, context)
-		local name = player:get_player_name()
-    if minetest.get_player_privs(name).craft then
-			return true
-		end
-	end
-})
-
 --  Add a sfinv page for the team selector
 sfinv.register_page("subgames:team", {
 	title = "Teams",
@@ -119,9 +92,6 @@ sfinv.register_page("subgames:kits", {
 		elseif player_lobby[name] == "hiddenseeker" then
 			hiddenseeker.create_kit_form(name)
 			return sfinv.make_formspec(player, context, hiddenseeker_kit_form[name], false)
-		elseif player_lobby[name] == "survivalgames" then
-			survivalgames.create_kit_form(name)
-			return sfinv.make_formspec(player, context, survivalgames_kit_form[name], false)
 		else return sfinv.make_formspec(player, context, (
 			"size[8,9]" ..
 			"label[0,0;Kits are not available here!]"
@@ -148,7 +118,6 @@ sfinv.register_page("subgames:kits", {
     end
 		skywars.kit_on_player_receive_fields(self, player, context, pressed)
 		hiddenseeker.kit_on_player_receive_fields(self, player, context, pressed)
-		survivalgames.kit_on_player_receive_fields(self, player, context, pressed)
 	end,
 	is_in_nav = function(self, player, context)
 		local name = player:get_player_name()
@@ -250,8 +219,6 @@ sfinv.register_page("subgames:lobbys", {
       subgames.change_lobby(player, "hiddenseeker")
 		elseif pressed.skywars then
       subgames.change_lobby(player, "skywars")
-		elseif pressed.survivalgames then
-      subgames.change_lobby(player, "survivalgames")
     end
     minetest.close_formspec(name, "")
 	end,
