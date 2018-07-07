@@ -1,0 +1,4 @@
+sfinv
+mesewars
+3d_armor
+subgames
