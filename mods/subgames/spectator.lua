@@ -89,3 +89,34 @@ function subgames.add_armor(player, stack1, stack2, stack3, stack4, stack5)
   end
   armor:set_player_armor(player)
 end
+
+minetest.register_chatcommand("spectate", {
+  params = "<name>",
+  description = "Use it to get the Lobby where a player is.",
+  privs = {ban=true},
+  func = function(user, param)
+    local player = minetest.get_player_by_name(param)
+    if player then
+      local privs = minetest.get_player_privs(param)
+    else minetest.chat_send_player(user, "The player is not online")
+    end
+  end,
+})
+
+minetest.register_chatcommand("unspectate", {
+  params = "<name>",
+  description = "Use it to get the Lobby where a player is.",
+  privs = {ban=true},
+  func = function(user, param)
+    local player = minetest.get_player_by_name(param)
+    if player then
+      local privs =
+      privs.interact = true
+      privs.fly = nil
+      privs.fast = nil
+      privs.noclip = nil
+      minetest.set_player_privs(param, privs)
+    else minetest.chat_send_player(user, "The player is not online")
+    end
+  end,
+})
