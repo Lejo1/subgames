@@ -110,7 +110,7 @@ minetest.register_chatcommand("unspectate", {
   func = function(user, param)
     local player = minetest.get_player_by_name(param)
     if player then
-      local privs =
+      local privs = {}
       privs.interact = true
       privs.fly = nil
       privs.fast = nil
