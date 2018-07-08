@@ -9,13 +9,15 @@ local ESC = minetest.formspec_escape
 local function make_list(filter)
 	filter = filter or ""
 	local list, n, dropped = { }, 0, false
-	for k in pairs(minetest.auth_table) do
-		if strfind(k, filter, 1, true) then
-			if n >= MAXLISTSIZE then
-				dropped = true
-				break
+	for _, e in ipairs(xban.db) do
+		for name in pairs(e.names) do
+			if strfind(name, filter, 1, true) then
+				if n >= MAXLISTSIZE then
+					dropped = true
+					break
+				end
+				n=n+1 list[n] = name
 			end
-			n=n+1 list[n] = k
 		end
 	end
 	table.sort(list)
