@@ -34,7 +34,7 @@ subgames.register_chatcommand("letleave", {
   lobby = "skywars",
 	func = function(name, param)
     local player = minetest.get_player_by_name(param)
-		if player then
+		if player and player_lobby[param] == "skywars" then
       local lobby = skywars.player_lobby[param]
       skywars.leave_game(player)
       skywars.win(lobby)

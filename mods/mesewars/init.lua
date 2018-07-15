@@ -139,7 +139,7 @@ subgames.register_chatcommand("letleave", {
   lobby = "mesewars",
 	func = function(name, param)
     local player = minetest.get_player_by_name(param)
-		if player then
+		if player and player_lobby[param] == "mesewars" then
       mesewars.to_lobby(player)
       mesewars.leave_pre_player(param)
       minetest.chat_send_player(name, "You have left the player "..param)

@@ -33,7 +33,7 @@ subgames.register_chatcommand("letleave", {
   lobby = "hiddenseeker",
 	func = function(name, param)
     local player = minetest.get_player_by_name(param)
-		if player then
+		if player and player_lobby[param] == "hiddenseeker" then
       hiddenseeker.leave_game(player)
       hiddenseeker.win(hiddenseeker.player_lobby[param])
       hiddenseeker.join_game(player, hiddenseeker.player_lobby[param])
