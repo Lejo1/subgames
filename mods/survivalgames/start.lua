@@ -50,7 +50,7 @@ function survivalgames.start_game(lobby)
   local players = survivalgames.get_lobby_players(lobby)
   local playercount = #players
   local ldata = survivalgames.lobbys[lobby]
-  local middle = {x=ldata.pos.x, y=150, z=ldata.pos.z}
+  local middle = {x=ldata.pos.x, y=140, z=ldata.pos.z}
   local node = minetest.get_node(middle)
   while (node.name == "air" or node.name == "ignore") and middle.y > -50 do
     middle.y = middle.y -1
