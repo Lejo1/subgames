@@ -304,7 +304,7 @@ subgames.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
     local toteam = mesewars.get_team(to)
     local fromteam = mesewars.get_team(from)
     if fromteam == toteam then
-      player:set_hp(player:get_hp()+damage)
+      return true
     else mesewars.handle_hit(player, hitter, time_from_last_punch)
     end
   end

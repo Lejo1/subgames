@@ -130,7 +130,7 @@ subgames.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
       return
     end
     if plobby == 0 or hiddenseeker.lobbys[plobby].players[name] == hiddenseeker.lobbys[plobby].players[hitname] or hiddenseeker.lobbys[plobby].players[name] ~= "seeker" and hiddenseeker.lobbys[plobby].players[hitname] ~= "seeker" or not hiddenseeker.lobbys[plobby].ingame then
-      player:set_hp(player:get_hp()+damage)
+      return true
     end
   end
 end)

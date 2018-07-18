@@ -130,7 +130,7 @@ subgames.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
     local name = player:get_player_name()
     local plobby = skywars.player_lobby[name]
     if plobby == 0 or not skywars.lobbys[plobby].ingame then
-      player:set_hp(player:get_hp()+damage)
+      return true
     end
   end
 end)

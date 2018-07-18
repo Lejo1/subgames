@@ -139,7 +139,7 @@ subgames.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
       return
     end
     if not survivalgames.lobbys[plobby].ingame or survivalgames.lobbys[plobby].protection then
-      player:set_hp(player:get_hp()+damage)
+      return true
     else survivalgames.handle_hit(player, hitter, time_from_last_punch)
     end
   end

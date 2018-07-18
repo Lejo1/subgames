@@ -192,11 +192,15 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
   if player and hitter then
     local name = player:get_player_name()
     local killname = hitter:get_player_name()
+    local to_return = nil
     if player_lobby[name] == player_lobby[killname] then
       for _, func in pairs(subgames.on_punchplayer) do
-        func(player, hitter, time_from_last_punch, tool_capabilities, dir, damage, player_lobby[name])
+        if func(player, hitter, time_from_last_punch, tool_capabilities, dir, damage, player_lobby[name]) then
+          to_return = true
+        end
       end
     end
+    return to_return
   end
 end)
 
