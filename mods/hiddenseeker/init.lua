@@ -135,6 +135,12 @@ subgames.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
   end
 end)
 
+subgames.register_on_dignode(function(pos, oldnode, digger, lobby)
+  if lobby == "hiddenseeker" then
+    minetest.set_node(pos, oldnode)
+  end
+end)
+
 function hiddenseeker.chat_send_all_lobby(lobby, msg)
   for _,player in pairs(hiddenseeker.get_lobby_players(lobby)) do
     local name = player:get_player_name()

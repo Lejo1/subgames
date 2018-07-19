@@ -259,6 +259,6 @@ end)
 
 subgames.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage, lobby)
   if lobby == "main" and player then
-    player:set_hp(player:get_hp()+damage)
+    return true
   end
 end)
