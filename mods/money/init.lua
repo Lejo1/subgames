@@ -8,10 +8,12 @@ dofile(minetest.get_modpath("money") .. "/settings.txt") --Loading settings.
 --Loading accounts
 local accounts = {}
 local input = io.open(minetest.get_worldpath() .. "/accounts", "r")
-while not input do end
-input = minetest.deserialize(input:read("*l"))
-while not input do end
-accounts = input
+if input then
+	input2 = minetest.deserialize(input:read("*l"))
+	if input2 then
+		accounts = input2
+	end
+end
 io.close(input)
 --End
 
