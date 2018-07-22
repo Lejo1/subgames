@@ -12,7 +12,7 @@ money = {}
 function money.save_accounts()
 end
 function money.set_money(name, amount)
-	storage:set_int(name, amount)
+	storage:set_int(name, amount - INITIAL_MONEY)
 end
 function money.get_money(name)
 	return storage:get_int(name) + INITIAL_MONEY
