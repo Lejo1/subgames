@@ -1,46 +1,24 @@
 --[[
 	Mod by kotolegokot
 	Version 2012.8.12.0
+	Modifyed by Lejo
 ]]
 
 dofile(minetest.get_modpath("money") .. "/settings.txt") --Loading settings.
-
---Loading accounts
-local accounts = {}
-local input = io.open(minetest.get_worldpath() .. "/accounts", "r")
-if input then
-	accounts = minetest.deserialize(input:read("*l"))
-	io.close(input)
-end
---End
+local storage = minetest.get_mod_storage()
 
 --Global functions.
 money = {}
 function money.save_accounts()
-	local output = io.open(minetest.get_worldpath() .. "/accounts", "w")
-	output:write(minetest.serialize(accounts))
-	io.close(output)
 end
 function money.set_money(name, amount)
-	accounts[name].money = amount
-	money.save_accounts()
+	storage:set_int(name, amount - INITIAL_MONEY)
 end
 function money.get_money(name)
-	return accounts[name].money
-end
-function money.freeze(name)
-	accounts[name].frozen = true
-	money.save_accounts()
-end
-function money.unfreeze(name)
-	accounts[name].frozen = false
-	money.save_accounts()
-end
-function money.is_frozen(name)
-	return accounts[name].frozen or false
+	return storage:get_int(name) + INITIAL_MONEY
 end
 function money.exist(name)
-	return accounts[name] ~= nil
+	return true
 end
 --End.
 
@@ -48,34 +26,13 @@ end
 local save_accounts = money.save_accounts
 local set_money = money.set_money
 local get_money = money.get_money
-local freeze = money.freeze
-local unfreeze = money.unfreeze
-local is_frozen = money.is_frozen
 local exist = money.exist
 --End.
 
---Creates player's account, if the player doesn't have it.
-minetest.register_on_joinplayer(function(player)
-	name = player:get_player_name()
-	if not exist(name) then
-		local input = io.open(minetest.get_worldpath() .. "/money_" .. name .. ".txt") --For compatible with old versions.
-		if input then
-			local n = input:read("*n")
-			io.close(input)
-			accounts[name] = {money = n}
-			os.remove(minetest.get_worldpath() .. "/money_" .. name .. ".txt")
-			save_accounts()
-		else
-			accounts[name] = {money = INITIAL_MONEY}
-		end
-	end
-end)
---End.
-	
 --Registration privileges.
 minetest.register_privilege("money", "Can use /money [pay <account> <amount>] command")
 minetest.register_privilege("money_admin", {
-	description = "Can use /money <account> | freeze/unfreeze <account> | take/set/inc/dec <account> <amount>",
+	description = "Can use /money <account> | take/set/inc/dec <account> <amount>",
 	give_to_singleplayer = false,
 })
 --End.
@@ -83,15 +40,12 @@ minetest.register_privilege("money_admin", {
 --Registration "money" command.
 minetest.register_chatcommand("money", {
 	privs = {money=true},
-	params = "[<account> | freeze/unfreeze <account> | pay/take/set/inc/dec <account> <amount>]",
+	params = "[<account> | pay/take/set/inc/dec <account> <amount>]",
 	description = "Operations with money",
 	func = function(name,  param)
 		if param == "" then --/money
 			minetest.chat_send_player(name, "Account " .. name .. ":")
 			minetest.chat_send_player(name, "  money: " .. CURRENCY_PREFIX .. get_money(name) .. CURRENCY_POSTFIX .. ";")
-			local is_f = "no"
-			if is_frozen(name) then is_f = "yes" end
-			minetest.chat_send_player(name, "  is frozen: " .. is_f .. ".")
 			return true
 		end
 		local m = string.split(param, " ")
@@ -101,9 +55,6 @@ minetest.register_chatcommand("money", {
 				if exist(param1) then
 					minetest.chat_send_player(name, "Account " .. param1 .. ":")
 					minetest.chat_send_player(name, "  money: " .. CURRENCY_PREFIX .. get_money(param1) .. CURRENCY_POSTFIX .. ";")
-					local is_f = "no"
-					if is_frozen(name) then is_f = "yes" end
-					minetest.chat_send_player(name, "  is frozen: " .. is_f .. ".")
 				else
 					minetest.chat_send_player(name, "\"" .. param1 .. "\" account don't exist.")
 				end
@@ -112,35 +63,15 @@ minetest.register_chatcommand("money", {
 			end
 			return true
 		end
-		if param1 and param2 and not param3 then --/money freeze/unfreeze <account>
-			if param1 == "freeze" or param1 == "unfreeze" then
-				if minetest.get_player_privs(name)["money_admin"] then
-					if exist(param2) then
-						if param1 == "freeze" then
-							freeze(param2)
-							minetest.chat_send_player(name, "\"" .. param2 .. "\" account is frozen.")
-						else
-							unfreeze(param2)
-							minetest.chat_send_player(name, "\"" .. param2 .. "\" account isn't frozen.")
-						end
-					else
-						minetest.chat_send_player(name, "\"" .. param2 .. "\" account don't exist.")
-					end
-					return true
-				else
-					minetest.chat_send_player(name, "You don't have permission to run this command (missing privileges: money_admin)")
-				end
-			end
-		end
 		if param1 and param2 and param3 then --/money pay/take/set/inc/dec <account> <amount>
 			if param1 == "pay" or param1 == "take" or param1 == "set" or param1 == "inc" or param1 == "dec" then
-				if exist(param2) then				
+				if exist(param2) then
 					if tonumber(param3) then
 						if tonumber(param3) >= 0 then
 							param3 = tonumber(param3)
 							if param1 == "pay" then
-								if not is_frozen(name) then
-									if not is_frozen(param2) then
+								if not false then
+									if not false then
 										if get_money(name) >= param3 then
 											set_money(param2, get_money(param2) + param3)
 											set_money(name, get_money(name) - param3)
@@ -149,18 +80,11 @@ minetest.register_chatcommand("money", {
 										else
 											minetest.chat_send_player(name, "You don't have enough " .. CURRENCY_PREFIX .. amount - get_money(name) .. CURRENCY_POSTFIX .. ".")
 										end
-									else
-										minetest.chat_send_player(name, "\"" .. param2 .. "\" account is frozen.")
 									end
-								else
-									minetest.chat_send_player(name, "Your account is frozen.")
-								end	
+								end
 								return true
 							end
 							if minetest.get_player_privs(name)["money_admin"] then
-								if is_frozen(param2) then
-									minetest.chat_send_player(name, "Note: \"" .. param2 .. "\" account is frozen.")
-								end
 								if param1 == "take" then
 									if get_money(param2) >= param3 then
 										set_money(param2, get_money(param2) - param3)
@@ -376,7 +300,7 @@ minetest.register_node("money:shop", {
 				minetest.chat_send_player(sender_name, "In the shop is not enough space.")
 				return true
 			elseif get_money(meta:get_string("owner")) - meta:get_string("costsell") < 0 then
-				minetest.chat_send_player(sender_name, "The buyer is not enough money.") 
+				minetest.chat_send_player(sender_name, "The buyer is not enough money.")
 				return true
 			end
 			set_money(sender_name, get_money(sender_name) + meta:get_string("costsell"))
@@ -520,7 +444,7 @@ minetest.register_node("money:barter_shop", {
 	end,
 })
 --End.
-	
+
 minetest.register_craft({--Barter shop recipe.
 	output = "money:barter_shop",
 	recipe = {
