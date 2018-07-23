@@ -225,12 +225,19 @@ function subgames.call_join_callbacks(player, lobby)
 end
 
 minetest.register_on_joinplayer(function(player)
+  local name = player:get_player_name()
   player:set_properties({
     visual_size = {x=1, y=1},
     makes_footstep_sound = true,
     collisionbox = {-0.3, -1, -0.3, 0.3, 1, 0.3}
   })
-  minetest.chat_send_player(player:get_player_name(), minetest.get_server_status())
+  local privs = minetest.get_player_privs(name)
+  privs.interact = true
+  privs.fly = nil
+  privs.fast = nil
+  privs.noclip = nil
+  minetest.set_player_privs(name, privs)
+  minetest.chat_send_player(name, minetest.get_server_status())
   subgames.call_join_callbacks(player, "main")
 end)
 
