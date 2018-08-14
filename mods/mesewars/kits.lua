@@ -42,7 +42,6 @@ function mesewars.save_kits(name)
 	if not name then
 		table_to_modstorage(storage, kits)
 	else table_to_modstorage(storage, kits[name], name)
-		minetest.log("error", dump(kits[name]))
 	end
 end
 
