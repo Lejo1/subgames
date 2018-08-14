@@ -1,19 +1,19 @@
 hiddenseeker_kit_form = {}
-hiddenseeker.kits = {}
+hiddenseeker_kits = {}
 local kits_register = {}
 local kits_all = {}
 
 local input = io.open(minetest.get_worldpath() .. "/hiddenseeker_kits", "r")
 if input then
 	local input2 = minetest.deserialize(input:read("*l"))
-	hiddenseeker.kits = input2
+	hiddenseeker_kits = input2
 	io.close(input)
 end
-if not hiddenseeker.kits then hiddenseeker.kits = {} end
+if not hiddenseeker_kits then hiddenseeker_kits = {} end
 
 function hiddenseeker.save_kits()
 	local output = io.open(minetest.get_worldpath() .. "/hiddenseeker_kits", "w")
-	output:write(minetest.serialize(hiddenseeker.kits))
+	output:write(minetest.serialize(hiddenseeker_kits))
 	io.close(output)
 end
 
@@ -25,19 +25,19 @@ end)
 subgames.register_on_joinplayer(function(player, lobby)
 	if lobby == "hiddenseeker" then
 	  local name = player:get_player_name()
-	  if not hiddenseeker.kits[name] then
-			hiddenseeker.kits[name] = {kit = {"Random"}, selected = {"Random"}}
+	  if not hiddenseeker_kits[name] then
+			hiddenseeker_kits[name] = {kit = {"Random"}, selected = {"Random"}}
     	hiddenseeker.save_kits()
 		end
-		if not hiddenseeker.kits[name].abilitys then
-			hiddenseeker.kits[name].abilitys = {}
+		if not hiddenseeker_kits[name].abilitys then
+			hiddenseeker_kits[name].abilitys = {}
 		end
 	  hiddenseeker.save_kits()
 	end
 end)
 
 function hiddenseeker.get_player_kits(name)
-  return hiddenseeker.kits[name].kit
+  return hiddenseeker_kits[name].kit
 end
 
 function hiddenseeker.register_kit(kitname, def)
@@ -48,11 +48,11 @@ end
 
 function hiddenseeker.add_player_kits(name, kitname)
   local def = kits_register[kitname]
-	local inserter = hiddenseeker.kits[name].kit
+	local inserter = hiddenseeker_kits[name].kit
   if def and money.get_money(name) >= def.cost then
-    if hiddenseeker.kits[name].kit == "" or not table.contains(hiddenseeker.kits[name].kit, kitname) == true then
+    if hiddenseeker_kits[name].kit == "" or not table.contains(hiddenseeker_kits[name].kit, kitname) == true then
       money.set_money(name, money.get_money(name)-def.cost)
-			table.insert(hiddenseeker.kits[name].kit, kitname)
+			table.insert(hiddenseeker_kits[name].kit, kitname)
 			hiddenseeker.save_kits()
       minetest.chat_send_player(name, "You have buyed the Block " ..kitname.."!")
     else minetest.chat_send_player(name, "You already have buyed this Block!")
@@ -62,8 +62,8 @@ function hiddenseeker.add_player_kits(name, kitname)
 end
 
 function hiddenseeker.set_player_kit(name, kitname)
-  if kitname ~= "" and hiddenseeker.kits[name].kit ~= "" and table.contains(hiddenseeker.kits[name].kit, kitname) then
-    hiddenseeker.kits[name].selected = kitname
+  if kitname ~= "" and hiddenseeker_kits[name].kit ~= "" and table.contains(hiddenseeker_kits[name].kit, kitname) then
+    hiddenseeker_kits[name].selected = kitname
   elseif kitname ~= "" then
 		minetest.chat_send_player(name, "You don't have this Block!")
   end
@@ -74,41 +74,41 @@ function hiddenseeker.create_kit_form(name)
   local selected_id = 1
 	local selected_buyid = 0
 	local defitems = ""
-	if not hiddenseeker.kits[name] then return end
-	if type(hiddenseeker.kits[name].kit) == "table" and #hiddenseeker.kits[name].kit >= 1 then
-  	for kitnumb,kitname in ipairs(hiddenseeker.kits[name].kit) do
-    	if kitname == hiddenseeker.kits[name].selected then
+	if not hiddenseeker_kits[name] then return end
+	if type(hiddenseeker_kits[name].kit) == "table" and #hiddenseeker_kits[name].kit >= 1 then
+  	for kitnumb,kitname in ipairs(hiddenseeker_kits[name].kit) do
+    	if kitname == hiddenseeker_kits[name].selected then
       	selected_id = kitnumb
     	end
   	end
 	end
-	if hiddenseeker.kits[name].buying then
+	if hiddenseeker_kits[name].buying then
   	for kitnumb, kitname in ipairs(kits_all) do
-    	if kitname == hiddenseeker.kits[name].buying then
+    	if kitname == hiddenseeker_kits[name].buying then
       	selected_buyid = kitnumb
     	end
   	end
 	end
-	if kits_register[hiddenseeker.kits[name].selected] then
-		local def = kits_register[hiddenseeker.kits[name].selected]
+	if kits_register[hiddenseeker_kits[name].selected] then
+		local def = kits_register[hiddenseeker_kits[name].selected]
 		if def.items then
 			defitems = def.items
 		end
 	end
 	local costbuy = ""
-	if hiddenseeker.kits[name].buying then
-		local costbuyb = kits_register[hiddenseeker.kits[name].buying]
+	if hiddenseeker_kits[name].buying then
+		local costbuyb = kits_register[hiddenseeker_kits[name].buying]
 		costbuy = costbuyb.cost
 	end
 	local itembuy = ""
-	if hiddenseeker.kits[name].buying then
-		local itembuyb = kits_register[hiddenseeker.kits[name].buying]
+	if hiddenseeker_kits[name].buying then
+		local itembuyb = kits_register[hiddenseeker_kits[name].buying]
 		itembuy = itembuyb.items
 	end
   hiddenseeker_kit_form[name] = (
   	"size[8,9]" ..
   	"label[0,0;Select your Block you want to be in the next round!]" ..
-  	"dropdown[0,0.5;8,1.5;blocklist;"..subgames.concatornil(hiddenseeker.kits[name].kit)..";"..selected_id.."]" ..
+  	"dropdown[0,0.5;8,1.5;blocklist;"..subgames.concatornil(hiddenseeker_kits[name].kit)..";"..selected_id.."]" ..
 		"label[0,1.5;Block: "..subgames.concatornil(defitems).." ]" ..
 		"label[0,2.5;Here you can buy your Block!]" ..
 		"label[0,3;Your money: "..money.get_money(name).." Coins]" ..
@@ -137,15 +137,15 @@ function hiddenseeker.kit_on_player_receive_fields(self, player, context, presse
 	local name = player:get_player_name()
 	if player_lobby[name] == "hiddenseeker" then
 		if pressed.buyblock then
-			if hiddenseeker.kits[name].buying then
-				hiddenseeker.add_player_kits(name, hiddenseeker.kits[name].buying)
+			if hiddenseeker_kits[name].buying then
+				hiddenseeker.add_player_kits(name, hiddenseeker_kits[name].buying)
 			end
 		end
 		if pressed.blocklist then
 			hiddenseeker.set_player_kit(name, pressed.blocklist)
 		end
 		if pressed.buylist then
-			hiddenseeker.kits[name].buying = pressed.buylist
+			hiddenseeker_kits[name].buying = pressed.buylist
 		end
 		hiddenseeker.save_kits()
 		hiddenseeker.create_kit_form(name)
@@ -155,7 +155,7 @@ end
 
 function hiddenseeker.get_player_block(name)
 	local lobby = hiddenseeker.player_lobby[name]
-	local selected = hiddenseeker.kits[name].selected
+	local selected = hiddenseeker_kits[name].selected
 	if not selected or selected == "Random" or selected == "" or not kits_register[selected] or not kits_register[selected].items then
 		return hiddenseeker.lobbys[lobby].blocks[math.random(#hiddenseeker.lobbys[lobby].blocks)]
 	else return kits_register[selected].items

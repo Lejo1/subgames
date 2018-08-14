@@ -1,4 +1,4 @@
-survivalgames.kits = {}
+survivalgames_kits = {}
 survivalgames_kit_form = {}
 local kits_all = {}
 local kits_register = {}
@@ -6,14 +6,14 @@ local kits_register = {}
 local input = io.open(minetest.get_worldpath() .. "/survivalgames_kits", "r")
 if input then
 	local input2 = minetest.deserialize(input:read("*l"))
-	survivalgames.kits = input2
+	survivalgames_kits = input2
 	io.close(input)
 end
-if not survivalgames.kits then survivalgames.kits = {} end
+if not survivalgames_kits then survivalgames_kits = {} end
 
 function survivalgames.save_kits()
 	local output = io.open(minetest.get_worldpath() .. "/survivalgames_kits", "w")
-	output:write(minetest.serialize(survivalgames.kits))
+	output:write(minetest.serialize(survivalgames_kits))
 	io.close(output)
 end
 
@@ -25,15 +25,15 @@ end)
 subgames.register_on_joinplayer(function(player, lobby)
 	if lobby == "survivalgames" then
 	local name = player:get_player_name()
-	if not survivalgames.kits[name] then
-		survivalgames.kits[name] = {kit = {}}
+	if not survivalgames_kits[name] then
+		survivalgames_kits[name] = {kit = {}}
     survivalgames.save_kits()
 	end
 	end
 end)
 
 function survivalgames.get_player_kits(name)
-  return survivalgames.kits[name].kit
+  return survivalgames_kits[name].kit
 end
 
 function survivalgames.register_kit(kitname, def)
@@ -44,11 +44,11 @@ end
 
 function survivalgames.add_player_kits(name, kitname)
   local def = kits_register[kitname]
-	local inserter = survivalgames.kits[name].kit
+	local inserter = survivalgames_kits[name].kit
   if def and money.get_money(name) >= def.cost then
-    if survivalgames.kits[name].kit == "" or not table.contains(survivalgames.kits[name].kit, kitname) == true then
+    if survivalgames_kits[name].kit == "" or not table.contains(survivalgames_kits[name].kit, kitname) == true then
       money.set_money(name, money.get_money(name)-def.cost)
-			table.insert(survivalgames.kits[name].kit, kitname)
+			table.insert(survivalgames_kits[name].kit, kitname)
 			survivalgames.save_kits()
       minetest.chat_send_player(name, "You have buyed the kit " ..kitname.."!")
     else minetest.chat_send_player(name, "You already have buyed this Kit!")
@@ -60,16 +60,16 @@ end
 function survivalgames.set_player_kit(name, kitname)
 	if survivalgames.lobbys[survivalgames.player_lobby[name]].players[name] == true then
 		minetest.chat_send_player(name, "You can't switch your kit while playing.")
-	elseif kitname ~= "" and survivalgames.kits[name].kit ~= "" and table.contains(survivalgames.kits[name].kit, kitname) then
-    survivalgames.kits[name].selected = kitname
+	elseif kitname ~= "" and survivalgames_kits[name].kit ~= "" and table.contains(survivalgames_kits[name].kit, kitname) then
+    survivalgames_kits[name].selected = kitname
   elseif kitname ~= "" then
 		minetest.chat_send_player(name, "You don't have this kit!")
   end
 end
 
 function survivalgames.give_kit_items(name)
-  if survivalgames.kits[name].selected then
-    local kitname = survivalgames.kits[name].selected
+  if survivalgames_kits[name].selected then
+    local kitname = survivalgames_kits[name].selected
     local def = kits_register[kitname]
     local player = minetest.get_player_by_name(name)
     local inv = player:get_inventory()
@@ -85,7 +85,7 @@ function survivalgames.give_kit_items(name)
 end
 
 function survivalgames.end_kit(name)
-	local kit = survivalgames.kits[name].selected
+	local kit = survivalgames_kits[name].selected
 	local player = minetest.get_player_by_name(name)
 	if player and kit and kits_register[kit] and kits_register[kit].on_end then
 		kits_register[kit].on_end(player)
@@ -97,47 +97,47 @@ function survivalgames.create_kit_form(name)
   local selected_id = 1
 	local selected_buyid = 0
 	local defitems = ""
-	if not survivalgames.kits[name] then return end
-	if type(survivalgames.kits[name].kit) == "table" and #survivalgames.kits[name].kit >= 1 then
-  	for kitnumb,kitname in ipairs(survivalgames.kits[name].kit) do
-    	if kitname == survivalgames.kits[name].selected then
+	if not survivalgames_kits[name] then return end
+	if type(survivalgames_kits[name].kit) == "table" and #survivalgames_kits[name].kit >= 1 then
+  	for kitnumb,kitname in ipairs(survivalgames_kits[name].kit) do
+    	if kitname == survivalgames_kits[name].selected then
       	selected_id = kitnumb
     	end
   	end
 	end
-	if survivalgames.kits[name].buying then
+	if survivalgames_kits[name].buying then
   	for kitnumb,kitname in ipairs(kits_all) do
-    	if kitname == survivalgames.kits[name].buying then
+    	if kitname == survivalgames_kits[name].buying then
       	selected_buyid = kitnumb
     	end
   	end
 	end
-	if kits_register[survivalgames.kits[name].selected] then
-		local def = kits_register[survivalgames.kits[name].selected]
+	if kits_register[survivalgames_kits[name].selected] then
+		local def = kits_register[survivalgames_kits[name].selected]
 		if def.items then
 			defitems = def.items
 		end
 	end
 	local costbuy = ""
-	if survivalgames.kits[name].buying then
-		local costbuyb = kits_register[survivalgames.kits[name].buying]
+	if survivalgames_kits[name].buying then
+		local costbuyb = kits_register[survivalgames_kits[name].buying]
 		costbuy = costbuyb.cost
 	end
 	local itembuy = ""
-	if survivalgames.kits[name].buying then
-		local itembuyb = kits_register[survivalgames.kits[name].buying]
+	if survivalgames_kits[name].buying then
+		local itembuyb = kits_register[survivalgames_kits[name].buying]
 		itembuy = itembuyb.items
 	end
 	local defeffect = ""
-	if kits_register[survivalgames.kits[name].selected] then
-		local def = kits_register[survivalgames.kits[name].selected]
+	if kits_register[survivalgames_kits[name].selected] then
+		local def = kits_register[survivalgames_kits[name].selected]
 		if def.effect then
 			defeffect = def.effect
 		end
 	end
 	local effectbuy = ""
-	if survivalgames.kits[name].buying then
-		local itembuyb = kits_register[survivalgames.kits[name].buying]
+	if survivalgames_kits[name].buying then
+		local itembuyb = kits_register[survivalgames_kits[name].buying]
 		if itembuyb.effect then
 			itembuy = itembuyb.effect
 		end
@@ -145,7 +145,7 @@ function survivalgames.create_kit_form(name)
   survivalgames_kit_form[name] = (
   	"size[8,9]" ..
   	"label[0,0;Select your Kit!]" ..
-  	"dropdown[0,0.5;8,1.5;kitlist;"..subgames.concatornil(survivalgames.kits[name].kit)..";"..selected_id.."]" ..
+  	"dropdown[0,0.5;8,1.5;kitlist;"..subgames.concatornil(survivalgames_kits[name].kit)..";"..selected_id.."]" ..
 		"label[0,1.5;Items: "..subgames.concatornil(defitems).." ]" ..
 		"label[0,2;Effect: "..defeffect.." ]" ..
 		"label[0,2.5;Here you can buy your kits!]" ..
@@ -164,7 +164,7 @@ subgames.register_on_kill_player(function(killer, killed, lobby)
   	local killname = killer:get_player_name()
   	money.set_money(killname, money.get_money(killname)+5)
   	minetest.chat_send_player(killname, "CoinSystem: You have receive 5 Coins!")
-		if survivalgames.kits[killname].selected == "Vampire" then
+		if survivalgames_kits[killname].selected == "Vampire" then
 			killer:set_hp(20)
 		end
 	end
@@ -174,15 +174,15 @@ function survivalgames.kit_on_player_receive_fields(self, player, context, press
   local name = player:get_player_name()
   if player_lobby[name] == "survivalgames" then
   if pressed.buykit then
-    if survivalgames.kits[name].buying then
-      survivalgames.add_player_kits(name, survivalgames.kits[name].buying)
+    if survivalgames_kits[name].buying then
+      survivalgames.add_player_kits(name, survivalgames_kits[name].buying)
     end
   end
   if pressed.kitlist then
     survivalgames.set_player_kit(name, pressed.kitlist)
   end
   if pressed.buylist then
-    survivalgames.kits[name].buying = pressed.buylist
+    survivalgames_kits[name].buying = pressed.buylist
   end
   survivalgames.save_kits()
   survivalgames.create_kit_form(name)
@@ -216,7 +216,7 @@ survivalgames.register_kit("Bomber", {
 
 function survivalgames.handle_hit(player, hitter, time_from_last_punch)
 	local name = player:get_player_name()
-	if survivalgames.kits[name].selected == "Scaredy cat" then
+	if survivalgames_kits[name].selected == "Scaredy cat" then
 		player:set_physics_override({speed=3})
 		minetest.after(5, function()
 			player:set_physics_override({speed=1})
