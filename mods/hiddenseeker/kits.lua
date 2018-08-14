@@ -3,23 +3,16 @@ hiddenseeker_kits = {}
 local kits_register = {}
 local kits_all = {}
 
-local input = io.open(minetest.get_worldpath() .. "/hiddenseeker_kits", "r")
-if input then
-	local input2 = minetest.deserialize(input:read("*l"))
-	hiddenseeker_kits = input2
-	io.close(input)
-end
+local storage = minetest.get_mod_storage()
+hiddenseeker_kits = modstorage_to_table(storage)
 if not hiddenseeker_kits then hiddenseeker_kits = {} end
 
-function hiddenseeker.save_kits()
-	local output = io.open(minetest.get_worldpath() .. "/hiddenseeker_kits", "w")
-	output:write(minetest.serialize(hiddenseeker_kits))
-	io.close(output)
+function hiddenseeker.save_kits(name)
+	if not name then
+		table_to_modstorage(storage, hiddenseeker_kits)
+	else table_to_modstorage(storage, hiddenseeker_kits[name], name)
+	end
 end
-
-minetest.register_on_shutdown(function()
-  hiddenseeker.save_kits()
-end)
 
 --  Creates player's account, if the player doesn't have it.
 subgames.register_on_joinplayer(function(player, lobby)
@@ -27,12 +20,11 @@ subgames.register_on_joinplayer(function(player, lobby)
 	  local name = player:get_player_name()
 	  if not hiddenseeker_kits[name] then
 			hiddenseeker_kits[name] = {kit = {"Random"}, selected = {"Random"}}
-    	hiddenseeker.save_kits()
 		end
 		if not hiddenseeker_kits[name].abilitys then
 			hiddenseeker_kits[name].abilitys = {}
 		end
-	  hiddenseeker.save_kits()
+	  hiddenseeker.save_kits(name)
 	end
 end)
 
@@ -53,7 +45,7 @@ function hiddenseeker.add_player_kits(name, kitname)
     if hiddenseeker_kits[name].kit == "" or not table.contains(hiddenseeker_kits[name].kit, kitname) == true then
       money.set_money(name, money.get_money(name)-def.cost)
 			table.insert(hiddenseeker_kits[name].kit, kitname)
-			hiddenseeker.save_kits()
+			hiddenseeker.save_kits(name)
       minetest.chat_send_player(name, "You have buyed the Block " ..kitname.."!")
     else minetest.chat_send_player(name, "You already have buyed this Block!")
     end
@@ -147,7 +139,7 @@ function hiddenseeker.kit_on_player_receive_fields(self, player, context, presse
 		if pressed.buylist then
 			hiddenseeker_kits[name].buying = pressed.buylist
 		end
-		hiddenseeker.save_kits()
+		hiddenseeker.save_kits(name)
 		hiddenseeker.create_kit_form(name)
 		sfinv.set_player_inventory_formspec(player)
 	end

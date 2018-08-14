@@ -3,23 +3,16 @@ survivalgames_kit_form = {}
 local kits_all = {}
 local kits_register = {}
 
-local input = io.open(minetest.get_worldpath() .. "/survivalgames_kits", "r")
-if input then
-	local input2 = minetest.deserialize(input:read("*l"))
-	survivalgames_kits = input2
-	io.close(input)
-end
+local storage = minetest.get_mod_storage()
+survivalgames_kits = modstorage_to_table(storage)
 if not survivalgames_kits then survivalgames_kits = {} end
 
-function survivalgames.save_kits()
-	local output = io.open(minetest.get_worldpath() .. "/survivalgames_kits", "w")
-	output:write(minetest.serialize(survivalgames_kits))
-	io.close(output)
+function survivalgames.save_kits(name)
+	if not name then
+		table_to_modstorage(storage, survivalgames_kits)
+	else table_to_modstorage(storage, survivalgames_kits[name], name)
+	end
 end
-
-minetest.register_on_shutdown(function()
-  survivalgames.save_kits()
-end)
 
 --  Creates player's account, if the player doesn't have it.
 subgames.register_on_joinplayer(function(player, lobby)
@@ -27,7 +20,7 @@ subgames.register_on_joinplayer(function(player, lobby)
 	local name = player:get_player_name()
 	if not survivalgames_kits[name] then
 		survivalgames_kits[name] = {kit = {}}
-    survivalgames.save_kits()
+    survivalgames.save_kits(name)
 	end
 	end
 end)
@@ -49,7 +42,7 @@ function survivalgames.add_player_kits(name, kitname)
     if survivalgames_kits[name].kit == "" or not table.contains(survivalgames_kits[name].kit, kitname) == true then
       money.set_money(name, money.get_money(name)-def.cost)
 			table.insert(survivalgames_kits[name].kit, kitname)
-			survivalgames.save_kits()
+			survivalgames.save_kits(name)
       minetest.chat_send_player(name, "You have buyed the kit " ..kitname.."!")
     else minetest.chat_send_player(name, "You already have buyed this Kit!")
     end
@@ -184,7 +177,7 @@ function survivalgames.kit_on_player_receive_fields(self, player, context, press
   if pressed.buylist then
     survivalgames_kits[name].buying = pressed.buylist
   end
-  survivalgames.save_kits()
+  survivalgames.save_kits(name)
   survivalgames.create_kit_form(name)
   sfinv.set_player_inventory_formspec(player)
   end
