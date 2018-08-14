@@ -142,7 +142,7 @@ sfinv.register_page("subgames:kits", {
 		if pressed.buylist then
 			kits[name].buying = pressed.buylist
 		end
-		mesewars.save_kits()
+		mesewars.save_kits(name)
 		mesewars.create_kit_form(name)
 		sfinv.set_player_inventory_formspec(player)
     end
@@ -224,7 +224,7 @@ sfinv.register_page("subgames:abilitys", {
 		elseif pressed.carefull5 then
 			mesewars.handle_buy(player, "carefull", 5, 3200)
 		end
-		mesewars.save_kits()
+		mesewars.save_kits(name)
 		mesewars.create_ability_form(player)
 		sfinv.set_player_inventory_formspec(player)
     end

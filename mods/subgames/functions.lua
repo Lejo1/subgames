@@ -1,5 +1,5 @@
 
---  Nice Function
+--  Nice Functions
 function table.contains(table, element)
   if type(table) == "table" then
     for _, value in pairs(table) do
@@ -27,6 +27,14 @@ function round(num, numDecimalPlaces)
 end
 function subgames.decomma_pos(pos)
   return {x=round(pos.x), y=round(pos.y), z=round(pos.z)}
+end
+
+function toboolean(string)
+  if string == "true" then
+    return true
+  elseif string == "false" then
+    return false
+  end
 end
 
 function is_inside_area(pos1, pos2, mainpos)
@@ -146,4 +154,100 @@ function subgames.drop_inv(name, pos)
     inv:set_list("craft", {})
 		inv:set_list("armor", {})
 		player:set_hp(20)
+end
+
+--max 5 stages
+function table_to_keyvalues(t)
+	local toreturn = {}
+	for k, v in pairs(t) do
+		local kstr = tostring(k)
+		if type(v) ~= "table" then
+			table.insert(toreturn, {k=kstr, v=v})
+		else
+			for k, v1 in pairs(v) do
+				local kstr1 = kstr.."€"..k
+				if type(v1) ~= "table" then
+					table.insert(toreturn, {k=kstr1, v=v1})
+				else
+					for k, v2 in pairs(v1) do
+						local kstr2 = kstr1.."€"..k
+						if type(v2) ~= "table" then
+							table.insert(toreturn, {k=kstr2, v=v2})
+						else
+							for k, v3 in pairs(v2) do
+								local kstr3 = kstr2.."€"..k
+								if type(v3) ~= "table" then
+									table.insert(toreturn, {k=kstr3, v=v3})
+								else
+									for k, v4 in pairs(v3) do
+										local kstr4 = kstr3.."€"..k
+										if type(v4) ~= "table" then
+											table.insert(toreturn, {k=kstr4, v=v4})
+										end
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	return toreturn
+end
+
+function table_to_modstorage(s, data, key)
+  if key then
+    key = key.."€"
+  else key = ""
+  end
+	if type(data) == "table" then
+		for _, table in pairs(table_to_keyvalues(data)) do
+			if type(table.v) == "number" then
+				if table.v == round(table.v) then
+					s:set_int(key..table.k, table.v)
+				else s:set_float(key..table.k, table.v)
+				end
+			else s:set_string(key..table.k, tostring(table.v))
+			end
+		end
+	end
+end
+
+function modstorage_to_table(s)
+  local toreturn = {}
+  for kstr, v in pairs(s:to_table().fields) do
+    keys = string.split(kstr, "€")
+    if not keys then
+      return
+    end
+    if toboolean(v) or toboolean(v) == false then
+      v = toboolean(v)
+    elseif tonumber(v) then
+      v = tonumber(v)
+    end
+    for numb, string in pairs(keys) do
+      if tonumber(string) and string ~= "nan" then --NaN compatible
+        keys[numb] = tonumber(string)
+      end
+    end
+    if not toreturn[keys[1]] then toreturn[keys[1]] = {} end
+    if #keys >= 2 then
+      if not toreturn[keys[1]][keys[2]] then toreturn[keys[1]][keys[2]] = {} end
+      if #keys >= 3 then
+        if not toreturn[keys[1]][keys[2]][keys[3]] then toreturn[keys[1]][keys[2]][keys[3]] = {} end
+        if #keys >= 4 then
+          if not toreturn[keys[1]][keys[2]][keys[3]][keys[4]] then toreturn[keys[1]][keys[2]][keys[3]][keys[4]] = {} end
+          if #keys == 5 then
+            toreturn[keys[1]][keys[2]][keys[3]][keys[4]][keys[5]] = v
+          else toreturn[keys[1]][keys[2]][keys[3]][keys[4]] = v
+          end
+        else toreturn[keys[1]][keys[2]][keys[3]] = v
+        end
+      else toreturn[keys[1]][keys[2]] = v
+      end
+    else toreturn[keys[1]] = v
+    end
+  end
+  return toreturn
 end

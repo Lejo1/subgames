@@ -34,23 +34,17 @@ local abilitys = {
 	}
 }
 
-local input = io.open(minetest.get_worldpath() .. "/kits", "r")
-if input then
-	local input2 = minetest.deserialize(input:read("*l"))
-	kits = input2
-	io.close(input)
-end
+local storage = minetest.get_mod_storage()
+kits = modstorage_to_table(storage)
 if not kits then kits = {} end
 
-function mesewars.save_kits()
-	local output = io.open(minetest.get_worldpath() .. "/kits", "w")
-	output:write(minetest.serialize(kits))
-	io.close(output)
+function mesewars.save_kits(name)
+	if not name then
+		table_to_modstorage(storage, kits)
+	else table_to_modstorage(storage, kits[name], name)
+		minetest.log("error", dump(kits[name]))
+	end
 end
-
-minetest.register_on_shutdown(function()
-  mesewars.save_kits()
-end)
 
 --  Creates player's account, if the player doesn't have it.
 subgames.register_on_joinplayer(function(player, lobby)
@@ -59,7 +53,6 @@ subgames.register_on_joinplayer(function(player, lobby)
 	if name ~= "register" then
 		if not kits[name] then
 			kits[name] = {kit = {}}
-    	mesewars.save_kits()
 		end
 		if not kits[name].abilitys then
 			kits[name].abilitys = {}
@@ -67,7 +60,7 @@ subgames.register_on_joinplayer(function(player, lobby)
 	else minetest.kick_player(name, "Sorry, but this name is disallowed.")
 	end
 	mesewars.create_abilitys(player)
-	mesewars.save_kits()
+	mesewars.save_kits(name)
 	end
 end)
 
@@ -82,6 +75,7 @@ function mesewars.register_kit(kitname, def)
   kits.register[kitname] = def
   def.name = kitname
 	table.insert(kits_all, kitname)
+	mesewars.save_kits("register")
 end
 
 function mesewars.add_player_kits(name, kitname)
@@ -91,7 +85,6 @@ function mesewars.add_player_kits(name, kitname)
     if kits[name].kit == "" or not table.contains(kits[name].kit, kitname) == true then
       money.set_money(name, money.get_money(name)-def.cost)
 			table.insert(kits[name].kit, kitname)
-			mesewars.save_kits()
       minetest.chat_send_player(name, "You have buyed the kit " ..kitname.."!")
     else minetest.chat_send_player(name, "You already have buyed this Kit!")
     end
