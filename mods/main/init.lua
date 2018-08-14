@@ -75,7 +75,7 @@ subgames.register_on_joinplayer(function(player, lobby)
       mustcreate = false
       local param1 = "mainlobby"
       local schem = minetest.get_worldpath() .. "/schems/" .. param1 .. ".mts"
-      minetest.place_schematic({x=-24, y=601, z=7}, schem)
+      minetest.place_schematic({x=-27, y=601, z=4}, schem)
     end
     minetest.after(1, function()
       if player:is_player_connected() and minetest.get_player_privs(name).shout and player_lobby[name] == "main" then

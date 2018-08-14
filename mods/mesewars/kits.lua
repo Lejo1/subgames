@@ -53,6 +53,9 @@ subgames.register_on_joinplayer(function(player, lobby)
 		if not kits[name] then
 			kits[name] = {kit = {}}
 		end
+		if not kits[name].kit then
+			kits[name].kit = {}
+		end
 		if not kits[name].abilitys then
 			kits[name].abilitys = {}
 		end
