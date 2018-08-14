@@ -455,22 +455,3 @@ function subgames.leaver(player)
     skywars.join_game(player, 0)
   end
 end
-
---[[TODO FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME TODO TODO TODO TODO TODO TODO TODO TODO TODO
-  Test Full Game!
-  fix team damage when time   may only lag...
-  add hud
-  Item clear fix!
-  Try block while walking or special items
-  maps from here https://minecraftmapsd.wixsite.com/minecraftmaps/packs
-  TODO skywars unendliche wasser quelle und blöcke
-  TODO maps
-  TODO may flowing liquid fix
-  TODO no regen after time
-  TODO Skywars dias balanchen
-Hide and seek map machen neue skywars submerged.
-may später shooter mod. TODO
-Mit server umleitung beschprechen.
-
-CHange 0.5
-disable chest range check]]
