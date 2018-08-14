@@ -231,13 +231,13 @@ function modstorage_to_table(s)
         keys[numb] = tonumber(string)
       end
     end
-    if not type(toreturn[keys[1]]) == "table" then toreturn[keys[1]] = {} end
+    if type(toreturn[keys[1]]) ~= "table" then toreturn[keys[1]] = {} end
     if #keys >= 2 then
-      if not type(toreturn[keys[1]][keys[2]]) == "table" then toreturn[keys[1]][keys[2]] = {} end
+      if type(toreturn[keys[1]][keys[2]]) ~= "table" then toreturn[keys[1]][keys[2]] = {} end
       if #keys >= 3 then
-        if not type(toreturn[keys[1]][keys[2]][keys[3]]) == "table" then toreturn[keys[1]][keys[2]][keys[3]] = {} end
+        if type(toreturn[keys[1]][keys[2]][keys[3]]) ~= "table" then toreturn[keys[1]][keys[2]][keys[3]] = {} end
         if #keys >= 4 then
-          if not type(toreturn[keys[1]][keys[2]][keys[3]][keys[4]]) == "table" then toreturn[keys[1]][keys[2]][keys[3]][keys[4]] = {} end
+          if type(toreturn[keys[1]][keys[2]][keys[3]][keys[4]]) ~= "table" then toreturn[keys[1]][keys[2]][keys[3]][keys[4]] = {} end
           if #keys == 5 then
             toreturn[keys[1]][keys[2]][keys[3]][keys[4]][keys[5]] = v
           else toreturn[keys[1]][keys[2]][keys[3]][keys[4]] = v
