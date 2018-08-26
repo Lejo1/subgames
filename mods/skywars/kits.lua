@@ -39,7 +39,7 @@ end
 
 function skywars.add_player_kits(name, kitname)
   local def = kits_register[kitname]
-	local inserter = skywars_kits[name].kit
+	if not skywars_kits[name].kit then skywars_kits[name].kit = {} end
   if def and money.get_money(name) >= def.cost then
     if skywars_kits[name].kit == "" or not table.contains(skywars_kits[name].kit, kitname) == true then
       money.set_money(name, money.get_money(name)-def.cost)

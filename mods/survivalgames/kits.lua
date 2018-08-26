@@ -37,7 +37,7 @@ end
 
 function survivalgames.add_player_kits(name, kitname)
   local def = kits_register[kitname]
-	local inserter = survivalgames_kits[name].kit
+	if not survivalgames_kits[name].kit then survivalgames_kits[name].kit = {} end
   if def and money.get_money(name) >= def.cost then
     if survivalgames_kits[name].kit == "" or not table.contains(survivalgames_kits[name].kit, kitname) == true then
       money.set_money(name, money.get_money(name)-def.cost)

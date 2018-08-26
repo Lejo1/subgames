@@ -40,7 +40,7 @@ end
 
 function hiddenseeker.add_player_kits(name, kitname)
   local def = kits_register[kitname]
-	local inserter = hiddenseeker_kits[name].kit
+	if not hiddenseeker_kits[name].kit then hiddenseeker_kits[name].kit = {} end
   if def and money.get_money(name) >= def.cost then
     if hiddenseeker_kits[name].kit == "" or not table.contains(hiddenseeker_kits[name].kit, kitname) == true then
       money.set_money(name, money.get_money(name)-def.cost)

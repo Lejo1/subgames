@@ -82,7 +82,7 @@ end
 
 function mesewars.add_player_kits(name, kitname)
   local def = kits.register[kitname]
-	local inserter = kits[name].kit
+	if not kits[name].kit then kits[name].kit = {} end
   if def and money.get_money(name) >= def.cost then
     if kits[name].kit == "" or not table.contains(kits[name].kit, kitname) == true then
       money.set_money(name, money.get_money(name)-def.cost)
