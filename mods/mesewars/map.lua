@@ -22,10 +22,8 @@ function areas.mesewars.dig(pos, node, digger)
 	local player = digger:get_player_name()
   local is_block = false
 	if node.name ~= "mesewars:mese1" and node.name ~= "mesewars:mese2" and node.name ~= "mesewars:mese3" and node.name ~= "mesewars:mese4" then
-  	for nubsave, savepos in ipairs(mapblocks) do
-    	if savepos == minetest.pos_to_string(pos) then
-      	return true
-    	end
+		if node.name == "tnt:tnt_burning" or node.name == "default:sandstone" or node.name == "default:obsidian" or node.name == "default:glass" or node.name == "default:steelblock" or node.name == "default:chest" then
+      return true
   	end
 	else return true
 	end
