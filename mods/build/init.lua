@@ -66,3 +66,12 @@ minetest.register_chatcommand("pinfo", {
     end
   end,
 })
+
+subgames.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage, lobby)
+  if player_lobby[hitter:get_player_name()] == "build" then
+    subgames.add_bothud(hitter, player:get_player_name(), 0xFFFFFF, 5)
+    return true
+  elseif minetest.get_player_privs(hitter:get_player_name()).ban then
+    subgames.add_bothud(hitter, player:get_player_name(), 0xFFFFFF, 5)
+  end
+end)
