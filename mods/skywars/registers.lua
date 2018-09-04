@@ -34,7 +34,6 @@ subgames.register_on_joinplayer(function(player, lobby)
     local name = player:get_player_name()
     skywars.join_game(player, 1)
     subgames.add_mithud(player, "You joined Skywars!", 0xFFFFFF, 3)
-    subgames.chat_send_all_lobby("skywars", "*** "..name.." joined Skywars.")
   end
 end)
 
@@ -45,7 +44,6 @@ subgames.register_on_leaveplayer(function(player, lobby)
     skywars.leave_game(player)
     skywars.win(plobby)
     skywars.player_lobby[name] = nil
-    subgames.chat_send_all_lobby("skywars", "*** "..name.." left Skywars.")
   end
 end)
 

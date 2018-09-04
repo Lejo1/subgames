@@ -42,18 +42,9 @@ minetest.register_chatcommand("build", {
 minetest.register_privilege("invs", "Allows you to be fully invisible!")
 
 function core.send_join_message(name)
-  if not minetest.get_player_privs(name).invs then
-    minetest.chat_send_all("*** "..name.." joined the game.")
-  end
 end
 
 function core.send_leave_message(name, timed_out)
-  if not minetest.get_player_privs(name).invs then
-    if not timed_out then
-      minetest.chat_send_all("*** "..name.." left the game.")
-    else minetest.chat_send_all("*** "..name.." left the game. (timed out)")
-    end
-  end
 end
 
 minetest.register_chatcommand("pinfo", {

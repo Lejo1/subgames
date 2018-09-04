@@ -4,7 +4,6 @@ subgames.register_on_joinplayer(function(name, lobby)
     local spawn = minetest.setting_get_pos("spawn_lobby")
     local pname = name:get_player_name()
     name:setpos(spawn)
-    subgames.chat_send_all_lobby("mesewars", "*** "..pname.." joined Mesewars.")
     if map_must_create == true then
       map_must_create = false
       local param1 = "submese2"
@@ -45,7 +44,6 @@ subgames.register_on_leaveplayer(function(player, lobby)
     local name = player:get_player_name()
     mesewars.leave_pre_player(name)
     mesewars.leave_player(player)
-    subgames.chat_send_all_lobby("mesewars", "*** "..name.." left Mesewars.")
     minetest.after(2, function()
       mesewars.win()
     end)

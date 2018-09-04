@@ -227,7 +227,6 @@ function skywars.leave_game(player)
     skywars.lobbys[lobby].players[name] = nil
     subgames.unspectate(player)
     if skywars.lobbys[lobby].ingame then
-      skywars.chat_send_all_lobby(lobby, name.." left this Round.")
       local privs = minetest.get_player_privs(name)
       privs.craft = nil
       minetest.set_player_privs(name, privs)

@@ -86,7 +86,6 @@ subgames.register_on_joinplayer(function(player, lobby)
     local name = player:get_player_name()
     hiddenseeker.join_game(player, 1)
     subgames.add_mithud(player, "You joined Hide and Seek!", 0xFFFFFF, 3)
-    subgames.chat_send_all_lobby("hiddenseeker", "*** "..name.." joined Hide and Seek.")
     if not hiddenseeker.disguis[name] then
       hiddenseeker.disguis[name] = {time=hiddenseeker.timetodisquis}
     end
@@ -104,7 +103,6 @@ subgames.register_on_leaveplayer(function(player, lobby)
     hiddenseeker.win(plobby)
     hiddenseeker.player_lobby[name] = nil
     hiddenseeker.disguis[name] = nil
-    subgames.chat_send_all_lobby("hiddenseeker", "*** "..name.." left Hide and Seek.")
   end
 end)
 
@@ -207,7 +205,6 @@ function hiddenseeker.leave_game(player)
     hiddenseeker.lobbys[lobby].players[name] = nil
     player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
     if hiddenseeker.lobbys[lobby].ingame then
-      hiddenseeker.chat_send_all_lobby(lobby, name.." left this Round.")
     end
   end
   if hiddenseeker.disguis[name].enable then

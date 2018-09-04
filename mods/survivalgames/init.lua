@@ -67,7 +67,6 @@ subgames.register_on_joinplayer(function(player, lobby)
     local name = player:get_player_name()
     survivalgames.join_game(player, 1)
     subgames.add_mithud(player, "You joined Survivalgames!", 0xFFFFFF, 3)
-    subgames.chat_send_all_lobby("survivalgames", "*** "..name.." joined Survivalgames.")
   end
 end)
 
@@ -78,7 +77,6 @@ subgames.register_on_leaveplayer(function(player, lobby)
     survivalgames.leave_game(player)
     survivalgames.win(plobby)
     survivalgames.player_lobby[name] = nil
-    subgames.chat_send_all_lobby("survivalgames", "*** "..name.." left Survivalgames.")
   end
 end)
 
@@ -210,7 +208,6 @@ function survivalgames.leave_game(player)
   if lobby then
     survivalgames.lobbys[lobby].players[name] = nil
     if survivalgames.lobbys[lobby].ingame then
-      survivalgames.chat_send_all_lobby(lobby, name.." left this Round.")
       local privs = minetest.get_player_privs(name)
       privs.craft = nil
       minetest.set_player_privs(name, privs)
