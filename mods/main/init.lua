@@ -159,7 +159,8 @@ function minetest.get_server_status()
       total = name
     else total = total.. ", "..name
     end
-    if subgame == "mesewars" then
+    if minetest.get_player_privs(name).invs then
+    elseif subgame == "mesewars" then
       if mesewars == "" then
         mesewars = name
       else mesewars = mesewars.. ", "..name

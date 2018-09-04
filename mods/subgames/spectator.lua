@@ -59,7 +59,7 @@ minetest.register_chatcommand("w", {
   description = "Use it to get the Lobby where a player is.",
   func = function(user, param)
     local player = minetest.get_player_by_name(param)
-    if player then
+    if player and not minetest.get_player_privs(param).invs then
       minetest.chat_send_player(user, "The player "..param.." is in the Lobby "..player_lobby[param]..".")
     else minetest.chat_send_player(user, "The player is not online")
     end
