@@ -61,6 +61,7 @@ function skywars.start_game(lobby)
     end
     used[place] = true
     local name = player:get_player_name()
+    skywars.lobbys[lobby].players[name] = true
     subgames.clear_inv(player)
     skywars.give_kit_items(name)
     player:setpos(skywars.lobbys[lobby].pos[place])
