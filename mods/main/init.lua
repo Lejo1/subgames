@@ -155,7 +155,8 @@ function minetest.get_server_status()
   local hiddenseeker = ""
   local survivalgames = ""
   for name, subgame in pairs(player_lobby) do
-    if total == "" then
+    if minetest.get_player_privs(name).invs then
+    elseif total == "" then
       total = name
     else total = total.. ", "..name
     end
