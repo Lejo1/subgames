@@ -93,7 +93,7 @@ end
 function areas.survivalgames.dig(pos, node, digger)
   local name = digger:get_player_name()
   local plobby = survivalgames.player_lobby[name]
-  if survivalgames.lobbys[plobby].ingame then
+  if name and plobby and survivalgames.lobbys[plobby].ingame then
     return true
   end
 end
