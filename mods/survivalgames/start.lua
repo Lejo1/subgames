@@ -110,7 +110,7 @@ function survivalgames.get_player_count(lobby)
 end
 
 function survivalgames.win(lobby)
-  if lobby ~= 0 and survivalgames.lobbys[lobby].ingame then
+  if lobby and lobby ~= 0 and survivalgames.lobbys[lobby].ingame then
     local count, winner = survivalgames.get_player_count(lobby)
     if count <= 1 then
       if count > 0 then

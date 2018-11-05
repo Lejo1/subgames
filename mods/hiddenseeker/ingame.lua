@@ -89,7 +89,7 @@ subgames.register_on_punchnode(function(bpos, node, puncher, pointed_thing, lobb
 	if lobby == "hiddenseeker" then
 		local name = puncher:get_player_name()
 		local plobby = hiddenseeker.player_lobby[name]
-		if plobby ~= 0 and hiddenseeker.lobbys[plobby].players[name] == "seeker" then
+		if plobby and plooby ~= 0 and hiddenseeker.lobbys[plobby].players[name] == "seeker" then
 			for pname, table in pairs(hiddenseeker.disguis) do
 				if table.pos then
 					if vector.equals(bpos, subgames.decomma_pos(minetest.string_to_pos(hiddenseeker.disguis[pname].pos))) then

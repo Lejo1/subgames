@@ -88,7 +88,7 @@ function skywars.get_player_count(lobby)
 end
 
 function skywars.win(lobby)
-  if lobby ~= 0 and skywars.lobbys[lobby].ingame then
+  if lobby and lobby ~= 0 and skywars.lobbys[lobby].ingame then
     local count, winner = skywars.get_player_count(lobby)
     if count <= 1 then
       if count > 0 then
