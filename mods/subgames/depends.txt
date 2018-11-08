@@ -3,3 +3,4 @@ sfinv
 3d_armor_sfinv
 controls
 atchat
+antispam
