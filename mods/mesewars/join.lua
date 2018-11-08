@@ -6,12 +6,9 @@ subgames.register_on_joinplayer(function(name, lobby)
     name:setpos(spawn)
     if map_must_create == true then
       map_must_create = false
-      local param1 = "submese2"
+      local param1 = "newmese2"
       local schem = minetest.get_worldpath() .. "/schems/" .. param1 .. ".mts"
-      local vm = minetest.get_voxel_manip()
-      vm:read_from_map(minetest.setting_get_pos("mappos1"), minetest.setting_get_pos("mappos2"))
-      minetest.place_schematic_on_vmanip(vm, schemp, schem)
-      vm:write_to_map()
+      minetest.place_schematic(schemp, schem)
     end
     minetest.after(2, function()
       if player_lobby[pname] == "mesewars" then

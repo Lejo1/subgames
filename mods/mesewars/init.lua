@@ -57,12 +57,9 @@ subgames.register_chatcommand("reset", {
   func = function(player)
     minetest.chat_send_all("Creating mesewars map may lag!")
     minetest.after(1, function()
-      local param1 = "submese"
+      local param1 = "newmese2"
       local schem = minetest.get_worldpath() .. "/schems/" .. param1 .. ".mts"
-      local vm = minetest.get_voxel_manip()
-      vm:read_from_map(minetest.setting_get_pos("mappos1"), minetest.setting_get_pos("mappos2"))
-      minetest.place_schematic_on_vmanip(vm, schemp, schem)
-      vm:write_to_map()
+      minetest.place_schematic(schemp, schem)
     end)
   end,
 })
