@@ -380,7 +380,7 @@ local AuthDatabase = function ( path, name )
 	end
 
 	self.on_login_success = function ( username, ip )
-		if data[ username ].oldlogin == -1 then
+		if not data[ username ].oldlogin or data[ username ].oldlogin == -1 then
 			data[ username ].oldlogin = journal.optime
 		end
 		users[ username ] = data[ username ].newlogin
