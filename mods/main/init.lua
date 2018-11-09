@@ -208,6 +208,10 @@ local info = {
     ["name"] = "Skywars",
     ["text"] = [[Skywars is just like in Minecraft. In Skywars you join on a small island you find weapons and blocks in the chests. Your goal is to kill all other players on their islands. In the middle of the maps is one big island with many chests and more items. Please be fair to other players and don't team in skywars it's not allowed otherwise we have to ban you temporarily.]]
   },
+  ["survivalgames"] = {
+    ["name"] = "Survivalgames",
+    ["text"] = [[The Goal in Survivalgames is just as the name says to survive. You can find chests on the map with loot to fight against the others. Teaming is not allowed. The is allways random generated. Important: The map gets reseted after each round so please don't build houses or other things there.]]
+  },
   ["commands"] = {
     ["name"] = "Commands",
     ["text"] = [[In minetest you have a lots a commands you have to write the commands in the chat. All commands start with a /.
@@ -226,13 +230,14 @@ You find the kits, skins and more in your inventory.]]
 
 function main.get_help_form(type)
   local toreturn = (
-  "size[8,5]"..
+  "size[8,6]"..
   "button[0,0;2,1;general;General]"..
   "button[0,1;2,1;mesewars;Mesewars]"..
   "button[0,2;2,1;hiddenseeker;Hide and Seek]"..
   "button[0,3;2,1;skywars;Skywars]"..
-  "button[0,4;2,1;commands;Commands]"..
-  "textarea[2.5,0.5;5.5,5;text;;"..minetest.formspec_escape(info[type].text).."]"..
+  "button[0,4;2,1;survivalgames;Survivalgames]"..
+  "button[0,5;2,1;commands;Commands]"..
+  "textarea[2.5,0.5;5.5,6;text;;"..minetest.formspec_escape(info[type].text).."]"..
   "label[3,0;"..info[type].name.."]")
   return toreturn
 end
@@ -252,6 +257,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
   if fields.mesewars then type = "mesewars" end
   if fields.hiddenseeker then type = "hiddenseeker" end
   if fields.skywars then type = "skywars" end
+  if fields.survivalgames then type = "survivalgames" end
   if fields.commands then type = "commands" end
   if type then
    minetest.show_formspec(player:get_player_name(), "main:info", main.get_help_form(type))
