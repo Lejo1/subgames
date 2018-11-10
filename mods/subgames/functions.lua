@@ -176,5 +176,6 @@ function modstorage_to_table(s, key)
     for kstr, v in pairs(s:to_table().fields) do
       toreturn[kstr] = minetest.deserialize(v)
     end
+    return toreturn
   end
 end

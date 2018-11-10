@@ -12,9 +12,6 @@ function survivalgames.save_kits(name)
 	end
 end
 
-storage:from_table(nil)
-survivalgames.save_kits()
-
 function survivalgames.load_kits(name)
 	if not name then
 		survivalgames_kits = modstorage_to_table(storage)

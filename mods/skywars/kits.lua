@@ -22,14 +22,20 @@ function survivalgames.load_kits(name)
 	end
 end
 
+function skywars.load_kits(name)
+	if not name then
+		skywars_kits = modstorage_to_table(storage)
+	else skywars_kits[name] = modstorage_to_table(storage, name)
+	end
+end
+
 --  Creates player's account, if the player doesn't have it.
 subgames.register_on_joinplayer(function(player, lobby)
 	if lobby == "survivalgames" then
 	local name = player:get_player_name()
-	survivalgames.load_kits(name)
-	if not survivalgames_kits[name] then
-		survivalgames_kits[name] = {kit = {}}
-    survivalgames.save_kits(name)
+	skywars.load_kits(name)
+	if not skywars_kits[name] then
+		skywars_kits[name] = {kit = {}}
 	end
 	end
 end)

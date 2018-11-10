@@ -22,14 +22,30 @@ function survivalgames.load_kits(name)
 	end
 end
 
+function mesewars.load_kits(name)
+	if not name then
+		kits = modstorage_to_table(storage)
+	else kits[name] = modstorage_to_table(storage, name)
+	end
+end
+mesewars.load_kits("register")
+
 --  Creates player's account, if the player doesn't have it.
 subgames.register_on_joinplayer(function(player, lobby)
 	if lobby == "survivalgames" then
 	local name = player:get_player_name()
-	survivalgames.load_kits(name)
-	if not survivalgames_kits[name] then
-		survivalgames_kits[name] = {kit = {}}
-    survivalgames.save_kits(name)
+	mesewars.load_kits(name)
+	if name ~= "register" then
+		if not kits[name] then
+			kits[name] = {kit = {}}
+		end
+		if not kits[name].kit then
+			kits[name].kit = {}
+		end
+		if not kits[name].abilitys then
+			kits[name].abilitys = {}
+		end
+	else minetest.kick_player(name, "Sorry, but this name is disallowed.")
 	end
 	end
 end)

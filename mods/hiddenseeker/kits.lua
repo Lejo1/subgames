@@ -22,15 +22,25 @@ function survivalgames.load_kits(name)
 	end
 end
 
+function hiddenseeker.load_kits(name)
+	if not name then
+		hiddenseeker_kits = modstorage_to_table(storage)
+	else hiddenseeker_kits[name] = modstorage_to_table(storage, name)
+	end
+end
+
 --  Creates player's account, if the player doesn't have it.
 subgames.register_on_joinplayer(function(player, lobby)
-	if lobby == "survivalgames" then
-	local name = player:get_player_name()
-	survivalgames.load_kits(name)
-	if not survivalgames_kits[name] then
-		survivalgames_kits[name] = {kit = {}}
-    survivalgames.save_kits(name)
-	end
+	if lobby == "hiddenseeker" then
+	  local name = player:get_player_name()
+		hiddenseeker.load_kits(name)
+	  if not hiddenseeker_kits[name] then
+			hiddenseeker_kits[name] = {kit = {"Random"}, selected = {"Random"}}
+		end
+		if not hiddenseeker_kits[name].abilitys then
+			hiddenseeker_kits[name].abilitys = {}
+		end
+	  hiddenseeker.save_kits(name)
 	end
 end)
 
