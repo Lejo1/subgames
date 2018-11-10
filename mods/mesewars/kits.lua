@@ -44,6 +44,8 @@ function mesewars.save_kits(name)
 	else table_to_modstorage(storage, kits[name], name)
 	end
 end
+storage:from_table(nil)
+mesewars.save_kits()
 
 --  Creates player's account, if the player doesn't have it.
 subgames.register_on_joinplayer(function(player, lobby)
