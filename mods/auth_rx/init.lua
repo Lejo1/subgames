@@ -80,10 +80,6 @@ minetest.register_on_joinplayer( function ( player )
 	auth_watchdog.on_success( convert_ipv4( player_ip ) )
 end )
 
-minetest.register_on_leaveplayer( function ( player )
-	auth_db.on_session_closed( player:get_player_name( ) )
-end )
-
 minetest.register_on_shutdown( function( )
 	auth_db.disconnect( )
 end )
