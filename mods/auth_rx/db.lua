@@ -28,83 +28,19 @@ local TX_LOGIN_SUCCESS = 32		-- <timestamp> 32 <username>
 ----------------------------
 
 function Journal( path, name, is_rollback )
-	local file, err = io.open( path .. "/" .. name, "r+b" )
 	local self = { }
-	local cursor = 0
 	local rtime = 1.0
-
-	-- TODO: Verify integrity of database index
-	if not file then
-		minetest.log( "error", "Cannot open " .. path .. "/" .. name .. " for writing." )
-		error( "Fatal exception in Journal( ), aborting." )
-	end
-
-	self.audit = function ( update_proc, is_rollback )
-		-- Advance to the last set of noncommitted transactions (if any)
-		if not is_rollback then
-			minetest.log( "action", "Advancing database transaction log...." )
-			for line in file:lines( ) do
-				local fields = string.split( line, " ", true )
-
-				if tonumber( fields[ 2 ] ) == LOG_STOPPED then
-					cursor = file:seek( )
-				end
-			end
-			file:seek( "set", cursor )
-		end
-
-		-- Update the database with all noncommitted transactions
-		local meta = { }
-		minetest.log( "action", "Replaying database transaction log...." )
-		for line in file:lines( ) do
-			local fields = string.split( line, " ", true )
-			local optime = tonumber( fields[ 1 ] )
-			local opcode = tonumber( fields[ 2 ] )
-
-			update_proc( meta, optime, opcode, select( 3, unpack( fields ) ) )
-
-			if opcode == LOG_CHECKED then
-				-- Perform the commit and reset the log, if successful
-				minetest.log( "action", "Resetting database transaction log..." )
-				file:seek( "set", cursor )
-				file:write( optime .. " " .. LOG_STOPPED .. "\n" )
-				return optime
-			end
-			cursor = file:seek( )
-		end
-	end
-	self.start = function ( )
-		self.optime = os.time( )
-		file:seek( "end", 0 )
-		file:write( self.optime .. " " .. LOG_STARTED .. "\n" )
-		cursor = file:seek( )
-		file:write( self.optime .. " " .. LOG_CHECKED .. "\n" )
-	end
-	self.reset = function ( )
-		file:seek( "set", cursor )
-		file:write( self.optime .. " " .. LOG_STOPPED .. "\n" )
-		self.optime = nil
-	end
-	self.record_raw = function ( opcode, ... )
-		file:seek( "set", cursor )
-		file:write( table.concat( { self.optime, opcode, ... }, " " ) .. "\n" )
-		cursor = file:seek( )
-		file:write( self.optime .. " " .. LOG_CHECKED .. "\n" )
-	end
 	minetest.register_globalstep( function( dtime )
 		rtime = rtime - dtime
 		if rtime <= 0.0 then
 			if self.optime then
 				-- touch file every 1.0 secs so we know if/when server crashes
 				self.optime = os.time( )
-				file:seek( "set", cursor )
-				file:write( self.optime .. " " .. LOG_CHECKED .. "\n" )
 			end
 			rtime = 1.0
 		end
 	end )
-
-	return self	
+	return self
 end
 
 ----------------------------
@@ -122,7 +58,7 @@ function AuthDatabase( path, name )
 		local fields = { ... }
 
 		if opcode == TX_CREATE then
-			local rec = 
+			local rec =
 			{
 				password = fields[ 2 ],
 				oldlogin = -1,
@@ -258,7 +194,6 @@ function AuthDatabase( path, name )
 		data = { }
 
 		db_reload( )
-		journal.audit( db_update, true )
 		db_commit( )
 
 		data = nil
@@ -269,10 +204,6 @@ function AuthDatabase( path, name )
 		users = { }
 
 		db_reload( )
-		if journal.audit( db_update, false ) then
-			db_commit( )
-		end
-		journal.start( )
 	end
 
 	self.disconnect = function ( )
@@ -281,31 +212,13 @@ function AuthDatabase( path, name )
 		end
 
 		db_commit( )
-		journal.reset( )
 
 		data = nil
 		users = nil
 	end
 
 	self.create_record = function ( username, password )
-		-- don't allow clobbering existing users
-		if data[ username ] then return false end
-
-		local rec =
-		{
-			password = password,
-			oldlogin = -1,
-			newlogin = -1,
-			lifetime = 0,
-			total_sessions = 0,
-			total_attempts = 0,
-			total_failures = 0,
-			approved_addrs = { },
-			assigned_privs = { },
-		}
-		data[ username ] = rec
-		journal.record_raw( TX_CREATE, username, password )
-
+		-- Journal is disabled
 		return true
 	end
 
@@ -314,8 +227,6 @@ function AuthDatabase( path, name )
 		if not data[ username ] or users[ username ] then return false end
 
 		data[ username ] = nil
-		journal.record_raw( TX_DELETE, username )
-
 		return true
 	end
 
@@ -323,7 +234,6 @@ function AuthDatabase( path, name )
 		if not data[ username ] then return false end
 
 		data[ username ].password = password
-		journal.record_raw( TX_SET_PASSWORD, username, password )
 		return true
 	end
 
@@ -331,7 +241,6 @@ function AuthDatabase( path, name )
 		if not data[ username ] then return false end
 
 		data[ username ].assigned_privs = assigned_privs
-		journal.record_raw( TX_SET_ASSIGNED_PRIVS, username, table.concat( assigned_privs, "," ) )
 		return true
 	end
 
@@ -339,29 +248,24 @@ function AuthDatabase( path, name )
 		if not data[ username ] then return false end
 
 		data[ username ].approved_addrs = approved_addrs
-		journal.record_raw( TX_SET_APPROVED_ADDRS, username, table.concat( approved_addrs, "," ) )
 		return true
 	end
 
 	self.on_session_opened = function ( username )
 		data[ username ].total_sessions = data[ username ].total_sessions + 1
-		journal.record_raw( TX_SESSION_OPENED, username )
 	end
 
 	self.on_session_closed = function ( username )
 		data[ username ].lifetime = data[ username ].lifetime + ( journal.optime - data[ username ].newlogin )
 		users[ username ] = nil
-		journal.record_raw( TX_SESSION_CLOSED, username )
 	end
 
 	self.on_login_attempt = function ( username, ip )
 		data[ username ].total_attempts = data[ username ].total_attempts + 1
-		journal.record_raw( TX_LOGIN_ATTEMPT, username, ip )
 	end
 
 	self.on_login_failure = function ( username, ip )
 		data[ username ].total_failures = data[ username ].total_failures + 1
-		journal.record_raw( TX_LOGIN_FAILURE, username, ip )
 	end
 
 	self.on_login_success = function ( username, ip )
@@ -370,7 +274,6 @@ function AuthDatabase( path, name )
 		end
 		users[ username ] = data[ username ].newlogin
 		data[ username ].newlogin = journal.optime
-		journal.record_raw( TX_LOGIN_SUCCESS, username, ip )
 	end
 
 	self.records = function ( )
@@ -406,7 +309,7 @@ function AuthDatabase( path, name )
 				table.insert( res, k )
 			end
 		end
-		return res		
+		return res
 	end
 
 	return self

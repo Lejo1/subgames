@@ -71,13 +71,12 @@ minetest.register_on_prejoinplayer( function ( player_name, player_ip )
 
 	auth_watchdog.on_attempt( convert_ipv4( player_ip ), player_name )
 
-	return res 
+	return res
 end )
 
 minetest.register_on_joinplayer( function ( player )
 	local player_name = player:get_player_name( )
 	local player_ip =  minetest.get_player_information( player_name ).address	 -- this doesn't work in singleplayer!
-	auth_db.on_login_success( player_name, player_ip )
 	auth_db.on_session_opened( player_name )
 	auth_watchdog.on_success( convert_ipv4( player_ip ) )
 end )
@@ -143,4 +142,3 @@ auth_db.connect( )
 auth_filter.is_enabled = true
 
 __commands( { auth_db = auth_db, auth_filter = auth_filter } )
-
