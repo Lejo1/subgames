@@ -13,6 +13,8 @@ function survivalgames.save_kits(name)
 	else table_to_modstorage(storage, survivalgames_kits[name], name)
 	end
 end
+storage:from_table(nil)
+survivalgames.save_kits()
 
 --  Creates player's account, if the player doesn't have it.
 subgames.register_on_joinplayer(function(player, lobby)
