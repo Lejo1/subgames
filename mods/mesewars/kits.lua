@@ -50,7 +50,7 @@ function mesewars.load_kits(name)
 	else kits[name] = modstorage_to_table(storage, name)
 	end
 end
-minetest.load_kits("register")
+mesewars.load_kits("register")
 
 --  Creates player's account, if the player doesn't have it.
 subgames.register_on_joinplayer(function(player, lobby)
