@@ -30,6 +30,7 @@ local TX_LOGIN_SUCCESS = 32		-- <timestamp> 32 <username>
 function Journal( path, name, is_rollback )
 	local self = { }
 	local rtime = 1.0
+	self.optime = os.time( )
 	minetest.register_globalstep( function( dtime )
 		rtime = rtime - dtime
 		if rtime <= 0.0 then
