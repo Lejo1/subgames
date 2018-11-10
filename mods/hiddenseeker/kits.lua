@@ -4,8 +4,6 @@ local kits_register = {}
 local kits_all = {}
 
 local storage = minetest.get_mod_storage()
-hiddenseeker_kits = modstorage_to_table(storage)
-if not hiddenseeker_kits then hiddenseeker_kits = {} end
 
 function hiddenseeker.save_kits(name)
 	if not name then
@@ -13,13 +11,19 @@ function hiddenseeker.save_kits(name)
 	else table_to_modstorage(storage, hiddenseeker_kits[name], name)
 	end
 end
-storage:from_table(nil)
-hiddenseeker.save_kits()
+
+function hiddenseeker.load_kits(name)
+	if not name then
+		hiddenseeker_kits = modstorage_to_table(storage)
+	else hiddenseeker_kits[name] = modstorage_to_table(storage, name)
+	end
+end
 
 --  Creates player's account, if the player doesn't have it.
 subgames.register_on_joinplayer(function(player, lobby)
 	if lobby == "hiddenseeker" then
 	  local name = player:get_player_name()
+		hiddenseeker.load_kits(name)
 	  if not hiddenseeker_kits[name] then
 			hiddenseeker_kits[name] = {kit = {"Random"}, selected = {"Random"}}
 		end

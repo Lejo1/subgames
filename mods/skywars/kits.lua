@@ -6,8 +6,6 @@ local kits_register = {}
 
 
 local storage = minetest.get_mod_storage()
-skywars_kits = modstorage_to_table(storage)
-if not skywars_kits then skywars_kits = {} end
 
 function skywars.save_kits(name)
 	if not name then
@@ -15,13 +13,19 @@ function skywars.save_kits(name)
 	else table_to_modstorage(storage, skywars_kits[name], name)
 	end
 end
-storage:from_table(nil)
-skywars.save_kits()
+
+function skywars.load_kits(name)
+	if not name then
+		skywars_kits = modstorage_to_table(storage)
+	else skywars_kits[name] = modstorage_to_table(storage, name)
+	end
+end
 
 --  Creates player's account, if the player doesn't have it.
 subgames.register_on_joinplayer(function(player, lobby)
 	if lobby == "skywars" then
 	local name = player:get_player_name()
+	skywars.load_kits(name)
 	if not skywars_kits[name] then
 		skywars_kits[name] = {kit = {}}
 	end

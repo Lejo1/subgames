@@ -35,8 +35,7 @@ local abilitys = {
 }
 
 local storage = minetest.get_mod_storage()
-kits = modstorage_to_table(storage)
-if not kits then kits = {} end
+
 
 function mesewars.save_kits(name)
 	if not name then
@@ -44,13 +43,20 @@ function mesewars.save_kits(name)
 	else table_to_modstorage(storage, kits[name], name)
 	end
 end
-storage:from_table(nil)
-mesewars.save_kits()
+
+function mesewars.load_kits(name)
+	if not name then
+		kits = modstorage_to_table(storage)
+	else kits[name] = modstorage_to_table(storage, name)
+	end
+end
+minetest.load_kits("register")
 
 --  Creates player's account, if the player doesn't have it.
 subgames.register_on_joinplayer(function(player, lobby)
 	if lobby == "mesewars" then
 	local name = player:get_player_name()
+	mesewars.load_kits(name)
 	if name ~= "register" then
 		if not kits[name] then
 			kits[name] = {kit = {}}
