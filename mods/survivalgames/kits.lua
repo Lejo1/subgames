@@ -4,8 +4,6 @@ local kits_all = {}
 local kits_register = {}
 
 local storage = minetest.get_mod_storage()
-survivalgames_kits = modstorage_to_table(storage)
-if not survivalgames_kits then survivalgames_kits = {} end
 
 function survivalgames.save_kits(name)
 	if not name then
@@ -13,13 +11,22 @@ function survivalgames.save_kits(name)
 	else table_to_modstorage(storage, survivalgames_kits[name], name)
 	end
 end
+
 storage:from_table(nil)
 survivalgames.save_kits()
+
+function survivalgames.load_kits(name)
+	if not name then
+		survivalgames_kits = modstorage_to_table(storage)
+	else survivalgames_kits[name] = modstorage_to_table(storage, name)
+	end
+end
 
 --  Creates player's account, if the player doesn't have it.
 subgames.register_on_joinplayer(function(player, lobby)
 	if lobby == "survivalgames" then
 	local name = player:get_player_name()
+	survivalgames.load_kits(name)
 	if not survivalgames_kits[name] then
 		survivalgames_kits[name] = {kit = {}}
     survivalgames.save_kits(name)

@@ -166,40 +166,15 @@ function table_to_modstorage(s, data, key)
   end
 end
 
-function modstorage_to_table(s)
-  local toreturn = {}
-  for kstr, v in pairs(s:to_table().fields) do
-    keys = string.split(kstr, "€")
-    if not keys then
-      return
+function modstorage_to_table(s, key)
+  if key then
+    if string.find(s:get_string(key), "return") then
+      return minetest.deserialize(s:get_string(key))
     end
-    if toboolean(v) or toboolean(v) == false then
-      v = toboolean(v)
-    elseif tonumber(v) then
-      v = tonumber(v)
-    end
-    for numb, string in pairs(keys) do
-      if tonumber(string) and string ~= "nan" then --NaN compatible
-        keys[numb] = tonumber(string)
-      end
-    end
-    if type(toreturn[keys[1]]) ~= "table" then toreturn[keys[1]] = {} end
-    if #keys >= 2 then
-      if type(toreturn[keys[1]][keys[2]]) ~= "table" then toreturn[keys[1]][keys[2]] = {} end
-      if #keys >= 3 then
-        if type(toreturn[keys[1]][keys[2]][keys[3]]) ~= "table" then toreturn[keys[1]][keys[2]][keys[3]] = {} end
-        if #keys >= 4 then
-          if type(toreturn[keys[1]][keys[2]][keys[3]][keys[4]]) ~= "table" then toreturn[keys[1]][keys[2]][keys[3]][keys[4]] = {} end
-          if #keys == 5 then
-            toreturn[keys[1]][keys[2]][keys[3]][keys[4]][keys[5]] = v
-          else toreturn[keys[1]][keys[2]][keys[3]][keys[4]] = v
-          end
-        else toreturn[keys[1]][keys[2]][keys[3]] = v
-        end
-      else toreturn[keys[1]][keys[2]] = v
-      end
-    else toreturn[keys[1]] = v
+  else
+    local toreturn = {}
+    for kstr, v in pairs(s:to_table().fields) do
+      toreturn[kstr] = minetest.deserialize(v)
     end
   end
-  return toreturn
 end
