@@ -58,7 +58,7 @@ minetest.register_chatcommand("pinfo", {
   end,
 })
 
-subgames.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage, lobby)
+minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage)
   if player_lobby[hitter:get_player_name()] == "build" then
     subgames.add_bothud(hitter, player:get_player_name(), 0xFFFFFF, 5)
     return true
