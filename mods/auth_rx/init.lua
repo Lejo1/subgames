@@ -117,7 +117,9 @@ minetest.register_authentication_handler( {
 	set_password = function ( username, password )
 		if auth_db.set_password( username, password ) then
 			minetest.log( "info", "Reset password of player '" .. username .. "' in authentication database" )
+			return true
 		end
+		return false
 	end,
 	set_privileges = function ( username, privileges )
 		-- server operator's privileges are immutable
