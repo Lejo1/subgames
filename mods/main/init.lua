@@ -70,7 +70,6 @@ subgames.register_on_joinplayer(function(player, lobby)
     local privs = minetest.get_player_privs(name)
     privs.interact = true
     minetest.set_player_privs(name, privs)
-    player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
     if mustcreate == true then
       mustcreate = false
       local param1 = "mainlobby"
@@ -91,7 +90,6 @@ end)
 
 subgames.register_on_leaveplayer(function(player, lobby)
   if lobby == "main" then
-    player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
   end
 end)
 
