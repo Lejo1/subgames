@@ -1,1 +1,0 @@
-This mod informs fake games players that they dont play minetest
