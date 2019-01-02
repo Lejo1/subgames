@@ -73,7 +73,6 @@ function skin_class:apply_skin_to_player(player)
 
 	local playername = player:get_player_name()
 	local ver = self:get_meta("format") or "1.0"
-	default.player_set_model(player, "skinsdb_3d_armor_character.b3d")
 
 	local v10_texture = "blank.png"
 	local v18_texture = "blank.png"
