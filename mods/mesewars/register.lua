@@ -146,6 +146,7 @@ end
 
 --  Add the pre players to the team players and start the game.
 function mesewars.start_game()
+  minetest.log("warning", "Mesewars: Starting Game")
   for _,player in ipairs(subgames.get_lobby_players("mesewars")) do
     local name = player:get_player_name()
     sfinv.set_page(player, "3d_armor:armor")
@@ -477,6 +478,7 @@ function mesewars.win()
   if rteam_count <=1 then
     spawner = false
       if rteam_count == 1 and root_restart == false then
+        minetest.log("warning", "Mesewars: "..minetest.strip_colors(win_team).." won the Game")
         subgames.chat_send_all_lobby("mesewars", win_team .. " has won the Game!  Game will restart soon.")
         telestart = false
       end

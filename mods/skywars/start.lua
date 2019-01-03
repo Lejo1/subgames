@@ -45,6 +45,7 @@ function skywars.reset_map(lobby)
 end
 
 function skywars.start_game(lobby)
+  minetest.log("warning", "Skywars: Starting Game of the lobby "..lobby)
   local players = skywars.get_lobby_players(lobby)
   local playercount = #players
   local seekercount
@@ -93,6 +94,7 @@ function skywars.win(lobby)
     if count <= 1 then
       if count > 0 then
         skywars.chat_send_all_lobby(lobby, winner.." Win!")
+        minetest.log("warning", "Skywars: "..winner.." won the Game of the lobby "..lobby)
         money.set_money(winner, money.get_money(winner)+20)
       	minetest.chat_send_player(winner, "CoinSystem: You have receive 20 Coins!")
         skywars.chat_send_all_lobby(lobby, "Server Restarts in 5 sec.")

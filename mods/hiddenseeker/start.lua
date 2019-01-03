@@ -50,6 +50,7 @@ function hiddenseeker.may_start_game(lobby)
 end
 
 function hiddenseeker.start_game(lobby)
+  minetest.log("warning", "Hiddenseeker: Starting Game of the lobby "..lobby)
   local players = hiddenseeker.get_lobby_players(lobby)
   local playercount = #players
   local seekercount
@@ -141,6 +142,7 @@ function hiddenseeker.get_seeker_count(lobby)
 end
 
 local function party_win_announce(party, lobby, ldata)
+  minetest.log("warning", "Hiddenseeker: "..party.." won the Game of the lobby "..lobby)
   hiddenseeker.chat_send_all_lobby(lobby, party .. " win! Restart in 5 seconds.")
   for _, player in ipairs(hiddenseeker.get_lobby_players(lobby)) do
     player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
