@@ -210,6 +210,4 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			end
 		end
 	end
-
-	print("Spawned " .. chests_placed .. " chests after " .. attempts .. " attempts!")
 end)

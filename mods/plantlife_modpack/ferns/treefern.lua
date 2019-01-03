@@ -4,7 +4,7 @@
 -- by Mossmanikin
 -- License (everything): 	WTFPL
 -- Contains code from: 		biome_lib
--- Looked at code from:		default	, trees			
+-- Looked at code from:		default	, trees
 -----------------------------------------------------------------------------------------------
 
 assert(abstract_ferns.config.enable_treefern == true)
@@ -17,31 +17,25 @@ abstract_ferns.grow_tree_fern = function(pos)
 			and minetest.get_node(pos_01).name ~= "default:junglegrass" then
 		return
 	end
-		
+
 	local size = math.random(1, 4) + math.random(1, 4)
 	if (size > 5) then
 		size = 10 - size
 	end
 	size = size + 1
 	local crown = ({ "ferns:tree_fern_leaves", "ferns:tree_fern_leaves_02" })[math.random(1, 2)]
-	
+
 	local i = 1
 	local brk = false
 	while (i < size) do
-		print(minetest.get_node({x = pos.x, y = pos.y + i, z = pos.z}).name)
 		if minetest.get_node({x = pos.x, y = pos.y + i, z = pos.z}).name ~= "air" then
 			brk = true
-			print("break!")
 			break
 		end
-		print("set trunk node at:")
-		print(dump({x = pos.x, y = pos.y + i, z = pos.z}))
 		minetest.set_node({x = pos.x, y = pos.y + i, z = pos.z}, { name = "ferns:fern_trunk" })
 		i = i + 1
 	end
 	if not brk then
-		print("set crown node at:")
-		print(dump({x = pos.x, y = pos.y + i, z = pos.z}))
 		minetest.set_node({x = pos.x, y = pos.y + i - 1, z = pos.z}, { name = crown })
 	end
 end
@@ -142,8 +136,8 @@ minetest.register_node("ferns:fern_trunk", {
 	sounds = default.node_sound_wood_defaults(),
 	after_destruct = function(pos,oldnode)
         local node = minetest.get_node({x=pos.x,y=pos.y+1,z=pos.z})
-        if node.name == "ferns:fern_trunk" then 
-            minetest.dig_node({x=pos.x,y=pos.y+1,z=pos.z}) 
+        if node.name == "ferns:fern_trunk" then
+            minetest.dig_node({x=pos.x,y=pos.y+1,z=pos.z})
             minetest.add_item(pos,"ferns:fern_trunk")
         end
     end,

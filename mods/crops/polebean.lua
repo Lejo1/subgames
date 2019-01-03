@@ -65,7 +65,6 @@ local function crops_beanpole_on_dig(pos, node, digger)
 		bottom_n = minetest.get_node(bottom)
 	else
 		-- ouch, this shouldn't happen
-		print("beanpole on_dig falsely attached to: " .. pos.x .. "," .. pos.y .. "," .. pos.z)
 		return
 	end
 
@@ -110,11 +109,6 @@ local function crops_beanpole_on_dig(pos, node, digger)
 		minetest.remove_node(top)
 	else
 		-- ouch, this shouldn't happen
-		print("beanpole on_dig can't handle blocks at to: " ..
-				bottom.x .. "," .. bottom.y .. "," .. bottom.z ..
-				" and " .. top.x .. "," .. top.y .. "," .. top.z)
-		print("removing a " .. node.name .. " at " ..
-				pos.x .. "," .. pos.y .. "," .. pos.z)
 		minetest.remove_node(pos)
 		return
 	end
@@ -306,4 +300,3 @@ crops.register({ name = "crops:beanpole_plant_base_2", properties = properties }
 crops.register({ name = "crops:beanpole_plant_base_3", properties = properties })
 crops.register({ name = "crops:beanpole_plant_base_4", properties = properties })
 crops.register({ name = "crops:beanpole_plant_base_5", properties = properties })
-

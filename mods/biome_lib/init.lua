@@ -44,7 +44,6 @@ local DEBUG = false --... except if you want to spam the console with debugging 
 
 function biome_lib:dbg(msg)
 	if DEBUG then
-		print("[Plantlife] "..msg)
 		minetest.log("verbose", "[Plantlife] "..msg)
 	end
 end
