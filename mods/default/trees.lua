@@ -85,10 +85,6 @@ function default.grow_sapling(pos)
 		minetest.log("action", "An acacia bush sapling grows into a bush at "..
 			minetest.pos_to_string(pos))
 		default.grow_acacia_bush(pos)
-	elseif node.name == "default:emergent_jungle_sapling" then
-		minetest.log("action", "An emergent jungle sapling grows into a tree at "..
-			minetest.pos_to_string(pos))
-		default.grow_new_emergent_jungle_tree(pos)
 	end
 end
 
@@ -398,16 +394,6 @@ function default.grow_new_jungle_tree(pos)
 end
 
 
--- New emergent jungle tree
-
-function default.grow_new_emergent_jungle_tree(pos)
-	local path = minetest.get_modpath("default") ..
-		"/schematics/emergent_jungle_tree_from_sapling.mts"
-	minetest.place_schematic({x = pos.x - 3, y = pos.y - 5, z = pos.z - 3},
-		path, "random", nil, false)
-end
-
-
 -- New pine tree
 
 function default.grow_new_pine_tree(pos)
@@ -503,6 +489,18 @@ function default.sapling_on_place(itemstack, placer, pointed_thing,
 		minetest.record_protection_violation(pos, player_name)
 		return itemstack
 	end
+	-- Check tree volume for protection
+	if default.intersects_protection(
+			vector.add(pos, minp_relative),
+			vector.add(pos, maxp_relative),
+			player_name,
+			interval) then
+		minetest.record_protection_violation(pos, player_name)
+		-- Print extra information to explain
+		minetest.chat_send_player(player_name, "Tree will intersect protection")
+		return itemstack
+	end
+
 	minetest.log("action", player_name .. " places node "
 			.. sapling_name .. " at " .. minetest.pos_to_string(pos))
 

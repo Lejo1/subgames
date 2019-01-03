@@ -30,14 +30,6 @@ minetest.override_item("default:dirt_with_rainforest_litter", {
 	}
 })
 
-minetest.override_item("default:dirt_with_coniferous_litter", {
-	soil = {
-		base = "default:dirt_with_coniferous_litter",
-		dry = "farming:soil",
-		wet = "farming:soil_wet"
-	}
-})
-
 minetest.register_node("farming:soil", {
 	description = "Soil",
 	tiles = {"default_dirt.png^farming_soil.png", "default_dirt.png"},
@@ -65,7 +57,7 @@ minetest.register_node("farming:soil_wet", {
 })
 
 minetest.override_item("default:desert_sand", {
-	groups = {crumbly=3, falling_node=0, sand=0, soil = 1},
+	groups = {crumbly=3, falling_node=1, sand=1, soil = 1},
 	soil = {
 		base = "default:desert_sand",
 		dry = "farming:desert_sand_soil",

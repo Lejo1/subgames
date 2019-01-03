@@ -103,7 +103,7 @@ function bucket.register_liquid(source, flowing, itemname, inventory_image, name
 					return
 				end
 
-				minetest.item_place_node(ItemStack(source), user, {type="node", under=lpos, above=lpos})
+				minetest.set_node(lpos, {name = source})
 				return ItemStack("bucket:bucket_empty")
 			end
 		})
@@ -189,12 +189,6 @@ bucket.register_liquid(
 	{water_bucket = 1}
 )
 
--- River water source is 'liquid_renewable = false' to avoid horizontal spread
--- of water sources in sloping rivers that can cause water to overflow
--- riverbanks and cause floods.
--- River water source is instead made renewable by the 'force renew' option
--- used here.
-
 bucket.register_liquid(
 	"default:river_water_source",
 	"default:river_water_flowing",
@@ -219,3 +213,4 @@ minetest.register_craft({
 	burntime = 60,
 	replacements = {{"bucket:bucket_lava", "bucket:bucket_empty"}},
 })
+
