@@ -103,7 +103,7 @@ function bucket.register_liquid(source, flowing, itemname, inventory_image, name
 					return
 				end
 
-				minetest.set_node(lpos, {name = source})
+				minetest.item_place_node(ItemStack(source), user, {type="node", under=lpos, above=lpos})
 				return ItemStack("bucket:bucket_empty")
 			end
 		})
@@ -213,4 +213,3 @@ minetest.register_craft({
 	burntime = 60,
 	replacements = {{"bucket:bucket_lava", "bucket:bucket_empty"}},
 })
-
