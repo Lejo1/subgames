@@ -40,6 +40,10 @@ minetest.register_on_player_receive_fields(function(player, formname, pressed)
       if #subgames.get_lobby_players("hiddenseeker") < hiddenseeker.max_players*#hiddenseeker.lobbys then
         subgames.change_lobby(player, "hiddenseeker")
       end
+    elseif pressed.mesewars then
+      if #subgames.get_lobby_players("mesewars") < mesewars.lobbys[1].playercount*#mesewars.lobbys then
+        subgames.change_lobby(player, "mesewars")
+      end
     elseif pressed.skywars then
       local count = 0
       for numb, table in pairs(skywars.lobbys) do

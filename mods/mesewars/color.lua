@@ -5,6 +5,32 @@
       team4 = red
 ]]
 
+function mesewars.get_color_from_team(teamnumb)
+  if teamnumb == 1 then
+    return "blue"
+  elseif teamnumb == 2 then
+    return "yellow"
+  elseif teamnumb == 3 then
+    return "green"
+  elseif teamnumb == 4 then
+    return "red"
+  else return "white"
+  end
+end
+
+function mesewars.get_hex_from_team(teamnumb)
+  if teamnumb == 1 then
+    return 0x0000FF
+  elseif teamnumb == 2 then
+    return 0xFFFF00
+  elseif teamnumb == 3 then
+    return 0x00FF00
+  elseif teamnumb == 4 then
+    return 0xFF0000
+  else return "white"
+  end
+end
+
 function mesewars.color_tag(player)
   local name = player:get_player_name()
   if table.contains(team1_players, name) == true then
