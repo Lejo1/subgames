@@ -6,7 +6,7 @@ function mesewars.may_start_game(lobby)
     start[lobby] = true
     mesewars.chat_send_all_lobby(lobby, "Game starts in 30 seconds!")
     for _,player in ipairs(mesewars.get_lobby_players(lobby)) do
-      subgames.add_bothud(player, "Game starts in 15 seconds!", 0xFFAE19, 2)
+      subgames.add_bothud(player, "Game starts in 30 seconds!", 0xFFAE19, 2)
     end
     minetest.after(20, function()
       mesewars.chat_send_all_lobby(lobby, "Game starts in 10 seconds!")
@@ -51,12 +51,16 @@ function mesewars.start_game(lobby)
   end
   mesewars.lobbys[lobby].ingame = true
   for k, v in pairs(mesewars.lobbys[lobby].mesepos) do
-    mesewars.lobbys[lobby].mese[k] = true
-    minetest.set_node(v, "mesewars:mese"..k)
+    mesewars.lobbys[lobby].meses[k] = true
+    minetest.set_node(v, {name="mesewars:mese"..k})
   end
   for _, player in pairs(mesewars.get_lobby_players(lobby)) do
     local name = player:get_player_name()
     local team = mesewars.lobbys[lobby].players[name]
+    if not team then
+      mesewars.give_random_team(player)
+      team = mesewars.lobbys[lobby].players[name]
+    end
     subgames.clear_inv(player)
     mesewars.give_kit_items(name)
     player:setpos(mesewars.lobbys[lobby].pos[team])

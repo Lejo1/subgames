@@ -112,6 +112,7 @@ function mesewars.join_game(player, lobby)
     player:setpos(mesewars.lobbys[lobby].specpos)
     subgames.clear_inv(player)
     mesewars.win(lobby)
+    mesewars.lobbys[lobby].players[name] = false
     if mesewars.lobbys[lobby].mustcreate == true then
       mesewars.lobbys[lobby].mustcreate = false
       minetest.chat_send_all("Creating mesewars map don't leave!, May lag")

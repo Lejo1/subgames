@@ -27,10 +27,12 @@ function mesewars.create_team_form(name)
       hight[team] = 0
     else hight[team] = hight[team] + 0.5
     end
-    playerlist = playerlist.."label["..(team-1)*(2)..","..2.5+hight[team]..";"..name.."]"
+    if team then
+      playerlist = playerlist.."label["..(team-1)*(2)..","..2.5+hight[team]..";"..name.."]"
+    end
   end
   return (
-    "size["..mesewars.lobbys[lobby].teams*(2.5)..","..lobby.playercount/lobbys.teams.."]" ..
+    "size["..mesewars.lobbys[lobby].teams*(2.5)..","..mesewars.lobbys[lobby].playercount/mesewars.lobbys[lobby].teams.."]" ..
     "label[0,0;Select your team for the next Round! You see the joined players below the buttons.]" ..
     "button[8,0;2,1;refresh;Refresh]" ..
     "button[0,1;2,1;1;Blue]" ..
@@ -65,6 +67,21 @@ subgames.register_chatcommand("team", {
   end,
 })
 
+function mesewars.give_random_team(player)
+  local name = player:get_player_name()
+  local lobby = mesewars.player_lobby[name]
+  local ltable = mesewars.lobbys[lobby]
+  local team = math.random(ltable.teams)
+  while #mesewars.get_team_players(lobby, team)>ltable.playercount/ltable.teams do
+    team = math.random(ltable.teams)
+  end
+  mesewars.lobbys[lobby].players[name] = team
+  local teamcolour = mesewars.get_color_from_team(team)
+  local msg = core.colorize("teamcolour", "You are now in Team "..teamcolour)
+  minetest.chat_send_player(name, msg)
+  subgames.add_bothud(player, "You are now in Team "..teamcolour, mesewars.get_hex_from_team(team), 2)
+end
+
 function mesewars.handle_teamform_input(player, pressed)
   local name = player:get_player_name()
   local lobby = mesewars.player_lobby[name]
@@ -73,25 +90,26 @@ function mesewars.handle_teamform_input(player, pressed)
     minetest.chat_send_player(name, "You can't switch your team while the lobby is ingame!")
     return
   end
+  if pressed.quit then
+    return
+  end
   for field, input in pairs(pressed) do
-    if not field.quit then
-      if field.leave then
-        mesewars.lobbys[lobby].players[name] = false
-        minetest.chat_send_player(name, "You have left your team!")
-        subgames.add_bothud(player, "You have left your team!", 0xFFFFFF, 2)
-      elseif tonumber(field) then
-        local team = tonumber(field)
-        if #mesewars.get_team_players(lobby, team) < ltable.playercount/ltable.teams then
-          mesewars.lobbys[lobby].players[name] = team
-          local teamcolour = mesewars.get_color_from_team(team)
-          local msg = core.colorize("teamcolour", "You are now in Team "..teamcolour)
-          minetest.chat_send_player(name, msg)
-          subgames.add_bothud(player, "You are now in Team "..teamcolour, mesewars.get_hex_from_team(team), 2)
-        else minetest.chat_send_player(name, "The Team is full!")
-        end
+    if field == "leave" then
+      mesewars.lobbys[lobby].players[name] = false
+      minetest.chat_send_player(name, "You have left your team!")
+      subgames.add_bothud(player, "You have left your team!", 0xFFFFFF, 2)
+    elseif tonumber(field) then
+      local team = tonumber(field)
+      if #mesewars.get_team_players(lobby, team) < ltable.playercount/ltable.teams then
+        mesewars.lobbys[lobby].players[name] = team
+        local teamcolour = mesewars.get_color_from_team(team)
+        local msg = core.colorize("teamcolour", "You are now in Team "..teamcolour)
+        minetest.chat_send_player(name, msg)
+        subgames.add_bothud(player, "You are now in Team "..teamcolour, mesewars.get_hex_from_team(team), 2)
+      else minetest.chat_send_player(name, "The Team is full!")
       end
-      mesewars.win(lobby)
     end
+    mesewars.win(lobby)
   end
 end
 
