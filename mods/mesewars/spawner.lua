@@ -5,7 +5,6 @@ local times = {
 	["gold"] = 70,
 	["msteel"] = 20
 }
-local timer1 = 0
 minetest.register_globalstep(function(dtime)
 	for lobby, ltable in pairs(mesewars.lobbys) do
 		if ltable.ingame then
@@ -20,10 +19,9 @@ minetest.register_globalstep(function(dtime)
 			timer[lobby].steel = timer[lobby].steel+dtime
 			timer[lobby].gold = timer[lobby].gold+dtime
 			timer[lobby].msteel = timer[lobby].msteel+dtime
-			minetest.log("error", dump(timer[lobby]))
 			for key, time in pairs(timer[lobby]) do
 				if time >= times[key]/ltable.maxteam then
-					timer[lobby].key = 0
+					timer[lobby][key] = 0
 					local item = "default:steel_ingot"
 					if key == "brick" then
 						item = "default:clay_brick"

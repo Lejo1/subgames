@@ -2,7 +2,7 @@
 local start = {}
 function mesewars.may_start_game(lobby)
   local playercount = #mesewars.get_lobby_players(lobby)
-  if playercount >=2 and not start[lobby] and lobby ~= 0 then
+  if playercount >=2 and not start[lobby] and lobby ~= 0 and mesewars.teams_correct(lobby) then
     start[lobby] = true
     mesewars.chat_send_all_lobby(lobby, "Game starts in 30 seconds!")
     for _,player in ipairs(mesewars.get_lobby_players(lobby)) do
@@ -20,7 +20,7 @@ function mesewars.may_start_game(lobby)
         end
         minetest.after(5, function()
           playercount = #mesewars.get_lobby_players(lobby)
-          if playercount >= 2 then
+          if playercount >= 2 and mesewars.teams_correct(lobby) then
             local msg = core.colorize("red", "Game Start now!")
             mesewars.chat_send_all_lobby(lobby, msg)
             for _,player in ipairs(mesewars.get_lobby_players(lobby)) do
@@ -62,6 +62,7 @@ function mesewars.start_game(lobby)
       team = mesewars.lobbys[lobby].players[name]
     end
     subgames.clear_inv(player)
+    mesewars.color_tag(player)
     mesewars.give_kit_items(name)
     player:setpos(mesewars.lobbys[lobby].pos[team])
     sfinv.set_page(player, "3d_armor:armor")
@@ -75,7 +76,7 @@ function mesewars.get_team_count(lobby)
   local restplayers = {}
   if lobby ~= 0 then
     for name, role in pairs(mesewars.lobbys[lobby].players) do
-      if not teams[role] then
+      if role and not teams[role] then
         teams[role] = true
         lastteam = role
         team=team+1
@@ -91,15 +92,15 @@ function mesewars.win(lobby)
     local count, winner, restplayers = mesewars.get_team_count(lobby)
     if count <= 1 then
       if count > 0 then
-        mesewars.chat_send_all_lobby(lobby, "Team "..minetest.colorize(mesewars.get_color_from_team(winner), mesewars.get_color_from_team(winner)).." Win!")
+        mesewars.chat_send_all_lobby(lobby, minetest.colorize(mesewars.get_color_from_team(winner), "Team "..mesewars.get_color_from_team(winner)).." Win!")
         minetest.log("warning", "mesewars: "..minetest.colorize(mesewars.get_color_from_team(winner), mesewars.get_color_from_team(winner)).." won the Game of the lobby "..lobby)
         for name,_ in pairs(restplayers) do
-          money.set_money(winner, money.get_money(winner)+25)
+          money.set_money(name, money.get_money(name)+25)
           minetest.chat_send_player(winner, "CoinSystem: You have receive 25 Coins!")
         end
         mesewars.chat_send_all_lobby(lobby, "Server Restarts in 5 sec.")
         for _,player in ipairs(mesewars.get_lobby_players(lobby)) do
-          subgames.add_mithud(player, winner.." Win!", 0xFF0000, 3)
+          subgames.add_mithud(player, "Team "..mesewars.get_color_from_team(winner).." Win!", mesewars.get_hex_from_team(winner), 3)
         end
       end
       minetest.after(5, function()
@@ -109,6 +110,7 @@ function mesewars.win(lobby)
           subgames.clear_inv(player)
           subgames.unspectate(player)
           mesewars.lobbys[lobby].players[name] = false
+          mesewars.color_tag(player)
           sfinv.set_page(player, "subgames:team")
         end
         mesewars.reset_map(lobby)

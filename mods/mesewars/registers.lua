@@ -32,8 +32,7 @@ end
 subgames.register_on_joinplayer(function(player, lobby)
   if lobby == "mesewars" then
     local name = player:get_player_name()
-    mesewars.join_game(player, 1)
-    subgames.add_mithud(player, "You joined mesewars!", 0xFFFFFF, 3)
+    subgames.add_mithud(player, mesewars.join_game(player, 1), 0xFFFFFF, 3)
   end
 end)
 
@@ -67,7 +66,7 @@ function areas.mesewars.dig(pos, node, digger)
   local name = digger:get_player_name()
   local plobby = mesewars.player_lobby[name]
   local nodename = node.name
-  if mesewars.lobbys[plobby].ingame and (nodename == "default:sandstone" or nodename == "default:obsidian" or nodename == "default:glass" or nodename == "default:steelblock" or nodename == "default:chest") then
+  if mesewars.lobbys[plobby].ingame and (nodename == "default:sandstone" or nodename == "default:obsidian" or nodename == "default:glass" or nodename == "default:steelblock" or nodename == "default:chest" or string.find(nodename, "mesewars:mese")) then
     return true
   end
 end
@@ -108,7 +107,7 @@ end
 
 function mesewars.get_team_base(name)
   local lobby = mesewars.player_lobby[name]
-  return mesewars.lobbys[lobby].pos[lobby]
+  return mesewars.lobbys[lobby].pos[mesewars.lobbys[lobby].players[name]]
 end
 
 subgames.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage, lobby)
@@ -141,7 +140,7 @@ subgames.register_on_respawnplayer(function(player, lobby)
 		local name = player:get_player_name()
 		local plobby = mesewars.player_lobby[name]
 		if plobby ~= 0 and mesewars.lobbys[plobby].ingame then
-      if not mesewars.lobbys.meses[plobby] then
+      if not mesewars.lobbys[plobby].meses[mesewars.lobbys[plobby].players[name]] then
         if mesewars.lobbys[plobby].players[name] then
 			    mesewars.chat_send_all_lobby(plobby, minetest.colorize(mesewars.get_color_from_team(mesewars.lobbys[plobby].players[name]) ,name).." has been eliminated.")
           mesewars.lobbys[plobby].players[name] = false

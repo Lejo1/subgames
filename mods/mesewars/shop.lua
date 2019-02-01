@@ -381,11 +381,9 @@ minetest.register_craftitem("mesewars:bridge", {
   inventory_image = "bridge.png",
   on_use = function(itemstack, user, pointed_thing)
     local name = user:get_player_name()
-    local counter = 0
     local lastpos = user:getpos() ; lastpos.y = lastpos.y -1
     local high = lastpos.y
-    while counter < 5 do
-      counter = counter +1
+    for counter=0, 5 do
       lastpos = vector.add(lastpos, user:get_look_dir()) ; lastpos.y = high
       minetest.item_place_node(ItemStack("default:sandstone"), user, {type="node", under=lastpos, above=lastpos})
     end

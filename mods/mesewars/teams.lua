@@ -71,9 +71,12 @@ function mesewars.give_random_team(player)
   local name = player:get_player_name()
   local lobby = mesewars.player_lobby[name]
   local ltable = mesewars.lobbys[lobby]
+  local lobbyplayers = #mesewars.get_lobby_players(lobby)
   local team = math.random(ltable.teams)
-  while #mesewars.get_team_players(lobby, team)>ltable.playercount/ltable.teams do
+  local teamplayers = #mesewars.get_team_players(lobby, team) + 1
+  while teamplayers > ltable.playercount/ltable.teams or teamplayers >= lobbyplayers do
     team = math.random(ltable.teams)
+    teamplayers = #mesewars.get_team_players(lobby, team) + 1
   end
   mesewars.lobbys[lobby].players[name] = team
   local teamcolour = mesewars.get_color_from_team(team)
@@ -110,7 +113,19 @@ function mesewars.handle_teamform_input(player, pressed)
       end
     end
     mesewars.win(lobby)
+    mesewars.color_tag(player)
   end
+end
+
+function mesewars.teams_correct(lobby)
+  local maxteam = 1
+  for team=0, mesewars.lobbys[lobby].teams do
+    local players = #mesewars.get_team_players(lobby, team)
+    if players > maxteam then
+      maxteam = players
+    end
+  end
+  return maxteam < #mesewars.get_lobby_players(lobby)
 end
 
 minetest.register_on_player_receive_fields(function(player, formname, pressed)

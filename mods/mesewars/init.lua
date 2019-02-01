@@ -4,7 +4,7 @@ mesewars = {}
 
 mesewars.lobbys = {
   [1] = {
-    ["string_name"] = "4Seasons by Sontrunks",
+    ["string_name"] = "4 Seasons by Sontrunks",
     ["playercount"] = 16,
     ["teams"] = 4,
     ["maxteam"] = 1,
