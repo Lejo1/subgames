@@ -66,8 +66,7 @@ function areas.mesewars.dig(pos, node, digger)
   local name = digger:get_player_name()
   local plobby = mesewars.player_lobby[name]
   local nodename = node.name
-  minetest.chat_send_all(minetest.pos_to_string(pos).." with "..dump(mesewars.lobbys[plobby].mapblocks[minetest.pos_to_string(pos)]))
-  if mesewars.lobbys[plobby].ingame and mesewars.lobbys[plobby].mapblocks[minetest.pos_to_string(pos)] and (nodename == "default:sandstone" or nodename == "default:obsidian" or nodename == "default:glass" or nodename == "default:steelblock" or nodename == "default:chest" or string.find(nodename, "mesewars:mese")) then
+  if mesewars.lobbys[plobby].ingame and (mesewars.lobbys[plobby].mapblocks[minetest.pos_to_string(pos)] and (nodename == "default:sandstone" or nodename == "default:obsidian" or nodename == "default:glass" or nodename == "default:steelblock" or nodename == "default:chest")) or string.find(nodename, "mesewars:mese") then
     return true
   end
 end
@@ -166,6 +165,7 @@ subgames.register_on_blast(function(pos, intensity, lobby)
     local nodename = node.name
     local plobby = get_lobby_from_pos(pos)
     if not plobby or plobby == 0 or mesewars.lobbys[plobby].ingame ~= true or not mesewars.lobbys[plobby].mapblocks[minetest.pos_to_string(pos)] or not (nodename == "default:sandstone" or nodename == "default:obsidian" or nodename == "default:glass" or nodename == "default:steelblock" or nodename == "default:chest") then
+      return false
     end
   end
 end)

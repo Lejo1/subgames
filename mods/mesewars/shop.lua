@@ -285,11 +285,11 @@ minetest.register_craftitem("mesewars:fallprotection", {
 subgames.register_on_item_eat(function(hp_change, replace_with_item, itemstack, user, pointed_thing, lobby)
     if lobby == "mesewars" then
     local name = user:get_player_name()
-    local pos = vector.round(user:getpos())
+    local pos = user:getpos()
     local blockpos = pos ; blockpos.y = blockpos.y -2
     if minetest.get_node(blockpos).name == "air" then
       minetest.set_node(blockpos, {name="default:glass"})
-      mesewars.lobbys[mesewars.player_lobby[name]].mapblocks[minetest.pos_to_string(blockpos)] = {name="air"}
+      mesewars.lobbys[mesewars.player_lobby[name]].mapblocks[minetest.pos_to_string(vector.round(blockpos))] = {name="air"}
     end
     local ent = minetest.add_entity(user:getpos(), "mesewars:temp")
     local obj = ent:get_luaentity()
@@ -390,8 +390,7 @@ minetest.register_craftitem("mesewars:bridge", {
       lastpos = vector.add(lastpos, user:get_look_dir()) ; lastpos.y = high
       if minetest.get_node(lastpos).name == "air" then
         minetest.set_node(lastpos, {name="default:sandstone"})
-        minetest.chat_send_all("I setted this "..minetest.pos_to_string(lastpos))
-        mesewars.lobbys[mesewars.player_lobby[name]].mapblocks[minetest.pos_to_string(lastpos)] = {name="air"}
+        mesewars.lobbys[mesewars.player_lobby[name]].mapblocks[minetest.pos_to_string(vector.round(lastpos))] = {name="air"}
       end
     end
     itemstack:take_item()
