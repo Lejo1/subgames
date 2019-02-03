@@ -35,7 +35,9 @@ minetest.register_on_player_receive_fields(function(player, formname, pressed)
   if formname == "main:teleporter" then
     local name = player:get_player_name()
     if pressed.mesewars then
-      subgames.change_lobby(player, "mesewars")
+      if #subgames.get_lobby_players("mesewars") < mesewars.lobbys[1].playercount*#mesewars.lobbys then
+        subgames.change_lobby(player, "mesewars")
+      end
     elseif pressed.hiddenseeker then
       if #subgames.get_lobby_players("hiddenseeker") < hiddenseeker.max_players*#hiddenseeker.lobbys then
         subgames.change_lobby(player, "hiddenseeker")

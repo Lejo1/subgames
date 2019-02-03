@@ -1,5 +1,1 @@
-3d_armor
-3d_armor_sfinv
-sfinv
 subgames
-main

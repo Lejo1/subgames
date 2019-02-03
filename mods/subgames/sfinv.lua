@@ -33,8 +33,7 @@ sfinv.register_page("subgames:team", {
 	get = function(self, player, context)
 		local name = player:get_player_name()
     if player_lobby[name] == "mesewars" then
-      mesewars.create_team_form()
-		  return sfinv.make_formspec(player, context, mesewars_team_form, false)
+		  return sfinv.make_formspec(player, context, mesewars.create_team_form(name), false)
     else return sfinv.make_formspec(player, context, (
 			"size[8,9]" ..
 			"label[0,0;Teams are not available here!]"
@@ -43,59 +42,11 @@ sfinv.register_page("subgames:team", {
 	end,
   on_player_receive_fields = function(self, player, context, pressed)
     local name = player:get_player_name()
-    if player_lobby[name] == "mesewars" then
-    if pressed["preteam1"] or pressed["preteam2"] or pressed["preteam3"] or pressed["preteam4"] then
-      if true == table.contains(pre1_players, name) or true == table.contains(pre2_players, name) or true == table.contains(pre3_players, name) or true == table.contains(pre4_players, name) then
-        mesewars.leave_pre_player(name)
-      end
-      if pressed["preteam1"] then
-        if #pre1_players < player_max then
-          pre1_players[#pre1_players+1] = name
-          local msg = core.colorize("blue", "You are now in Team Blue")
-          minetest.chat_send_player(name, msg)
-          subgames.add_bothud(player, "You are now in Team Blue", 0x0000FF, 2)
-        else minetest.chat_send_player(name, "The Team is full!")
-        end
-      elseif pressed["preteam2"] then
-        if #pre2_players < player_max then
-          pre2_players[#pre2_players+1] = name
-          local msg = core.colorize("yellow", "You are now in Team Yellow")
-          minetest.chat_send_player(name, msg)
-          subgames.add_bothud(player, "You are now in Team Yellow", 0xFFFF00, 2)
-        else minetest.chat_send_player(name, "The Team is full!")
-        end
-      elseif pressed["preteam3"] then
-        if #pre3_players < player_max then
-          pre3_players[#pre3_players+1] = name
-          local msg = core.colorize("green", "You are now in Team Green")
-          minetest.chat_send_player(name, msg)
-          subgames.add_bothud(player, "You are now in Team Green", 0x00FF00, 2)
-        else minetest.chat_send_player(name, "The Team is full!")
-        end
-      elseif pressed["preteam4"] then
-        if #pre4_players < player_max then
-          pre4_players[#pre4_players+1] = name
-          local msg = core.colorize("red", "You are now in Team Red")
-          minetest.chat_send_player(name, msg)
-          subgames.add_bothud(player, "You are now in Team Red", 0xFF0000, 2)
-        else minetest.chat_send_player(name, "The Team is full!")
-        end
-      end
-      mesewars.win()
-      mesewars.create_team_form()
-      sfinv.set_player_inventory_formspec(player)
-    elseif pressed["leave"] then
-      mesewars.leave_pre_player(name)
-      minetest.chat_send_player(name, "You have left your team!")
-      subgames.add_bothud(player, "You have left your team!", 0xFFFFFF, 2)
-      mesewars.create_team_form()
-      sfinv.set_player_inventory_formspec(player)
-      mesewars.win()
-    elseif pressed["refresh"] then
-      mesewars.create_team_form()
-      sfinv.set_player_inventory_formspec(player)
-    end
-    end
+    mesewars.handle_teamform_input(player, pressed)
+		if not pressed.quit then
+			mesewars.create_team_form(name)
+			sfinv.set_player_inventory_formspec(player)
+		end
   end,
 	is_in_nav = function(self, player, context)
 		local name = player:get_player_name()
@@ -263,6 +214,8 @@ sfinv.register_page("subgames:maps", {
 		local name = player:get_player_name()
 		if player_lobby[name] == "skywars" then
 			return sfinv.make_formspec(player, context, skywars.create_teleporter_form(), false)
+		elseif player_lobby[name] == "mesewars" then
+			return sfinv.make_formspec(player, context, mesewars.create_teleporter_form(), false)
 		else return sfinv.make_formspec(player, context, (
 			"size[8,9]" ..
 			"label[0,0;Maps are not available here!]"
@@ -271,19 +224,31 @@ sfinv.register_page("subgames:maps", {
   end,
 	on_player_receive_fields = function(self, player, context, pressed)
 		local name = player:get_player_name()
-    if pressed.map1 then
-      skywars.leave_game(player)
-			skywars.win(skywars.player_lobby[name])
-      minetest.chat_send_player(name, skywars.join_game(player, 1))
-    elseif pressed.map2 then
-      skywars.leave_game(player)
-      minetest.chat_send_player(name, skywars.join_game(player, 2))
-    end
+		local lobby = player_lobby[name]
+		if lobby == "skywars" then
+			if pressed.map1 then
+				skywars.leave_game(player)
+				skywars.win(skywars.player_lobby[name])
+				minetest.chat_send_player(name, skywars.join_game(player, 1))
+			elseif pressed.map2 then
+				skywars.leave_game(player)
+				minetest.chat_send_player(name, skywars.join_game(player, 2))
+			end
+		elseif lobby == "mesewars" then
+			if pressed.map1 then
+				mesewars.leave_game(player)
+				mesewars.win(mesewars.player_lobby[name])
+				minetest.chat_send_player(name, mesewars.join_game(player, 1))
+			elseif pressed.map2 then
+				mesewars.leave_game(player)
+				minetest.chat_send_player(name, mesewars.join_game(player, 2))
+			end
+		end
     minetest.close_formspec(name, "")
 	end,
 	is_in_nav = function(self, player, context)
 		local name = player:get_player_name()
-    if player_lobby[name] == "skywars" then
+    if player_lobby[name] == "skywars" or player_lobby[name] == "mesewars" then
 			return true
 		end
 	end

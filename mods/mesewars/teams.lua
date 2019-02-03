@@ -6,38 +6,45 @@ function table.is_not_nil(value)
   end
 end
 
+--  Add a function to get the players of a team
+function mesewars.get_team_players(lobby, team)
+  local players = {}
+  for name, pteam in pairs(mesewars.lobbys[lobby].players) do
+    if pteam == team then
+      table.insert(players, name)
+    end
+  end
+  return players
+end
+
 -- Add a function to open the formspec.
-function mesewars.create_team_form()
-  mesewars_team_form = (
-    "size[10,4]" ..
+function mesewars.create_team_form(name)
+  local lobby = mesewars.player_lobby[name]
+  local hight = {}
+  local playerlist = ""
+  for name, team in pairs(mesewars.lobbys[lobby].players) do
+    if not hight[team] then
+      hight[team] = 0
+    else hight[team] = hight[team] + 0.5
+    end
+    if team then
+      playerlist = playerlist.."label["..(team-1)*(2)..","..2.5+hight[team]..";"..name.."]"
+    end
+  end
+  return (
+    "size["..mesewars.lobbys[lobby].teams*(2.5)..","..mesewars.lobbys[lobby].playercount/mesewars.lobbys[lobby].teams.."]" ..
     "label[0,0;Select your team for the next Round! You see the joined players below the buttons.]" ..
     "button[8,0;2,1;refresh;Refresh]" ..
-    "button[0,1;2,1;preteam1;Blue]" ..
-    "button[2,1;2,1;preteam2;Yellow]" ..
-    "button[4,1;2,1;preteam3;Green]" ..
-    "button[6,1;2,1;preteam4;Red]" ..
+    "button[0,1;2,1;1;Blue]" ..
+    "button[2,1;2,1;2;Yellow]" ..
+    "button[4,1;2,1;3;Green]" ..
+    "button[6,1;2,1;4;Red]" ..
     "button[8,1;2,1;leave;Leave]" ..
-    "label[0,2.5;"..table.is_not_nil(pre1_players[1]).."]" ..
-    "label[0,3;"..table.is_not_nil(pre1_players[2]).."]" ..
-    "label[0,3.5;"..table.is_not_nil(pre1_players[3]).."]" ..
-    "label[0,4;"..table.is_not_nil(pre1_players[4]).."]" ..
-    "label[2,2.5;"..table.is_not_nil(pre2_players[1]).."]" ..
-    "label[2,3;"..table.is_not_nil(pre2_players[2]).."]" ..
-    "label[2,3.5;"..table.is_not_nil(pre2_players[3]).."]" ..
-    "label[2,4;"..table.is_not_nil(pre2_players[4]).."]" ..
-    "label[4,2.5;"..table.is_not_nil(pre3_players[1]).."]" ..
-    "label[4,3;"..table.is_not_nil(pre3_players[2]).."]" ..
-    "label[4,3.5;"..table.is_not_nil(pre3_players[3]).."]" ..
-    "label[4,4;"..table.is_not_nil(pre3_players[4]).."]" ..
-    "label[6,2.5;"..table.is_not_nil(pre4_players[1]).."]" ..
-    "label[6,3;"..table.is_not_nil(pre4_players[2]).."]" ..
-    "label[6,3.5;"..table.is_not_nil(pre4_players[3]).."]" ..
-    "label[6,4;"..table.is_not_nil(pre4_players[4]).."]"
+    playerlist
   )
 end
 function mesewars.team_form(name)
-  mesewars.create_team_form()
-  minetest.show_formspec(name, "mesewars:team", mesewars_team_form)
+  minetest.show_formspec(name, "mesewars:team", mesewars.create_team_form(name))
 end
 
 --  Add the team selector.
@@ -60,78 +67,74 @@ subgames.register_chatcommand("team", {
   end,
 })
 
+function mesewars.give_random_team(player)
+  local name = player:get_player_name()
+  local lobby = mesewars.player_lobby[name]
+  local ltable = mesewars.lobbys[lobby]
+  local lobbyplayers = #mesewars.get_lobby_players(lobby)
+  local team = math.random(ltable.teams)
+  local teamplayers = #mesewars.get_team_players(lobby, team) + 1
+  while teamplayers > ltable.playercount/ltable.teams or teamplayers >= lobbyplayers do
+    team = math.random(ltable.teams)
+    teamplayers = #mesewars.get_team_players(lobby, team) + 1
+  end
+  mesewars.lobbys[lobby].players[name] = team
+  local teamcolour = mesewars.get_color_from_team(team)
+  local msg = core.colorize("teamcolour", "You are now in Team "..teamcolour)
+  minetest.chat_send_player(name, msg)
+  subgames.add_bothud(player, "You are now in Team "..teamcolour, mesewars.get_hex_from_team(team), 2)
+end
+
+function mesewars.handle_teamform_input(player, pressed)
+  local name = player:get_player_name()
+  local lobby = mesewars.player_lobby[name]
+  local ltable = mesewars.lobbys[lobby]
+  if ltable.ingame then
+    minetest.chat_send_player(name, "You can't switch your team while the lobby is ingame!")
+    return
+  end
+  if pressed.quit then
+    return
+  end
+  for field, input in pairs(pressed) do
+    if field == "leave" then
+      mesewars.lobbys[lobby].players[name] = false
+      minetest.chat_send_player(name, "You have left your team!")
+      subgames.add_bothud(player, "You have left your team!", 0xFFFFFF, 2)
+    elseif tonumber(field) then
+      local team = tonumber(field)
+      if #mesewars.get_team_players(lobby, team) < ltable.playercount/ltable.teams then
+        mesewars.lobbys[lobby].players[name] = team
+        local teamcolour = mesewars.get_color_from_team(team)
+        local msg = core.colorize("teamcolour", "You are now in Team "..teamcolour)
+        minetest.chat_send_player(name, msg)
+        subgames.add_bothud(player, "You are now in Team "..teamcolour, mesewars.get_hex_from_team(team), 2)
+      else minetest.chat_send_player(name, "The Team is full!")
+      end
+    end
+    mesewars.win(lobby)
+    mesewars.color_tag(player)
+  end
+end
+
+function mesewars.teams_correct(lobby)
+  local maxteam = 1
+  for team=0, mesewars.lobbys[lobby].teams do
+    local players = #mesewars.get_team_players(lobby, team)
+    if players > maxteam then
+      maxteam = players
+    end
+  end
+  return maxteam < #mesewars.get_lobby_players(lobby)
+end
+
 minetest.register_on_player_receive_fields(function(player, formname, pressed)
 	if formname == "mesewars:team" then
     local name = player:get_player_name()
-    if pressed["preteam1"] or pressed["preteam2"] or pressed["preteam3"] or pressed["preteam4"] then
-      if true == table.contains(pre1_players, name) or true == table.contains(pre2_players, name) or true == table.contains(pre3_players, name) or true == table.contains(pre4_players, name) then
-        mesewars.leave_pre_player(name)
-      end
-      if pressed["preteam1"] then
-        if #pre1_players < player_max then
-          pre1_players[#pre1_players+1] = name
-          local msg = core.colorize("blue", "You are now in Team Blue")
-          minetest.chat_send_player(name, msg)
-          subgames.add_bothud(player, "You are now in Team Blue", 0x0000FF, 2)
-        else minetest.chat_send_player(name, "The Team is full!")
-        end
-      elseif pressed["preteam2"] then
-        if #pre2_players < player_max then
-          pre2_players[#pre2_players+1] = name
-          local msg = core.colorize("yellow", "You are now in Team Yellow")
-          minetest.chat_send_player(name, msg)
-          subgames.add_bothud(player, "You are now in Team Yellow", 0xFFFF00, 2)
-        else minetest.chat_send_player(name, "The Team is full!")
-        end
-      elseif pressed["preteam3"] then
-        if #pre3_players < player_max then
-          pre3_players[#pre3_players+1] = name
-          local msg = core.colorize("green", "You are now in Team Green")
-          minetest.chat_send_player(name, msg)
-          subgames.add_bothud(player, "You are now in Team Green", 0x00FF00, 2)
-        else minetest.chat_send_player(name, "The Team is full!")
-        end
-      elseif pressed["preteam4"] then
-        if #pre4_players < player_max then
-          pre4_players[#pre4_players+1] = name
-          local msg = core.colorize("red", "You are now in Team Red")
-          minetest.chat_send_player(name, msg)
-          subgames.add_bothud(player, "You are now in Team Red", 0xFF0000, 2)
-        else minetest.chat_send_player(name, "The Team is full!")
-        end
-      end
-      mesewars.team_form(name)
-      mesewars.win()
-      sfinv.set_player_inventory_formspec(player)
-    elseif pressed["leave"] then
-      mesewars.leave_pre_player(name)
-      minetest.chat_send_player(name, "You have left your team!")
-      subgames.add_bothud(player, "You have left your team!", 0xFFFFFF, 2)
-      mesewars.team_form(name)
-      mesewars.win()
-      sfinv.set_player_inventory_formspec(player)
-    elseif pressed["refresh"] then
+    mesewars.handle_teamform_input(player, pressed)
+    if not pressed.quit then
       mesewars.team_form(name)
       sfinv.set_player_inventory_formspec(player)
     end
-  end
-end)
-
---  Add coloured names
-subgames.register_on_chat_message(function(name, message, lobby)
-  if lobby == "mesewars" and name and message then
-    local team = mesewars.get_team(name)
-    local cname = core.colorize("white", "<"..name.."> ")
-    if team == "team1" then
-      cname = core.colorize("blue", "<"..name.."> ")
-    elseif team == "team2" then
-      cname = core.colorize("yellow", "<"..name.."> ")
-    elseif team == "team3" then
-      cname = core.colorize("green", "<"..name.."> ")
-    elseif team == "team4" then
-      cname = core.colorize("red", "<"..name.."> ")
-    end
-    subgames.chat_send_all_lobby("mesewars", cname..message)
-    return true
   end
 end)
