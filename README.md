@@ -7,7 +7,7 @@ This Repository is not for using on your own Server!
 
 Installing
 ----------
-1. `git clone https://github.com/Lejo1/subgames.git`
+1. `git clone --recursive https://github.com/Lejo1/subgames.git`
 
 License
 -------

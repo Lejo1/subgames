@@ -1,0 +1,19 @@
+[submodule "mods/serverlist_score"]
+	path = mods/serverlist_score
+	url = https://github.com/Lejo1/serverlist_score
+[submodule "mods/getip"]
+	path = mods/getip
+	url = https://github.com/Lejo1/getip
+[submodule "mods/vps_blocker"]
+	path = mods/vps_blocker
+	url = https://github.com/Lejo1/vps_blocker
+[submodule "mods/playtime"]
+	path = mods/playtime
+	url = https://github.com/Lejo1/playtime
+[submodule "mods/reportlist"]
+	path = mods/reportlist
+	url = https://github.com/Lejo1/reportlist
+[submodule "mods/xban2"]
+	path = mods/xban2
+	url = https://github.com/Lejo1/xban2
+	branch = report
