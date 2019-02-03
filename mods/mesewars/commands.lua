@@ -22,7 +22,6 @@ subgames.register_chatcommand("leave", {
       mesewars.join_game(player, lobby)
       minetest.chat_send_player(user, "You have left the Game!")
     end
-
   end,
 })
 

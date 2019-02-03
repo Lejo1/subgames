@@ -23,10 +23,10 @@ mesewars.lobbys = {
       [4] = {x=21, y=1156, z=-110}
     },
     ["meses"] = {
-      [1] = true,
-      [2] = true,
-      [3] = true,
-      [4] = true
+      [1] = false,
+      [2] = false,
+      [3] = false,
+      [4] = false
     },
     ["brick"] = {
       [1] = {x=57, y=1156, z=-62},
@@ -59,6 +59,63 @@ mesewars.lobbys = {
     ["mappos2"] = {x=74, y=1202, z=-18},
     ["schem"] = "newmese2",
     ["schempos"] = {x=-31, y=1100, z=-116}
+  },
+  [2] = {
+    ["string_name"] = "Mesewars is just like Eggwars",
+    ["playercount"] = 16,
+    ["teams"] = 4,
+    ["maxteam"] = 1,
+    ["players"] = {},
+    ["ingame"] = false,
+    ["pos"] = {
+      [1] = {x=-584, y=1138, z=-502},
+      [2] = {x=-584, y=1138, z=-666},
+      [3] = {x=-666, y=1138, z=-584},
+      [4] = {x=-502, y=1138, z=-584}
+    },
+    ["mesepos"] = {
+      [1] = {x=-584, y=1138, z=-498},
+      [2] = {x=-584, y=1138, z=-670},
+      [3] = {x=-670, y=1138, z=-584},
+      [4] = {x=-498, y=1138, z=-584}
+    },
+    ["meses"] = {
+      [1] = false,
+      [2] = false,
+      [3] = false,
+      [4] = false
+    },
+    ["brick"] = {
+      [1] = {x=-591, y=1138, z=-501},
+      [2] = {x=-577, y=1138, z=-667},
+      [3] = {x=-667, y=1138, z=-591},
+      [4] = {x=-501, y=1138, z=-577}
+    },
+    ["steel"] = {
+      [1] = {x=-584, y=1138, z=-507},
+      [2] = {x=-584, y=1138, z=-661},
+      [3] = {x=-661, y=1138, z=-584},
+      [4] = {x=-507, y=1138, z=-584}
+    },
+    ["gold"] = {
+      [1] = {x=-584, y=1141, z=-581},
+      [2] = {x=-584, y=1141, z=-587},
+      [3] = {x=-587, y=1141, z=-584},
+      [4] = {x=-581, y=1141, z=-584}
+    },
+    ["msteel"] = {
+      [1] = {x=-584, y=1141, z=-571},
+      [2] = {x=-584, y=1141, z=-597},
+      [3] = {x=-597, y=1141, z=-584},
+      [4] = {x=-571, y=1141, z=-584}
+    },
+    ["specpos"] = {x=-584, y=1172, z=-584},
+    ["mustcreate"] = true,
+    ["mapblocks"] = {},
+    ["mappos1"] = {x=-700, y=1100, z=-700},
+    ["mappos2"] = {x=-468, y=1187, z=-468},
+    ["schem"] = "submese3",
+    ["schempos"] = {x=-700, y=1100, z=-700}
   }
 }
 
@@ -93,12 +150,12 @@ end
 function mesewars.join_game(player, lobby)
   local name = player:get_player_name()
   if #mesewars.get_lobby_players(lobby) >= mesewars.lobbys[lobby].playercount then
-    --[[for newlobby,ldata in pairs(mesewars.lobbys) do
+    for newlobby,ldata in pairs(mesewars.lobbys) do
       if #mesewars.get_lobby_players(newlobby) < ldata.playercount then
         mesewars.join_game(player, newlobby)
         return "The lobby is full, so you joined the map "..ldata.string_name.."!"
       end
-    end]]
+    end
     return "The lobby is full !"
   elseif mesewars.lobbys[lobby].ingame == true then
     mesewars.player_lobby[name] = lobby
@@ -106,7 +163,7 @@ function mesewars.join_game(player, lobby)
     subgames.clear_inv(player)
     mesewars.lobbys[lobby].players[name] = false
     subgames.spectate(player)
-    sfinv.set_page(player, "subgames:team")
+    sfinv.set_page(player, "subgames:maps")
     return "Lobby is ingame! So you are now spectating."
   else mesewars.player_lobby[name] = lobby
     player:setpos(mesewars.lobbys[lobby].specpos)

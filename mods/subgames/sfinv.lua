@@ -214,6 +214,8 @@ sfinv.register_page("subgames:maps", {
 		local name = player:get_player_name()
 		if player_lobby[name] == "skywars" then
 			return sfinv.make_formspec(player, context, skywars.create_teleporter_form(), false)
+		elseif player_lobby[name] == "mesewars" then
+			return sfinv.make_formspec(player, context, mesewars.create_teleporter_form(), false)
 		else return sfinv.make_formspec(player, context, (
 			"size[8,9]" ..
 			"label[0,0;Maps are not available here!]"
@@ -222,19 +224,31 @@ sfinv.register_page("subgames:maps", {
   end,
 	on_player_receive_fields = function(self, player, context, pressed)
 		local name = player:get_player_name()
-    if pressed.map1 then
-      skywars.leave_game(player)
-			skywars.win(skywars.player_lobby[name])
-      minetest.chat_send_player(name, skywars.join_game(player, 1))
-    elseif pressed.map2 then
-      skywars.leave_game(player)
-      minetest.chat_send_player(name, skywars.join_game(player, 2))
-    end
+		local lobby = player_lobby[name]
+		if lobby == "skywars" then
+			if pressed.map1 then
+				skywars.leave_game(player)
+				skywars.win(skywars.player_lobby[name])
+				minetest.chat_send_player(name, skywars.join_game(player, 1))
+			elseif pressed.map2 then
+				skywars.leave_game(player)
+				minetest.chat_send_player(name, skywars.join_game(player, 2))
+			end
+		elseif lobby == "mesewars" then
+			if pressed.map1 then
+				mesewars.leave_game(player)
+				mesewars.win(mesewars.player_lobby[name])
+				minetest.chat_send_player(name, mesewars.join_game(player, 1))
+			elseif pressed.map2 then
+				mesewars.leave_game(player)
+				minetest.chat_send_player(name, mesewars.join_game(player, 2))
+			end
+		end
     minetest.close_formspec(name, "")
 	end,
 	is_in_nav = function(self, player, context)
 		local name = player:get_player_name()
-    if player_lobby[name] == "skywars" then
+    if player_lobby[name] == "skywars" or player_lobby[name] == "mesewars" then
 			return true
 		end
 	end

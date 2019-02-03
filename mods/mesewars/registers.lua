@@ -12,9 +12,9 @@ function mesewars.create_teleporter_form()
     end
   end
   local toreturn = ("size[4,5]" ..
-    "image_button[0,0;2,2;tiki.jpg;map1;"..status[1].."]" ..
+    "image_button[0,0;2,2;newmese.png;map1;"..status[1].."]" ..
     "tooltip[map1;"..mesewars.lobbys[1].string_name.."]" ..
-    "image_button[2,0;2,2;submerged.png;map2;"..status[2].."]" ..
+    "image_button[2,0;2,2;submese.png;map2;"..status[2].."]" ..
     "tooltip[map2;"..mesewars.lobbys[2].string_name.."]")
   return toreturn
 end
