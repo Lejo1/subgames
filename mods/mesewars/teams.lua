@@ -89,7 +89,7 @@ function mesewars.handle_teamform_input(player, pressed)
   local name = player:get_player_name()
   local lobby = mesewars.player_lobby[name]
   local ltable = mesewars.lobbys[lobby]
-  if ltable.ingame then
+  if lobby and ltable and ltable.ingame then
     minetest.chat_send_player(name, "You can't switch your team while the lobby is ingame!")
     return
   end
