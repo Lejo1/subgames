@@ -107,7 +107,7 @@ end
 
 function mesewars.get_team_base(name)
   local lobby = mesewars.player_lobby[name]
-  return mesewars.lobbys[lobby].pos[mesewars.lobbys[lobby].players[name]]
+  return mesewars.lobbys[lobby].pos[mesewars.lobbys[lobby].players[name]] or mesewars.lobbys[lobby].specpos
 end
 
 subgames.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage, lobby)
