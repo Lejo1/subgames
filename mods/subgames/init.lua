@@ -252,6 +252,7 @@ function subgames.call_leave_callbacks(player)
   for _,value in pairs(subgames.on_leaveplayer) do
     value(player, player_lobby[name])
   end
+  player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
   subgames.unspectate(player)
   player_lobby[name] = nil
 end
