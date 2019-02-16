@@ -66,6 +66,7 @@ function mesewars.start_game(lobby)
     mesewars.give_kit_items(name)
     player:setpos(mesewars.lobbys[lobby].pos[team])
     sfinv.set_page(player, "3d_armor:armor")
+    mesewars.set_maxteam(lobby)
   end
 end
 

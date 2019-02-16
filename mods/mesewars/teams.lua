@@ -128,6 +128,17 @@ function mesewars.teams_correct(lobby)
   return maxteam < #mesewars.get_lobby_players(lobby)
 end
 
+function mesewars.set_maxteam(lobby)
+  local maxteam = 1
+  for team=0, mesewars.lobbys[lobby].teams do
+    local players = #mesewars.get_team_players(lobby, team)
+    if players > maxteam then
+      maxteam = players
+    end
+  end
+  mesewars.lobbys[lobby].maxteam = maxteam
+end
+
 minetest.register_on_player_receive_fields(function(player, formname, pressed)
 	if formname == "mesewars:team" then
     local name = player:get_player_name()
