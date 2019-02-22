@@ -2,10 +2,17 @@ Enable_type_text_to_accept= false
 Enable_Only_1_language= false
 Default_language_number= 1
 
+--  To save the accepted version
+local storage = minetest.get_mod_storage()
+
 --Version 3
 --default languages: english=1, spanish=2, france=3,germany=4
 -- Add "," between the rules
 
+local rule_version = 1.0
+function agreerules_accepted(name)
+	return rule_version <= (storage:get_float(name) or 0)
+end
 arok_text={
 	{
 		"English",
@@ -153,13 +160,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 			return true
 			end
 		end
-
---================= Privs to grant =================
-			privs.shout = true
-			privs.zoom = true
---===========================================
-
-			minetest.set_player_privs(name, privs)
+			storage:set_float(name, rule_version)
 			minetest.chat_send_player(name,arok_text[i][15] .." "..name.. " " .. arok_text[i][10])
 			minetest.after(0.1, function()
 				minetest.show_formspec(name, "main:info", main.get_help_form("general"))
@@ -168,9 +169,10 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 end)
 
 minetest.register_on_joinplayer(function(player)
-	if minetest.check_player_privs(player:get_player_name(), {shout=true})==false then
+	local name = player:get_player_name()
+	if rule_version > storage:get_float(name) then
 		create_agreerules_form(Default_language_number)
-		minetest.show_formspec(player:get_player_name(), "AgreeRulesYesNoForm",agreerules_form)
+		minetest.show_formspec(name, "AgreeRulesYesNoForm",agreerules_form)
 	end
 end)
 
