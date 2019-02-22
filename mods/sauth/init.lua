@@ -8,6 +8,11 @@ local MN = minetest.get_current_modname()
 local WP = minetest.get_worldpath()
 local ie = minetest.request_insecure_environment()
 
+-- conf file settings
+local caching = minetest.setting_getbool(MN .. '.caching') or false
+local max_cache_records = tonumber(minetest.setting_get(MN .. '.cache_max')) or 500
+local ttl = tonumber(minetest.setting_get(MN..'.cache_ttl')) or 86400 -- defaults to 24 hours
+
 if not ie then
 	error("insecure environment inaccessible"..
 		" - make sure this mod has been added to minetest.conf!")
@@ -15,7 +20,8 @@ end
 
 -- Requires library for db access
 local _sql = ie.require("lsqlite3")
--- Don't allow other mods to use this global library!
+
+-- Prevent other mods using this instance!
 if sqlite3 then sqlite3 = nil end
 
 local singleplayer = minetest.is_singleplayer()
@@ -36,27 +42,54 @@ local function db_exec(stmt)
 	end
 end
 
-local function cache_check(name)
-	local chk = false
-	for _,data in ipairs(minetest.get_connected_players()) do
-		if data:get_player_name() == name then
-			chk = true
-			break
+-- Cache handling
+local cap = 0
+local function fetch_cache()
+	local q = "SELECT max(last_login) AS result FROM auth;"
+	local it, state = db:nrows(q)
+	local last = it(state)
+	if last then
+		last = last.result - ttl
+		local r = {}
+		q = ([[SELECT *	FROM auth WHERE last_login > %s LIMIT %s;
+		]]):format(last, max_cache_records)
+		for row in db:nrows(q) do
+			auth_table[row.name] = {
+				password = row.password,
+				privileges = minetest.string_to_privs(row.privileges),
+				last_login = row.last_login
+			}
+			cap = cap + 1
 		end
 	end
-	if not chk then
-		auth_table[name] = nil
+	minetest.log("action", "[sauth] cached " .. cap .. " records.")
+end
+
+local function trim_cache()
+	if cap < max_cache_records then return end
+	local entry = os.time()
+	local name
+	for k, v in pairs(auth_table) do
+		if v.last_login < entry then
+			entry = v.last_login
+			name = k
+		end
 	end
+	auth_table[name] = nil
+	cap = cap - 1
 end
 
 -- Db tables - because we need them!
 local create_db = [[
-CREATE TABLE IF NOT EXISTS auth (id INTEGER PRIMARY KEY AUTOINCREMENT,
-name VARCHAR(32), password VARCHAR(512), privileges VARCHAR(512),
-last_login INTEGER);
-CREATE TABLE IF NOT EXISTS _s (import BOOLEAN);
+CREATE TABLE IF NOT EXISTS auth (name VARCHAR(32) PRIMARY KEY ON CONFLICT IGNORE,
+password VARCHAR(512), privileges VARCHAR(512), last_login INTEGER);
+CREATE TABLE IF NOT EXISTS _s (import BOOLEAN, db_version VARCHAR(6));
 ]]
 db_exec(create_db)
+
+if caching then
+	fetch_cache()
+end
 
 --[[
 ###########################
@@ -65,6 +98,9 @@ db_exec(create_db)
 ]]
 
 local function get_record(name)
+	-- cached?
+	if auth_table[name] then return auth_table[name] end
+	-- fetch record
 	local query = ([[
 	    SELECT * FROM auth WHERE name = '%s' LIMIT 1;
 	]]):format(name)
@@ -165,6 +201,10 @@ local function del_record(name)
 	db_exec(stmt)
 end
 
+if not get_setting('db_version') then
+	add_setting('db_version', '1.1')
+end
+
 --[[
 ######################
 ###  Auth Handler  ###
@@ -187,20 +227,25 @@ sauth.auth_handler = {
 		-- Check and load db record if reqd
 		if r == nil then
 			r = get_record(name)
-	  	else
-		  	return auth_table[name]	-- cached copy			
 	  	end
 		-- Return nil on missing entry
 		if not r then return nil end
 		-- Figure out what privileges the player should have.
 		-- Take a copy of the players privilege table
 		local privileges, admin = {}
-		for priv, _ in pairs(minetest.string_to_privs(r.privileges)) do
-			privileges[priv] = true
+		if type(r.privileges) == "string" then
+			-- db record
+			for priv, _ in pairs(minetest.string_to_privs(r.privileges)) do
+				privileges[priv] = true
+			end
+		else
+			-- cache
+			privileges = r.privileges
 		end
 		if core.settings then
 			admin = core.settings:get("name")
 		else
+			-- use old api
 			admin = core.setting_get("name")
 		end
 		-- If singleplayer, grant privileges marked give_to_singleplayer = true
@@ -222,7 +267,11 @@ sauth.auth_handler = {
 			privileges = privileges,
 			last_login = tonumber(r.last_login)
 			}
-		if not auth_table[name] and add_to_cache then auth_table[name] = record end -- Cache if reqd
+		-- Cache if reqd
+		if not auth_table[name] and add_to_cache then
+			auth_table[name] = record
+			cap = cap + 1
+		end
 		return record
 	end,
 	create_auth = function(name, password)
@@ -232,7 +281,7 @@ sauth.auth_handler = {
 		if core.settings then
 			privs = core.settings:get("default_privs")
 		else
-			-- use old method
+			-- use old api
 			privs = core.setting_get("default_privs")
 		end
 		-- Params: name, password, privs, last_login
@@ -241,9 +290,13 @@ sauth.auth_handler = {
 	end,
 	delete_auth = function(name)
 		assert(type(name) == 'string')
-		-- Offline only!
-		if auth_table[name] == nil then del_record(name) end
-		return true
+		local record = get_record(name)
+		if record then
+			del_record(name)
+			auth_table[name] = nil
+			minetest.log("info", "[sauth] Db record for " .. name .. " was deleted!")
+ 			return true
+		end
 	end,
 	set_password = function(name, password)
 		assert(type(name) == 'string')
@@ -276,6 +329,7 @@ sauth.auth_handler = {
 		if core.settings then
 			admin = core.settings:get("name")
 		else
+			-- use old api method
 			admin = core.setting_get("name")
 		end
 		if name == admin then privs.privs = true end
@@ -290,7 +344,7 @@ sauth.auth_handler = {
 	record_login = function(name)
 		assert(type(name) == 'string')
 		update_login(name)
-		
+
 		local auth = auth_table[name]
 		if auth then
 			auth.last_login = os.time()
@@ -315,13 +369,13 @@ sauth.auth_handler = {
 -- Manage import/export dependant on size
 if get_setting("import") == nil then
 	local importauth = {}
-	
+
 	local function tablelength(T)
   		local count = 0
   		for _ in pairs(T) do count = count + 1 end
   		return count
 	end
-	
+
 	local function save_sql(stmt)
 		-- save file
 		local file = ie.io.open(WP.."/auth.sql", "a")
@@ -347,16 +401,19 @@ if get_setting("import") == nil then
 				local name, password, privilege_string, last_login = unpack(fields)
 				last_login = tonumber(last_login)
 				if not (name and password and privilege_string) then
-					minetest.log("info", "Invalid line in auth.txt: "..dump(line))
+					minetest.log("info", "Invalid record in auth.txt: "..dump(line))
 					break
 				end
-				local privileges = minetest.string_to_privs(privilege_string)
-				importauth[name] = {password=password, privileges=privileges, last_login=last_login}
+				importauth[name] = {
+					password = password,
+					privileges = privilege_string,
+					last_login = last_login
+				}
 			end
 		end
 		ie.io.close(file)
 	end
-	
+
 	local function export_auth()
 		local file, errmsg = ie.io.open(WP.."/auth.txt", 'rb')
 		if not file then
@@ -364,9 +421,8 @@ if get_setting("import") == nil then
 			return
 		end
 		remove_sql()
-		local index = 1
 		-- Create export file by appending lines
-		local stmt = create_db.."BEGIN;\n"
+		local stmt = create_db.."BEGIN TRANSACTION;\n"
 		for line in file:lines() do
 			if line ~= "" then
 				local fields = line:split(":", true)
@@ -375,16 +431,15 @@ if get_setting("import") == nil then
 				if not (name and password and privs) then
 					break -- can't use bad data
 				end
-				stmt = stmt..("INSERT INTO auth VALUES ('%s','%s','%s','%s','%s');\n"
-				):format(index, name, password, privs, last_login)
+				stmt = stmt..("INSERT INTO auth VALUES ('%s','%s','%s','%s');\n"
+				):format(name, password, privs, last_login)
 				save_sql(stmt)
 				stmt = ""
-				index = index + 1
 			end
 		end
-		stmt = "INSERT INTO _s (import) VALUES ('true');\n"
+		stmt = "INSERT INTO _s (import, db_version) VALUES ('true', '1.1');\n"
 		ie.io.close(file) -- close auth.txt
-		save_sql(stmt.."END;\n") -- finalise
+		save_sql(stmt.."COMMIT;\n") -- finalise
 		ie.os.remove(WP.."/sauth.sqlite") -- remove existing db
 		minetest.request_shutdown("Server Shutdown requested...", false, 5)
 	end
@@ -396,31 +451,33 @@ if get_setting("import") == nil then
 			player_name = player_name[1].name
 		end
 		for name, stuff in pairs(importauth) do
-			local privs = minetest.privs_to_string(stuff.privileges)
 			if name ~= player_name then
-				add_record(name,stuff.password,privs,stuff.last_login)
+				add_record(name,stuff.password,stuff.privileges,stuff.last_login)
 			else
-				update_privileges(name, privs)
+				update_privileges(name, stuff.privileges)
 				update_password(name, stuff.password)
 			end
 		end
 		importauth = nil
-		add_setting("import", 'true') -- set db flag
+		if not get_setting("import") then
+			add_setting("import", 'true') -- set db flag
+		end
 	end
-	
+
 	local function task()
 		-- load auth.txt
 		read_auth_file()
 		if tablelength(importauth) < 1 then
-			minetest.log("info", "[sban] nothing to import!")
+			minetest.log("info", "[sauth] nothing to import!")
 			return
-		end			
+		end
 		-- limit direct transfer to a sensible ~1 minute
 		if tablelength(importauth) < 3600 then db_import() end
 		-- are we there yet?
 		if get_setting("import") == nil then export_auth() end -- dump to sql
 		-- rename auth.txt otherwise it will still load!
 		ie.os.rename(WP.."/auth.txt", WP.."/auth.txt.bak")
+		-- removed from later versions of minetest
 		if core.auth_table then
 			core.auth_table = {} -- unload redundant data
 		end
@@ -438,14 +495,8 @@ end
 minetest.register_authentication_handler(sauth.auth_handler)
 minetest.log('action', MN .. ": Registered auth handler")
 
--- Housekeeping
-minetest.register_on_leaveplayer(function(player)
-	-- Schedule a check to see if the player has gone
-	minetest.after(60, cache_check, player:get_player_name())
-end)
-
 minetest.register_on_prejoinplayer(function(name, ip)
-	local r = get_record(name)	
+	local r = get_record(name)
 	if r ~= nil then
 		return
 	end
@@ -453,10 +504,14 @@ minetest.register_on_prejoinplayer(function(name, ip)
 	local chk = check_name(name)
 	if chk then
 		return ("\nCannot create new player called '%s'. "..
-			"Another account called '%s' is already registered. "..
+			"Another account called '%s' is already registered.\n"..
 			"Please check the spelling if it's your account "..
-			"or use a different nickname."):format(name, chk.name)
+			"or use a different name."):format(name, chk.name)
 	end
+end)
+
+minetest.register_on_joinplayer(function(player)
+	trim_cache()
 end)
 
 minetest.register_on_shutdown(function()
