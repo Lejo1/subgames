@@ -9,6 +9,9 @@ end
 --  Add a function to get the players of a team
 function mesewars.get_team_players(lobby, team)
   local players = {}
+  if not lobby or lobby == 0 then
+    return {}
+  end
   for name, pteam in pairs(mesewars.lobbys[lobby].players) do
     if pteam == team then
       table.insert(players, name)
