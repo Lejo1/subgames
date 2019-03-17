@@ -11,12 +11,8 @@ local modpath = minetest.get_modpath("homedecor")
 
 local S = homedecor_i18n.gettext
 
-homedecor = {
-	modpath = modpath,
-
-	-- infinite stacks
-	expect_infinite_stacks = minetest.setting_getbool("creative_mode") and not minetest.get_modpath("unified_inventory")
-}
+homedecor = {}
+homedecor.modpath = modpath
 
 -- Determine if the item being pointed at is the underside of a node (e.g a ceiling)
 function homedecor.find_ceiling(itemstack, placer, pointed_thing)
@@ -121,4 +117,8 @@ dofile(modpath.."/exterior.lua")
 dofile(modpath.."/trash_cans.lua")
 dofile(modpath.."/wardrobe.lua")
 
-print("[HomeDecor] " .. S("Loaded!"))
+dofile(modpath.."/crafts.lua")
+
+if minetest.settings:get_bool("log_mod") then
+	minetest.log("action", "[HomeDecor] " .. S("Loaded!"))
+end

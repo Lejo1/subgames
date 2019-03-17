@@ -428,6 +428,7 @@ minetest.register_chatcommand("say", {
 })
 minetest.register_on_joinplayer(function(player)
 		player:hud_set_flags({minimap = false})
+    player:set_properties({zoom_fov=10})
 end)
 
 minetest.register_tool("subgames:leaver", {

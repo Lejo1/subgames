@@ -1,11 +1,11 @@
 --[[
 Map Tools: unbreakable default nodes
 
-Copyright (c) 2012-2015 Calinou and contributors.
+Copyright © 2012-2019 Hugo Locurcio and contributors.
 Licensed under the zlib license. See LICENSE.md for more information.
 --]]
 
-local S = maptools.intllib
+local S = maptools.S
 
 maptools.creative = maptools.config["hide_from_creative_inventory"]
 
@@ -17,6 +17,7 @@ minetest.register_node("maptools:stone", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_stone_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:stonebrick", {
@@ -27,6 +28,7 @@ minetest.register_node("maptools:stonebrick", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_stone_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:tree", {
@@ -37,18 +39,24 @@ minetest.register_node("maptools:tree", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_wood_defaults(),
-	on_place = minetest.rotate_node
+	on_place = minetest.rotate_node,
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:jungletree", {
 	description = S("Unbreakable Jungle Tree"),
 	range = 12,
 	stack_max = 10000,
-	tiles = {"default_jungletree_top.png", "default_jungletree_top.png", "default_jungletree.png"},
+	tiles = {
+		"default_jungletree_top.png",
+		"default_jungletree_top.png",
+		"default_jungletree.png",
+	},
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_wood_defaults(),
-	on_place = minetest.rotate_node
+	on_place = minetest.rotate_node,
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:cactus", {
@@ -59,7 +67,8 @@ minetest.register_node("maptools:cactus", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_wood_defaults(),
-	on_place = minetest.rotate_node
+	on_place = minetest.rotate_node,
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:papyrus", {
@@ -80,6 +89,7 @@ minetest.register_node("maptools:papyrus", {
 	},
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_leaves_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:dirt", {
@@ -90,6 +100,7 @@ minetest.register_node("maptools:dirt", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_dirt_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:wood", {
@@ -100,6 +111,7 @@ minetest.register_node("maptools:wood", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_wood_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:junglewood", {
@@ -110,6 +122,7 @@ minetest.register_node("maptools:junglewood", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_wood_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:glass", {
@@ -123,7 +136,7 @@ minetest.register_node("maptools:glass", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_glass_defaults(),
-	on_blast = function() end,
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:leaves", {
@@ -136,6 +149,7 @@ minetest.register_node("maptools:leaves", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_leaves_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:sand", {
@@ -146,6 +160,7 @@ minetest.register_node("maptools:sand", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_sand_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:gravel", {
@@ -159,6 +174,7 @@ minetest.register_node("maptools:gravel", {
 		footstep = {name="default_gravel_footstep", gain=0.35},
 		dug = {name="default_gravel_footstep", gain=0.6},
 	}),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:clay", {
@@ -169,6 +185,7 @@ minetest.register_node("maptools:clay", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_dirt_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:desert_sand", {
@@ -179,6 +196,7 @@ minetest.register_node("maptools:desert_sand", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_sand_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:sandstone", {
@@ -189,6 +207,7 @@ minetest.register_node("maptools:sandstone", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_stone_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:sandstone_brick", {
@@ -199,6 +218,7 @@ minetest.register_node("maptools:sandstone_brick", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_stone_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:desert_stone", {
@@ -209,6 +229,7 @@ minetest.register_node("maptools:desert_stone", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_stone_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:desert_cobble", {
@@ -219,6 +240,7 @@ minetest.register_node("maptools:desert_cobble", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_stone_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:desert_stonebrick", {
@@ -229,19 +251,25 @@ minetest.register_node("maptools:desert_stonebrick", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_stone_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:grass", {
 	description = S("Unbreakable Dirt with Grass"),
 	range = 12,
 	stack_max = 10000,
-	tiles = {"default_grass.png", "default_dirt.png", "default_dirt.png^default_grass_side.png"},
+	tiles = {
+		"default_grass.png",
+		"default_dirt.png",
+		"default_dirt.png^default_grass_side.png",
+	},
 	paramtype2 = "facedir",
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_dirt_defaults({
 		footstep = {name="default_grass_footstep", gain = 0.4},
 	}),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:fullgrass", {
@@ -254,6 +282,7 @@ minetest.register_node("maptools:fullgrass", {
 	sounds = default.node_sound_dirt_defaults({
 		footstep = {name="default_grass_footstep", gain=0.4},
 	}),
+	on_drop = maptools.drop_msg
 })
 
 for slab_num = 1,3,1 do
@@ -261,7 +290,11 @@ for slab_num = 1,3,1 do
 		description = S("Grass Slab"),
 		range = 12,
 		stack_max = 10000,
-		tiles = {"default_grass.png", "default_dirt.png", "default_dirt.png^maptools_grass_side_" .. slab_num * 4 .. ".png"},
+		tiles = {
+			"default_grass.png",
+			"default_dirt.png",
+			"default_dirt.png^maptools_grass_side_" .. slab_num * 4 .. ".png",
+		},
 		drawtype = "nodebox",
 		node_box = {
 			type = "fixed",
@@ -272,7 +305,10 @@ for slab_num = 1,3,1 do
 		paramtype2 = "facedir",
 		drop = "",
 		groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
-		sounds = default.node_sound_dirt_defaults({footstep = {name="default_grass_footstep", gain = 0.4}}),
+		sounds = default.node_sound_dirt_defaults(
+			{footstep = {name="default_grass_footstep", gain = 0.4}}
+		),
+		on_drop = maptools.drop_msg
 	})
 end
 
@@ -284,6 +320,7 @@ minetest.register_node("maptools:cobble", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_stone_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:mossycobble", {
@@ -294,6 +331,7 @@ minetest.register_node("maptools:mossycobble", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_stone_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:brick", {
@@ -304,6 +342,7 @@ minetest.register_node("maptools:brick", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_stone_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:coalblock", {
@@ -314,6 +353,7 @@ minetest.register_node("maptools:coalblock", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_stone_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 
@@ -325,6 +365,7 @@ minetest.register_node("maptools:steelblock", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_stone_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:goldblock", {
@@ -335,6 +376,7 @@ minetest.register_node("maptools:goldblock", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_stone_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:copperblock", {
@@ -345,6 +387,7 @@ minetest.register_node("maptools:copperblock", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_stone_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:bronzeblock", {
@@ -355,6 +398,7 @@ minetest.register_node("maptools:bronzeblock", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_stone_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:diamondblock", {
@@ -365,6 +409,7 @@ minetest.register_node("maptools:diamondblock", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_stone_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 -- Farming:
@@ -373,10 +418,20 @@ minetest.register_node("maptools:soil_wet", {
 	description = "Wet Soil",
 	range = 12,
 	stack_max = 10000,
-	tiles = {"farming_soil_wet.png", "farming_soil_wet_side.png"},
+	tiles = {
+		"default_dirt.png^farming_soil_wet.png",
+		"default_dirt.png^farming_soil_wet_side.png",
+	},
 	drop = "",
-	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative, soil = 3, wet = 1, grassland = 1},
+	groups = {
+		unbreakable = 1,
+		not_in_creative_inventory = maptools.creative,
+		soil = 3,
+		wet = 1,
+		grassland = 1,
+	},
 	sounds = default.node_sound_dirt_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:desert_sand_soil_wet", {
@@ -385,6 +440,13 @@ minetest.register_node("maptools:desert_sand_soil_wet", {
 	stack_max = 10000,
 	drop = "",
 	tiles = {"farming_desert_sand_soil_wet.png", "farming_desert_sand_soil_wet_side.png"},
-	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative, soil = 3, wet = 1, desert = 1},
+	groups = {
+		unbreakable = 1,
+		not_in_creative_inventory = maptools.creative,
+		soil = 3,
+		wet = 1,
+		desert = 1,
+	},
 	sounds = default.node_sound_sand_defaults(),
+	on_drop = maptools.drop_msg
 })

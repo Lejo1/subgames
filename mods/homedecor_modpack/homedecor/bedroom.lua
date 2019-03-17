@@ -52,13 +52,11 @@ homedecor.register("bed_regular", {
 	on_rotate = screwdriver.disallow,
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
 		unifieddyes.fix_rotation_nsew(pos, placer, itemstack, pointed_thing)
-		unifieddyes.recolor_on_place(pos, placer, itemstack, pointed_thing)
 		if not placer:get_player_control().sneak then
 			return homedecor.bed_expansion(pos, placer, itemstack, pointed_thing)
 		end
 	end,
 	after_dig_node = function(pos, oldnode, oldmetadata, digger)
-		unifieddyes.after_dig_node(pos, oldnode, oldmetadata, digger)
 		homedecor.unextend_bed(pos)
 	end,
 	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
@@ -66,11 +64,9 @@ homedecor.register("bed_regular", {
 		if itemname == "homedecor:bed_regular" then
 			homedecor.bed_expansion(pos, clicker, itemstack, pointed_thing, true)
 			return itemstack
-		else
---			if minetest.get_modpath("beds") then
---				beds.on_rightclick(pos, clicker)
---			end
-			return itemstack
+--		else
+--			homedecor.beds_on_rightclick(pos, node, clicker)
+--			return itemstack
 		end
 	end
 })
@@ -93,16 +89,11 @@ homedecor.register("bed_extended", {
 	sounds = default.node_sound_wood_defaults(),
 	expand = { forward = "air" },
 	on_rotate = screwdriver.disallow,
-	after_place_node = unifieddyes.recolor_on_place,
 	after_dig_node = function(pos, oldnode, oldmetadata, digger)
-		unifieddyes.after_dig_node(pos, oldnode, oldmetadata, digger)
 		homedecor.unextend_bed(pos)
 	end,
 --	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
---		local itemname = itemstack:get_name()
---		if minetest.get_modpath("beds") then
---			beds.on_rightclick(pos, clicker)
---		end
+--		homedecor.beds_on_rightclick(pos, node, clicker)
 --		return itemstack
 --	end,
 	drop = "homedecor:bed_regular"
@@ -129,10 +120,8 @@ homedecor.register("bed_kingsize", {
 	on_rotate = screwdriver.disallow,
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
 		unifieddyes.fix_rotation_nsew(pos, placer, itemstack, pointed_thing)
-		unifieddyes.recolor_on_place(pos, placer, itemstack, pointed_thing)
 	end,
 	after_dig_node = function(pos, oldnode, oldmetadata, digger)
-		unifieddyes.after_dig_node(pos, oldnode, oldmetadata, digger)
 		local inv = digger:get_inventory()
 		if digger:get_player_control().sneak and inv:room_for_item("main", "homedecor:bed_regular 2") then
 			inv:remove_item("main", "homedecor:bed_kingsize 1")
@@ -140,12 +129,9 @@ homedecor.register("bed_kingsize", {
 		end
 	end,
 --	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
---		local itemname = itemstack:get_name()
---		if minetest.get_modpath("beds") then
---			beds.on_rightclick(pos, clicker)
---		end
+--		homedecor.beds_on_rightclick(pos, node, clicker)
 --		return itemstack
---	end
+--	end,
 })
 
 for _, w in pairs({ N_("mahogany"), N_("oak") }) do

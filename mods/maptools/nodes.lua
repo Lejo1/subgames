@@ -1,25 +1,25 @@
 --[[
 Map Tools: node definitions
 
-Copyright (c) 2012-2015 Calinou and contributors.
+Copyright © 2012-2019 Hugo Locurcio and contributors.
 Licensed under the zlib license. See LICENSE.md for more information.
 --]]
 
-local S = maptools.intllib
+local S = maptools.S
 
 maptools.creative = maptools.config["hide_from_creative_inventory"]
 
--- Redefine cloud so that the admin pickaxe can mine it:
+-- Redefine cloud so that the admin pickaxe can mine it
 minetest.register_node(":default:cloud", {
 	description = S("Cloud"),
 	tiles = {"default_cloud.png"},
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 -- Nodes
--- =====
 
 minetest.register_node("maptools:black", {
 	description = S("Black"),
@@ -30,6 +30,7 @@ minetest.register_node("maptools:black", {
 	post_effect_color = {a=255, r=0, g=0, b=0},
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_stone_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:white", {
@@ -41,6 +42,7 @@ minetest.register_node("maptools:white", {
 	post_effect_color = {a=255, r=128, g=128, b=128},
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_stone_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:playerclip", {
@@ -54,12 +56,11 @@ minetest.register_node("maptools:playerclip", {
 	sunlight_propagates = true,
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
-	on_blast = function() end,
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:fake_walkable", {
 	description = S("Player Clip"),
-	drawtype = "nodebox",
 	range = 12,
 	stack_max = 10000,
 	inventory_image = "default_steel_block.png^dye_green.png",
@@ -75,6 +76,7 @@ minetest.register_node("maptools:fake_walkable", {
 	},
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:fullclip", {
@@ -87,11 +89,11 @@ minetest.register_node("maptools:fullclip", {
 	sunlight_propagates = true,
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:fake_walkable_pointable", {
 	description = S("Player Clip"),
-	drawtype = "nodebox",
 	range = 12,
 	stack_max = 10000,
 	inventory_image = "default_steel_block.png^dye_green.png",
@@ -106,6 +108,7 @@ minetest.register_node("maptools:fake_walkable_pointable", {
 	},
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:ignore_like", {
@@ -118,6 +121,7 @@ minetest.register_node("maptools:ignore_like", {
 	sunlight_propagates = true,
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:ignore_like_no_clip", {
@@ -131,6 +135,7 @@ minetest.register_node("maptools:ignore_like_no_clip", {
 	sunlight_propagates = true,
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
+	on_drop = maptools.drop_msg
 })
 
 
@@ -145,6 +150,7 @@ minetest.register_node("maptools:ignore_like_no_point", {
 	sunlight_propagates = true,
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:ignore_like_no_clip_no_point", {
@@ -159,6 +165,7 @@ minetest.register_node("maptools:ignore_like_no_clip_no_point", {
 	sunlight_propagates = true,
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:fullclip_face", {
@@ -176,7 +183,12 @@ minetest.register_node("maptools:fullclip_face", {
 		fixed = {-0.5, -0.5, -0.5, 0.5, -0.4999, 0.5},
 	},
 	drop = "",
-	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative, fall_damage_add_percent=-100},
+	groups = {
+		unbreakable = 1,
+		not_in_creative_inventory = maptools.creative,
+		fall_damage_add_percent = -100,
+	},
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:playerclip_bottom", {
@@ -194,7 +206,12 @@ minetest.register_node("maptools:playerclip_bottom", {
 		fixed = {-0.5, -0.5, -0.5, 0.5, -0.4999, 0.5},
 	},
 	drop = "",
-	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative, fall_damage_add_percent=-100},
+	groups = {
+		unbreakable = 1,
+		not_in_creative_inventory = maptools.creative,
+		fall_damage_add_percent = -100,
+	},
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:playerclip_top", {
@@ -212,27 +229,38 @@ minetest.register_node("maptools:playerclip_top", {
 		fixed = {-0.5, 0.4999, -0.5, 0.5, 0.5, 0.5},
 	},
 	drop = "",
-	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative, fall_damage_add_percent=-100},
+	groups = {
+		unbreakable = 1,
+		not_in_creative_inventory = maptools.creative,
+		fall_damage_add_percent = -100,
+	},
+	on_drop = maptools.drop_msg
 })
 
 for pusher_num=1,10,1 do
-minetest.register_node("maptools:pusher_" .. pusher_num, {
-	description = S("Pusher (%s)"):format(pusher_num),
-	range = 12,
-	stack_max = 10000,
-	inventory_image = "default_steel_block.png^default_apple.png",
-	drawtype = "nodebox",
-	tiles = {"invisible.png"},
-	paramtype = "light",
-	paramtype2 = "facedir",
-	sunlight_propagates = true,
-	node_box = {
-		type = "fixed",
-		fixed = {-0.5, -0.5, -0.5, 0.5, -0.4999, 0.5},
-	},
-	drop = "",
-	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative, fall_damage_add_percent=-100, bouncy=pusher_num*100},
-})
+	minetest.register_node("maptools:pusher_" .. pusher_num, {
+		description = S("Pusher (%s)"):format(pusher_num),
+		range = 12,
+		stack_max = 10000,
+		inventory_image = "default_steel_block.png^default_apple.png",
+		drawtype = "nodebox",
+		tiles = {"invisible.png"},
+		paramtype = "light",
+		paramtype2 = "facedir",
+		sunlight_propagates = true,
+		node_box = {
+			type = "fixed",
+			fixed = {-0.5, -0.5, -0.5, 0.5, -0.4999, 0.5},
+		},
+		drop = "",
+		groups = {
+			unbreakable = 1,
+			not_in_creative_inventory = maptools.creative,
+			fall_damage_add_percent = -100,
+			bouncy = pusher_num * 100,
+		},
+		on_drop = maptools.drop_msg
+	})
 end
 
 minetest.register_node("maptools:lightbulb", {
@@ -243,11 +271,12 @@ minetest.register_node("maptools:lightbulb", {
 	drawtype = "airlike",
 	walkable = false,
 	pointable = false,
-	light_source = 15,
+	light_source = 14,
 	paramtype = "light",
 	sunlight_propagates = true,
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:nobuild", {
@@ -262,6 +291,7 @@ minetest.register_node("maptools:nobuild", {
 	sunlight_propagates = true,
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:nointeract", {
@@ -275,13 +305,14 @@ minetest.register_node("maptools:nointeract", {
 	sunlight_propagates = true,
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:climb", {
 	description = S("Climb Block"),
 	range = 12,
 	stack_max = 10000,
-	inventory_image = "default_steel_block.png^default_ladder.png",
+	inventory_image = "default_steel_block.png^default_ladder_wood.png",
 	drawtype = "airlike",
 	walkable = false,
 	climbable = true,
@@ -290,6 +321,7 @@ minetest.register_node("maptools:climb", {
 	sunlight_propagates = true,
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
+	on_drop = maptools.drop_msg
 })
 
 for damage_num=1,5,1 do
@@ -306,7 +338,7 @@ minetest.register_node("maptools:damage_" .. damage_num, {
 	sunlight_propagates = true,
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
-	on_blast = function() end,
+	on_drop = maptools.drop_msg
 })
 end
 
@@ -323,7 +355,7 @@ minetest.register_node("maptools:kill", {
 	sunlight_propagates = true,
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
-	on_blast = function() end,
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:smoke", {
@@ -337,6 +369,7 @@ minetest.register_node("maptools:smoke", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	post_effect_color = {a=192, r=96, g=96, b=96},
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:ladder", {
@@ -344,9 +377,9 @@ minetest.register_node("maptools:ladder", {
 	range = 12,
 	stack_max = 10000,
 	drawtype = "signlike",
-	tiles = {"default_ladder.png"},
-	inventory_image = "default_ladder.png",
-	wield_image = "default_ladder.png",
+	tiles = {"default_ladder_wood.png"},
+	inventory_image = "default_ladder_wood.png",
+	wield_image = "default_ladder_wood.png",
 	paramtype = "light",
 	paramtype2 = "wallmounted",
 	walkable = false,
@@ -357,6 +390,7 @@ minetest.register_node("maptools:ladder", {
 	drop = "",
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sounds = default.node_sound_wood_defaults(),
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:permanent_fire", {
@@ -376,6 +410,7 @@ minetest.register_node("maptools:permanent_fire", {
 	sunlight_propagates = true,
 	walkable = false,
 	damage_per_second = 4,
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:fake_fire", {
@@ -394,13 +429,13 @@ minetest.register_node("maptools:fake_fire", {
 	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	sunlight_propagates = true,
 	walkable = false,
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:igniter", {
 	drawtype = "airlike",
 	range = 12,
 	stack_max = 10000,
-	inventory_image = "default_steel_block.png^crosshair.png",
 	description = S("Igniter"),
 	paramtype = "light",
 	inventory_image = "fire_basic_flame.png",
@@ -409,6 +444,7 @@ minetest.register_node("maptools:igniter", {
 	sunlight_propagates = true,
 	pointable = false,
 	walkable = false,
+	on_drop = maptools.drop_msg
 })
 
 minetest.register_node("maptools:superapple", {
@@ -429,4 +465,5 @@ minetest.register_node("maptools:superapple", {
 	groups = {fleshy=3, dig_immediate=3, not_in_creative_inventory = maptools.creative},
 	on_use = minetest.item_eat(20),
 	sounds = default.node_sound_defaults(),
+	on_drop = maptools.drop_msg
 })

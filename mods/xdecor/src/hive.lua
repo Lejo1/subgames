@@ -10,7 +10,9 @@ function hive.construct(pos)
 			image[6,0;1,1;hive_bee.png]
 			image[5,0;1,1;hive_layout.png]
 			list[context;honey;5,0;1,1;]
-			list[current_player;main;0,1.35;8,4;] ]]
+			list[current_player;main;0,1.35;8,4;]
+			listring[current_player;main]
+			listring[context;honey] ]]
 			..xbg..default.get_hotbar_bg(0,1.35)
 
 	meta:set_string("formspec", formspec)
@@ -67,3 +69,23 @@ xdecor.register("hive", {
 	end
 })
 
+-- Craft items
+
+minetest.register_craftitem("xdecor:honey", {
+	description = "Honey",
+	inventory_image = "xdecor_honey.png",
+	wield_image = "xdecor_honey.png",
+	groups = {food_honey = 1, food_sugar = 1, flammable = 2, not_in_creative_inventory=1},
+	on_use = minetest.item_eat(2)
+})
+
+-- Recipes
+
+minetest.register_craft({
+	output = "xdecor:hive",
+	recipe = {
+		{"group:stick", "group:stick", "group:stick"},
+		{"default:paper", "default:paper", "default:paper"},
+		{"group:stick", "group:stick", "group:stick"}
+	}
+})

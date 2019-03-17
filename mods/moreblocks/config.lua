@@ -1,14 +1,14 @@
 --[[
 More Blocks: configuration handling
 
-Copyright (c) 2011-2017 Hugo Locurcio and contributors.
+Copyright © 2011-2019 Hugo Locurcio and contributors.
 Licensed under the zlib license. See LICENSE.md for more information.
 --]]
 
 moreblocks.config = {}
 
 local function getbool_default(setting, default)
-	local value = minetest.setting_getbool(setting)
+	local value = minetest.settings:get_bool(setting)
 	if value == nil then
 		value = default
 	end
@@ -21,7 +21,7 @@ local function setting(settingtype, name, default)
 			getbool_default("moreblocks." .. name, default)
 	else
 		moreblocks.config[name] =
-			minetest.setting_get("moreblocks." .. name) or default
+			minetest.settings:get("moreblocks." .. name) or default
 	end
 end
 

@@ -6,6 +6,7 @@ local plate = {}
 screwdriver = screwdriver or {}
 
 local function door_toggle(pos_actuator, pos_door, player)
+	local player_name = player:get_player_name()
 	local actuator = minetest.get_node(pos_actuator)
 	local door = doors.get(pos_door)
 
@@ -20,7 +21,9 @@ local function door_toggle(pos_actuator, pos_door, player)
 			minetest.set_node(pos_actuator,
 				{name=actuator.name, param2=actuator.param2})
 		end
-		door:close(player)
+		-- Re-get player object (or nil) because 'player' could
+		-- be an invalid object at this time (player left)
+		door:close(minetest.get_player_by_name(player_name))
 	end)
 end
 
@@ -115,3 +118,24 @@ xdecor.register("lever_on", {
 	drop = "xdecor:lever_off"
 })
 
+-- Recipes
+
+minetest.register_craft({
+	output = "xdecor:pressure_stone_off",
+	type = "shapeless",
+	recipe = {"group:stone", "group:stone"}
+})
+
+minetest.register_craft({
+	output = "xdecor:pressure_wood_off",
+	type = "shapeless",
+	recipe = {"group:wood", "group:wood"}
+})
+
+minetest.register_craft({
+	output = "xdecor:lever_off",
+	recipe = {
+		{"group:stick"},
+		{"group:stone"}
+	}
+})

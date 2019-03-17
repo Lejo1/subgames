@@ -9,9 +9,6 @@ local enchanting = {
 	uses     = 1.2,  -- Durability
 	times    = 0.1,  -- Efficiency
 	damages  = 1,    -- Sharpness
-	strength = 1.2,  -- Armor strength (3d_armor only)
-	speed    = 0.2,  -- Player speed (3d_armor only)
-	jump     = 0.2   -- Player jumping (3d_armor only)
 }
 
 local function cap(S) return S:gsub("^%l", string.upper) end
@@ -39,8 +36,6 @@ function enchanting:get_tooltip(enchant, orig_caps, fleshy)
 		durable = {"#00baff", " (+"..bonus.durable.."%)"},
 		fast    = {"#74ff49", " (+"..bonus.efficiency.."%)"},
 		sharp   = {"#ffff00", " (+"..bonus.damages.."%)"},
-		strong  = {"#ff3d3d", ""},
-		speed   = {"#fd5eff", ""}
 	}
 	return minetest.colorize and minetest.colorize(specs[enchant][1],
 			"\n"..cap(enchant)..specs[enchant][2]) or
@@ -50,10 +45,7 @@ end
 local enchant_buttons = {
 	[[ image_button[3.9,0.85;4,0.92;bg_btn.png;fast;Efficiency]
 	image_button[3.9,1.77;4,1.12;bg_btn.png;durable;Durability] ]],
-	"image_button[3.9,0.85;4,0.92;bg_btn.png;strong;Strength]",
 	"image_button[3.9,2.9;4,0.92;bg_btn.png;sharp;Sharpness]",
-	[[ image_button[3.9,0.85;4,0.92;bg_btn.png;strong;Strength]
-	image_button[3.9,1.77;4,1.12;bg_btn.png;speed;Speed] ]]
 }
 
 function enchanting.formspec(pos, num)
@@ -71,9 +63,7 @@ function enchanting.formspec(pos, num)
 			image[2,2.9;1,1;mese_layout.png]
 			tooltip[sharp;Your weapon inflicts more damages]
 			tooltip[durable;Your tool last longer]
-			tooltip[fast;Your tool digs faster]
-			tooltip[strong;Your armor is more resistant]
-			tooltip[speed;Your speed is increased] ]]
+			tooltip[fast;Your tool digs faster] ]]
 			..default.gui_slots..default.get_hotbar_bg(0.5,4.5)
 
 	formspec = formspec..(enchant_buttons[num] or "")
@@ -85,8 +75,7 @@ function enchanting.on_put(pos, listname, _, stack)
 		local stackname = stack:get_name()
 		local tool_groups = {
 			"axe, pick, shovel",
-			"chestplate, leggings, helmet",
-			"sword", "boots"
+			"sword",
 		}
 
 		for idx, tools in pairs(tool_groups) do
@@ -155,7 +144,7 @@ function enchanting.construct(pos)
 
 	minetest.add_entity({x=pos.x, y=pos.y+0.85, z=pos.z}, "xdecor:book_open")
 	local timer = minetest.get_node_timer(pos)
-	timer:start(5.0)
+	timer:start(0.5)
 end
 
 function enchanting.destruct(pos)
@@ -190,7 +179,8 @@ function enchanting.timer(pos)
 			velocity = {x=x, y=2-y, z=z},
 			acceleration = {x=0, y=-2.2, z=0},
 			expirationtime = 1,
-			size = 2,
+			size = 1.5,
+			glow = 5,
 			texture = "xdecor_glyph"..random(1,18)..".png"
 		})
 	end
@@ -203,6 +193,7 @@ xdecor.register("enchantment_table", {
 		 "xdecor_enchantment_side.png", "xdecor_enchantment_side.png",
 		 "xdecor_enchantment_side.png", "xdecor_enchantment_side.png"},
 	groups = {cracky=1, level=1},
+	light_source = 6,
 	sounds = default.node_sound_stone_defaults(),
 	on_rotate = screwdriver.rotate_simple,
 	can_dig = enchanting.dig,
@@ -273,32 +264,6 @@ function enchanting:register_tools(mod, def)
 				}
 			})
 		end
-
-		if mod == "3d_armor" then
-			local original_armor_groups = original_tool.groups
-			local armorcaps = {}
-			armorcaps.not_in_creative_inventory = 1
-
-			for armor_group, value in pairs(original_armor_groups) do
-				if enchant == "strong" then
-					armorcaps[armor_group] = ceil(value * enchanting.strength)
-				elseif enchant == "speed" then
-					armorcaps[armor_group] = value
-					armorcaps.physics_speed = enchanting.speed
-					armorcaps.physics_jump = enchanting.jump
-				end
-			end
-
-			minetest.register_tool(":"..mod..":enchanted_"..tool.."_"..material.."_"..enchant, {
-				description = "Enchanted "..cap(material).." "..cap(tool)..
-					self:get_tooltip(enchant),
-				inventory_image = original_tool.inventory_image,
-				texture = "3d_armor_"..tool.."_"..material,
-				wield_image = original_tool.wield_image,
-				groups = armorcaps,
-				wear = 0
-			})
-		end
 	end
 	end
 	end
@@ -314,13 +279,13 @@ enchanting:register_tools("default", {
 	}
 })
 
-enchanting:register_tools("3d_armor", {
-	materials = "steel, bronze, gold, diamond",
-	tools = {
-		boots      = {enchants = "strong, speed"},
-		chestplate = {enchants = "strong"},
-		helmet     = {enchants = "strong"},
-		leggings   = {enchants = "strong"}
+-- Recipes
+
+minetest.register_craft({
+	output = "xdecor:enchantment_table",
+	recipe = {
+		{"", "default:book", ""},
+		{"default:diamond", "default:obsidian", "default:diamond"},
+		{"default:obsidian", "default:obsidian", "default:obsidian"}
 	}
 })
-

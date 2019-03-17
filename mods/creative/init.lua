@@ -1,12 +1,27 @@
 creative = {}
 
+local function update_sfinv(name)
+	minetest.after(0, function()
+		local player = minetest.get_player_by_name(name)
+		if player then
+			if sfinv.get_page(player):sub(1, 9) == "creative:" then
+				sfinv.set_page(player, sfinv.get_homepage_name(player))
+			else
+				sfinv.set_player_inventory_formspec(player)
+			end
+		end
+	end)
+end
+
 minetest.register_privilege("creative", {
 	description = "Allow player to use creative inventory",
 	give_to_singleplayer = false,
-	give_to_admin = false
+	give_to_admin = false,
+	on_grant = update_sfinv,
+	on_revoke = update_sfinv,
 })
 
-local creative_mode_cache = minetest.setting_getbool("creative_mode")
+local creative_mode_cache = minetest.settings:get_bool("creative_mode")
 
 function creative.is_enabled_for(name)
 	return creative_mode_cache or

@@ -1,7 +1,7 @@
 --[[
 Map Tools: configuration handling
 
-Copyright (c) 2012-2015 Calinou and contributors.
+Copyright © 2012-2019 Hugo Locurcio and contributors.
 Licensed under the zlib license. See LICENSE.md for more information.
 --]]
 

@@ -13,23 +13,62 @@
 local enable_colored_metal_signs = true
 
 -- CWz's keyword interact mod uses this setting.
-local current_keyword = minetest.setting_get("interact_keyword") or "iaccept"
+local current_keyword = minetest.settings:get("interact_keyword") or "iaccept"
 
 signs_lib = {}
+signs_lib.path = minetest.get_modpath(minetest.get_current_modname())
 screwdriver = screwdriver or {}
 
-signs_lib.wallmounted_rotate = function(pos, node, user, mode, new_param2)
-	if mode ~= screwdriver.ROTATE_AXIS then return false end
-	minetest.swap_node(pos, {name = node.name, param2 = (node.param2 + 1) % 6})
-	for _, v in ipairs(minetest.get_objects_inside_radius(pos, 0.5)) do
-		local e = v:get_luaentity()
-		if e and e.name == "signs:text" then
-			v:remove()
-		end
-	end
-	signs_lib.update_sign(pos)
+-- Load support for intllib.
+local S, NS = dofile(signs_lib.path .. "/intllib.lua")
+signs_lib.gettext = S
+
+-- text encoding
+dofile(signs_lib.path .. "/encoding.lua");
+
+-- Initialize character texture cache
+local ctexcache = {}
+
+
+local wall_dir_change = {
+	[0] = 4,
+	0,
+	5,
+	1,
+	2,
+	3,
+	0
+}
+
+signs_lib.wallmounted_rotate = function(pos, node, user, mode)
+	if mode ~= screwdriver.ROTATE_FACE then return false end 
+	minetest.swap_node(pos, { name = node.name, param2 = wall_dir_change[node.param2 % 6] })
+	signs_lib.update_sign(pos,nil,nil,node)
 	return true
 end
+
+signs_lib.facedir_rotate = function(pos, node, user, mode)
+	if mode ~= screwdriver.ROTATE_FACE then return false end
+	local newparam2 = (node.param2 %8) + 1
+	if newparam2 == 5 then
+		newparam2 = 6
+	elseif newparam2 > 6 then
+		newparam2 = 0
+	end
+	minetest.swap_node(pos, { name = node.name, param2 = newparam2 })
+	signs_lib.update_sign(pos,nil,nil,node)
+	return true
+end
+
+signs_lib.facedir_rotate_simple = function(pos, node, user, mode)
+	if mode ~= screwdriver.ROTATE_FACE then return false end
+	local newparam2 = (node.param2 %8) + 1
+	if newparam2 > 3 then newparam2 = 0 end
+	minetest.swap_node(pos, { name = node.name, param2 = newparam2 })
+	signs_lib.update_sign(pos,nil,nil,node)
+	return true
+end
+
 
 signs_lib.modpath = minetest.get_modpath("signs_lib")
 
@@ -113,10 +152,6 @@ signs_lib.sign_post_model = {
 	}
 }
 
--- Boilerplate to support localized strings if intllib mod is installed.
-local S = rawget(_G, "intllib") and intllib.Getter() or function(s) return s end
-signs_lib.gettext = S
-
 -- the list of standard sign nodes
 
 signs_lib.sign_node_list = {
@@ -152,20 +187,20 @@ default_sign_metal_image = "default_sign_steel.png"
 --table copy
 
 function signs_lib.table_copy(t)
-    local nt = { };
-    for k, v in pairs(t) do
-        if type(v) == "table" then
-            nt[k] = signs_lib.table_copy(v)
-        else
-            nt[k] = v
-        end
-    end
-    return nt
+	local nt = { }
+	for k, v in pairs(t) do
+		if type(v) == "table" then
+			nt[k] = signs_lib.table_copy(v)
+		else
+			nt[k] = v
+		end
+	end
+	return nt
 end
 
 -- infinite stacks
 
-if not minetest.setting_getbool("creative_mode") then
+if not minetest.settings:get_bool("creative_mode") then
 	signs_lib.expect_infinite_stacks = false
 else
 	signs_lib.expect_infinite_stacks = true
@@ -173,28 +208,48 @@ end
 
 -- CONSTANTS
 
-local MP = minetest.get_modpath("signs_lib")
-
--- Used by `build_char_db' to locate the file.
-local FONT_FMT = "%s/hdf_%02x.png"
-
--- Simple texture name for building text texture.
-local FONT_FMT_SIMPLE = "hdf_%02x.png"
-
 -- Path to the textures.
-local TP = MP.."/textures"
+local TP = signs_lib.path .. "/textures"
+-- Font file formatter
+local CHAR_FILE = "%s_%02x.png"
+-- Fonts path
+local CHAR_PATH = TP .. "/" .. CHAR_FILE
+
+-- Font name.
+local font_name = "hdf"
 
 -- Lots of overkill here. KISS advocates, go away, shoo! ;) -- kaeza
 
 local PNG_HDR = string.char(0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A)
 
+-- check if a file does exist
+-- to avoid reopening file after checking again
+-- pass TRUE as second argument
+function file_exists(name, return_handle, mode)
+	mode = mode or "r";
+	local f = io.open(name, mode)
+	if f ~= nil then
+		if (return_handle) then
+			return f
+		end
+		io.close(f) 
+		return true 
+	else 
+		return false 
+	end
+end
+
 -- Read the image size from a PNG file.
 -- Returns image_w, image_h.
 -- Only the LSB is read from each field!
 local function read_image_size(filename)
-	local f = io.open(filename, "rb")
+	local f = file_exists(filename, true, "rb")
+	-- file might not exist (don't crash the game)
+	if (not f) then
+		return 0, 0
+	end
 	f:seek("set", 0x0)
-	local hdr = f:read(8)
+	local hdr = f:read(string.len(PNG_HDR))
 	if hdr ~= PNG_HDR then
 		f:close()
 		return
@@ -242,8 +297,8 @@ local function build_char_db()
 	local total_width = 0
 	local char_count = 0
 
-	for c = 32, 126 do
-		local w, h = read_image_size(FONT_FMT:format(TP, c))
+	for c = 32, 255 do
+		local w, h = read_image_size(CHAR_PATH:format(font_name, c))
 		if w and h then
 			local ch = string.char(c)
 			charwidth[ch] = w
@@ -307,6 +362,24 @@ local function fill_line(x, y, w, c)
 	return table.concat(tex)
 end
 
+-- make char texture file name
+-- if texture file does not exist use fallback texture instead
+local function char_tex(font_name, ch)
+	if ctexcache[font_name..ch] then
+		return ctexcache[font_name..ch], true
+	else
+		local c = ch:byte()
+		local exists, tex = file_exists(CHAR_PATH:format(font_name, c))
+		if exists and c ~= 14 then
+			tex = CHAR_FILE:format(font_name, c)
+		else
+			tex = CHAR_FILE:format(font_name, 0x0)
+		end
+		ctexcache[font_name..ch] = tex
+		return tex, exists
+	end
+end
+
 local function make_line_texture(line, lineno, pos)
 
 	local width = 0
@@ -322,6 +395,24 @@ local function make_line_texture(line, lineno, pos)
 	for word_i, word in ipairs(line) do
 		local chars = { }
 		local ch_offs = 0
+		word = string.gsub(word, "%^[12345678abcdefgh]", {
+			["^1"] = string.char(0x81),
+			["^2"] = string.char(0x82),
+			["^3"] = string.char(0x83),
+			["^4"] = string.char(0x84),
+			["^5"] = string.char(0x85),
+			["^6"] = string.char(0x86),
+			["^7"] = string.char(0x87),
+			["^8"] = string.char(0x88),
+			["^a"] = string.char(0x8a),
+			["^b"] = string.char(0x8b),
+			["^c"] = string.char(0x8c),
+			["^d"] = string.char(0x8d),
+			["^e"] = string.char(0x8e),
+			["^f"] = string.char(0x8f),
+			["^g"] = string.char(0x90),
+			["^h"] = string.char(0x91)
+		})
 		local word_l = #word
 		local i = 1
 		while i <= word_l  do
@@ -343,9 +434,9 @@ local function make_line_texture(line, lineno, pos)
 					end
 					if #chars < MAX_INPUT_CHARS then
 						table.insert(chars, {
-							off=ch_offs,
-							tex=FONT_FMT_SIMPLE:format(c:byte()),
-							col=("%X"):format(cur_color),
+							off = ch_offs,
+							tex = char_tex(font_name, c),
+							col = ("%X"):format(cur_color),
 						})
 					end
 					ch_offs = ch_offs + w
@@ -386,7 +477,10 @@ local function make_line_texture(line, lineno, pos)
 			end
 			table.insert(texture, (":%d,%d=%s"):format(xpos + ch.off, ypos, ch.tex))
 		end
-		table.insert(texture, (":%d,%d=hdf_20.png"):format(xpos + word.w, ypos))
+		table.insert(
+			texture, 
+			(":%d,%d="):format(xpos + word.w, ypos) .. char_tex(font_name, " ")
+		)
 		xpos = xpos + word.w + charwidth[" "]
 		if xpos >= (SIGN_WIDTH + charwidth[" "]) then break end
 	end
@@ -412,33 +506,34 @@ end
 
 local function set_obj_text(obj, text, new, pos)
 	local split = new and split_lines_and_words or split_lines_and_words_old
+	local text_ansi = Utf8ToAnsi(text)
 	local n = minetest.registered_nodes[minetest.get_node(pos).name]
-	local text_scale = n.text_scale or DEFAULT_TEXT_SCALE
+	local text_scale = (n and n.text_scale) or DEFAULT_TEXT_SCALE
 	obj:set_properties({
-		textures={make_sign_texture(split(text), pos)},
+		textures={make_sign_texture(split(text_ansi), pos)},
 		visual_size = text_scale,
 	})
 end
 
 signs_lib.construct_sign = function(pos, locked)
-    local meta = minetest.get_meta(pos)
+	local meta = minetest.get_meta(pos)
 	meta:set_string(
 		"formspec",
 		"size[6,4]"..
 		"textarea[0,-0.3;6.5,3;text;;${text}]"..
-		"button_exit[2,3.4;2,1;ok;Write]"..
+		"button_exit[2,3.4;2,1;ok;"..S("Write").."]"..
 		"background[-0.5,-0.5;7,5;bg_signs_lib.jpg]")
 	meta:set_string("infotext", "")
 end
 
 signs_lib.destruct_sign = function(pos)
-    local objects = minetest.get_objects_inside_radius(pos, 0.5)
-    for _, v in ipairs(objects) do
+	local objects = minetest.get_objects_inside_radius(pos, 0.5)
+	for _, v in ipairs(objects) do
 		local e = v:get_luaentity()
-        if e and e.name == "signs:text" then
-            v:remove()
-        end
-    end
+		if e and e.name == "signs:text" then
+			v:remove()
+		end
+	end
 end
 
 local function make_infotext(text)
@@ -451,7 +546,7 @@ local function make_infotext(text)
 	return table.concat(lines2, "\n")
 end
 
-signs_lib.update_sign = function(pos, fields, owner)
+signs_lib.update_sign = function(pos, fields, owner, node)
 
 	-- First, check if the interact keyword from CWz's mod is being set,
 	-- or has been changed since the last restart...
@@ -473,7 +568,7 @@ signs_lib.update_sign = function(pos, fields, owner)
 			signs_lib.destruct_sign(pos)
 			meta:set_string("keyword", current_keyword)
 			local ownstr = ""
-			if owner then ownstr = "Locked sign, owned by "..owner.."\n" end
+			if owner then ownstr = S("Locked sign, owned by @1\n", owner) end
 			meta:set_string("infotext", ownstr..string.gsub(make_infotext(stored_text), "@KEYWORD", current_keyword).." ")
 		end
 	end
@@ -485,7 +580,7 @@ signs_lib.update_sign = function(pos, fields, owner)
 		fields.text = trim_input(fields.text)
 
 		local ownstr = ""
-		if owner then ownstr = "Locked sign, owned by "..owner.."\n" end
+		if owner then ownstr = S("Locked sign, owned by @1\n", owner) end
 
 		meta:set_string("infotext", ownstr..string.gsub(make_infotext(fields.text), "@KEYWORD", current_keyword).." ")
 		meta:set_string("text", fields.text)
@@ -495,28 +590,11 @@ signs_lib.update_sign = function(pos, fields, owner)
 	else
 		new = (meta:get_int("__signslib_new_format") ~= 0)
 	end
+	signs_lib.destruct_sign(pos)
 	local text = meta:get_string("text")
-	if text == nil then return end
-	local objects = minetest.get_objects_inside_radius(pos, 0.5)
-	local found
-	for _, v in ipairs(objects) do
-		local e = v:get_luaentity()
-		if e and e.name == "signs:text" then
-			if found then
-				v:remove()
-			else
-				set_obj_text(v, text, new, pos)
-				found = true
-			end
-		end
-	end
-	if found then
-		return
-	end
-
-	-- if there is no entity
+	if text == nil or text == "" then return end
 	local sign_info
-	local signnode = minetest.get_node(pos)
+	local signnode = node or minetest.get_node(pos)
 	local signname = signnode.name
 	local textpos = minetest.registered_nodes[signname].textpos
 	if textpos then
@@ -631,11 +709,12 @@ function signs_lib.receive_fields(pos, formname, fields, sender, lock)
 			sender:get_player_name())
 		return
 	end
-	local lockstr = lock and "locked " or ""
+	local lockstr = lock and S("locked ") or ""
 	if fields and fields.text and fields.ok then
-		minetest.log("action", S("%s wrote \"%s\" to "..lockstr.."sign at %s"):format(
+		minetest.log("action", S("@1 wrote \"@2\" to @3sign at @4",
 			(sender:get_player_name() or ""),
-			fields.text,
+			fields.text:gsub('\\', '\\\\'):gsub("\n", "\\n"),
+			lockstr,
 			minetest.pos_to_string(pos)
 		))
 		if lock then
@@ -672,50 +751,52 @@ minetest.register_node(":"..default_sign, {
 		signs_lib.receive_fields(pos, formname, fields, sender)
 	end,
 	on_punch = function(pos, node, puncher)
-		signs_lib.update_sign(pos)
+		signs_lib.update_sign(pos,nil,nil,node)
 	end,
 	on_rotate = signs_lib.wallmounted_rotate
 })
 
 minetest.register_node(":signs:sign_yard", {
-    paramtype = "light",
+	paramtype = "light",
 	sunlight_propagates = true,
-    paramtype2 = "facedir",
-    drawtype = "nodebox",
-    node_box = signs_lib.yard_sign_model.nodebox,
+	paramtype2 = "facedir",
+	drawtype = "nodebox",
+	node_box = signs_lib.yard_sign_model.nodebox,
 	selection_box = {
 		type = "fixed",
 		fixed = {-0.4375, -0.5, -0.0625, 0.4375, 0.375, 0}
 	},
-    tiles = {"signs_top.png", "signs_bottom.png", "signs_side.png", "signs_side.png", "signs_back.png", "signs_front.png"},
-    groups = {choppy=2, dig_immediate=2},
-    drop = default_sign,
+	tiles = {"signs_top.png", "signs_bottom.png", "signs_side.png", "signs_side.png", "signs_back.png", "signs_front.png"},
+	groups = {choppy=2, dig_immediate=2},
+	drop = default_sign,
 
-    on_construct = function(pos)
-        signs_lib.construct_sign(pos)
-    end,
-    on_destruct = function(pos)
-        signs_lib.destruct_sign(pos)
-    end,
+	on_construct = function(pos)
+		signs_lib.construct_sign(pos)
+	end,
+	on_destruct = function(pos)
+		signs_lib.destruct_sign(pos)
+	end,
 	on_receive_fields = function(pos, formname, fields, sender)
 		signs_lib.receive_fields(pos, formname, fields, sender)
 	end,
 	on_punch = function(pos, node, puncher)
-		signs_lib.update_sign(pos)
+		signs_lib.update_sign(pos,nil,nil,node)
 	end,
+	on_rotate = signs_lib.facedir_rotate_simple
+
 })
 
 minetest.register_node(":signs:sign_hanging", {
-    paramtype = "light",
+	paramtype = "light",
 	sunlight_propagates = true,
-    paramtype2 = "facedir",
-    drawtype = "nodebox",
-    node_box = signs_lib.hanging_sign_model.nodebox,
-    selection_box = {
+	paramtype2 = "facedir",
+	drawtype = "nodebox",
+	node_box = signs_lib.hanging_sign_model.nodebox,
+	selection_box = {
 		type = "fixed",
 		fixed = {-0.45, -0.275, -0.049, 0.45, 0.5, 0.049}
 	},
-    tiles = {
+	tiles = {
 		"signs_hanging_top.png",
 		"signs_hanging_bottom.png",
 		"signs_hanging_side.png",
@@ -723,30 +804,31 @@ minetest.register_node(":signs:sign_hanging", {
 		"signs_hanging_back.png",
 		"signs_hanging_front.png"
 	},
-    groups = {choppy=2, dig_immediate=2},
-    drop = default_sign,
+	groups = {choppy=2, dig_immediate=2},
+	drop = default_sign,
 
-    on_construct = function(pos)
-        signs_lib.construct_sign(pos)
-    end,
-    on_destruct = function(pos)
-        signs_lib.destruct_sign(pos)
-    end,
+	on_construct = function(pos)
+		signs_lib.construct_sign(pos)
+	end,
+	on_destruct = function(pos)
+		signs_lib.destruct_sign(pos)
+	end,
 	on_receive_fields = function(pos, formname, fields, sender)
 		signs_lib.receive_fields(pos, formname, fields, sender)
 	end,
 	on_punch = function(pos, node, puncher)
-		signs_lib.update_sign(pos)
+		signs_lib.update_sign(pos,nil,nil,node)
 	end,
+	on_rotate = signs_lib.facedir_rotate_simple
 })
 
 minetest.register_node(":signs:sign_post", {
-    paramtype = "light",
+	paramtype = "light",
 	sunlight_propagates = true,
-    paramtype2 = "facedir",
-    drawtype = "nodebox",
-    node_box = signs_lib.sign_post_model.nodebox,
-    tiles = {
+	paramtype2 = "facedir",
+	drawtype = "nodebox",
+	node_box = signs_lib.sign_post_model.nodebox,
+	tiles = {
 		"signs_post_top.png",
 		"signs_post_bottom.png",
 		"signs_post_side.png",
@@ -754,22 +836,23 @@ minetest.register_node(":signs:sign_post", {
 		"signs_post_back.png",
 		"signs_post_front.png",
 	},
-    groups = {choppy=2, dig_immediate=2},
-    drop = {
+	groups = {choppy=2, dig_immediate=2},
+	drop = {
 		max_items = 2,
 		items = {
 			{ items = { default_sign }},
 			{ items = { "default:fence_wood" }},
 		},
-    },
+	},
+	on_rotate = signs_lib.facedir_rotate_simple
 })
 
 -- Locked wall sign
 
-minetest.register_privilege("sign_editor", "Can edit all locked signs")
+minetest.register_privilege("sign_editor", S("Can edit all locked signs"))
 
 minetest.register_node(":locked_sign:sign_wall_locked", {
-	description = S("Sign"),
+	description = S("Locked Sign"),
 	inventory_image = "signs_locked_inv.png",
 	wield_image = "signs_locked_inv.png",
 	node_placement_prediction = "",
@@ -793,20 +876,20 @@ minetest.register_node(":locked_sign:sign_wall_locked", {
 		local meta = minetest.get_meta(pos)
 		local owner = meta:get_string("owner")
 		local pname = sender:get_player_name() or ""
-		if pname ~= owner and pname ~= minetest.setting_get("name")
+		if pname ~= owner and pname ~= minetest.settings:get("name")
 		  and not minetest.check_player_privs(pname, {sign_editor=true}) then
 			return
 		end
 		signs_lib.receive_fields(pos, formname, fields, sender, true)
 	end,
 	on_punch = function(pos, node, puncher)
-		signs_lib.update_sign(pos)
+		signs_lib.update_sign(pos,nil,nil,node)
 	end,
 	can_dig = function(pos, player)
 		local meta = minetest.get_meta(pos)
 		local owner = meta:get_string("owner")
 		local pname = player:get_player_name()
-		return pname == owner or pname == minetest.setting_get("name")
+		return pname == owner or pname == minetest.settings:get("name")
 			or minetest.check_player_privs(pname, {sign_editor=true})
 	end,
 	on_rotate = signs_lib.wallmounted_rotate
@@ -841,7 +924,7 @@ if minetest.registered_nodes["default:sign_wall_steel"] then
 			signs_lib.receive_fields(pos, formname, fields, sender)
 		end,
 		on_punch = function(pos, node, puncher)
-			signs_lib.update_sign(pos)
+			signs_lib.update_sign(pos,nil,nil,node)
 		end,
 		on_rotate = signs_lib.wallmounted_rotate
 	})
@@ -849,14 +932,23 @@ end
 
 -- metal, colored signs
 if enable_colored_metal_signs then
-	local sign_colors = { "green", "yellow", "red", "white_red", "white_black", "orange", "blue", "brown" }
-	local sign_default_text_colors = { "f", "0", "f", "4", "0", "0", "f", "f" }
+	-- array : color, translated color, default text color
+	local sign_colors = {
+		{"green",        S("green"),       "f"},
+		{"yellow",       S("yellow"),      "0"},
+		{"red",          S("red"),         "f"},
+		{"white_red",    S("white_red"),   "4"},
+		{"white_black",  S("white_black"), "0"},
+		{"orange",       S("orange"),      "0"},
+		{"blue",         S("blue"),        "f"},
+		{"brown",        S("brown"),       "f"},
+	}
 
 	for i, color in ipairs(sign_colors) do
-		minetest.register_node(":signs:sign_wall_"..color, {
-			description = S("Sign ("..color..", metal)"),
-			inventory_image = "signs_"..color.."_inv.png",
-			wield_image = "signs_"..color.."_inv.png",
+		minetest.register_node(":signs:sign_wall_"..color[1], {
+			description = S("Sign (@1, metal)", color[2]),
+			inventory_image = "signs_"..color[1].."_inv.png",
+			wield_image = "signs_"..color[1].."_inv.png",
 			node_placement_prediction = "",
 			paramtype = "light",
 			sunlight_propagates = true,
@@ -869,9 +961,9 @@ if enable_colored_metal_signs then
 				"signs_metal_sides.png",
 				"signs_metal_sides.png",
 				"signs_metal_back.png",
-				"signs_"..color.."_front.png"
+				"signs_"..color[1].."_front.png"
 			},
-			default_color = sign_default_text_colors[i],
+			default_color = color[3],
 			groups = sign_groups,
 			on_place = function(itemstack, placer, pointed_thing)
 				return signs_lib.determine_sign_type(itemstack, placer, pointed_thing)
@@ -886,8 +978,9 @@ if enable_colored_metal_signs then
 				signs_lib.receive_fields(pos, formname, fields, sender)
 			end,
 			on_punch = function(pos, node, puncher)
-				signs_lib.update_sign(pos)
+				signs_lib.update_sign(pos,nil,nil,node)
 			end,
+			on_rotate = signs_lib.facedir_rotate
 		})
 	end
 end
@@ -899,16 +992,16 @@ signs_text_on_activate = function(self)
 	local meta = minetest.get_meta(pos)
 	local text = meta:get_string("text")
 	local new = (meta:get_int("__signslib_new_format") ~= 0)
-	if text then
+	if text and minetest.registered_nodes[minetest.get_node(pos).name] then
 		text = trim_input(text)
 		set_obj_text(self.object, text, new, pos)
 	end
 end
 
 minetest.register_entity(":signs:text", {
-    collisionbox = { 0, 0, 0, 0, 0, 0 },
-    visual = "upright_sprite",
-    textures = {},
+	collisionbox = { 0, 0, 0, 0, 0, 0 },
+	visual = "upright_sprite",
+	textures = {},
 
 	on_activate = signs_text_on_activate,
 })
@@ -916,17 +1009,17 @@ minetest.register_entity(":signs:text", {
 -- And the good stuff here! :-)
 
 function signs_lib.register_fence_with_sign(fencename, fencewithsignname)
-    local def = minetest.registered_nodes[fencename]
-    local def_sign = minetest.registered_nodes[fencewithsignname]
-    if not (def and def_sign) then
-        minetest.log("warning", "[signs_lib] Attempt to register unknown node as fence")
-        return
-    end
-    def = signs_lib.table_copy(def)
-    def_sign = signs_lib.table_copy(def_sign)
-    fences_with_sign[fencename] = fencewithsignname
+	local def = minetest.registered_nodes[fencename]
+	local def_sign = minetest.registered_nodes[fencewithsignname]
+	if not (def and def_sign) then
+		minetest.log("warning", "[signs_lib] "..S("Attempt to register unknown node as fence"))
+		return
+	end
+	def = signs_lib.table_copy(def)
+	def_sign = signs_lib.table_copy(def_sign)
+	fences_with_sign[fencename] = fencewithsignname
 
-    def_sign.on_place = function(itemstack, placer, pointed_thing, ...)
+	def_sign.on_place = function(itemstack, placer, pointed_thing, ...)
 		local node_above = minetest.get_node_or_nil(pointed_thing.above)
 		local node_under = minetest.get_node_or_nil(pointed_thing.under)
 		local def_above = node_above and minetest.registered_nodes[node_above.name]
@@ -971,18 +1064,20 @@ function signs_lib.register_fence_with_sign(fencename, fencewithsignname)
 		signs_lib.receive_fields(pos, formname, fields, sender)
 	end
 	def_sign.on_punch = function(pos, node, puncher, ...)
-		signs_lib.update_sign(pos)
+		signs_lib.update_sign(pos,nil,nil,node)
 	end
 	local fencename = fencename
 	def_sign.after_dig_node = function(pos, node, ...)
-	    node.name = fencename
-	    minetest.add_node(pos, node)
+		node.name = fencename
+		minetest.add_node(pos, node)
 	end
-    def_sign.drop = default_sign
+	def_sign.on_rotate = signs_lib.facedir_rotate_simple
+
+	def_sign.drop = default_sign
 	minetest.register_node(":"..fencename, def)
 	minetest.register_node(":"..fencewithsignname, def_sign)
 	table.insert(signs_lib.sign_node_list, fencewithsignname)
-	minetest.log("verbose", S("Registered %s and %s"):format(fencename, fencewithsignname))
+	minetest.log("verbose", S("Registered @1 and @2", fencename, fencewithsignname))
 end
 
 build_char_db()
@@ -1001,10 +1096,152 @@ minetest.register_lbm({
 	label = "Restore sign text",
 	run_at_every_load = true,
 	action = function(pos, node)
-		signs_lib.update_sign(pos)
+		signs_lib.update_sign(pos,nil,nil,node)
 	end
 })
 
-if minetest.setting_get("log_mods") then
-	minetest.log("action", S("signs loaded"))
+-- locked sign
+
+minetest.register_craft({
+		output = "locked_sign:sign_wall_locked",
+		recipe = {
+			{default_sign},
+			{"basic_materials:padlock"},
+	},
+})
+
+-- craft recipes for the metal signs
+if enable_colored_metal_signs then
+
+	minetest.register_craft( {
+		output = "signs:sign_wall_green",
+		recipe = {
+				{ "dye:dark_green", "dye:white", "dye:dark_green" },
+				{ "", default_sign_metal, "" }
+		},
+	})
+
+	minetest.register_craft( {
+		output = "signs:sign_wall_green 2",
+		recipe = {
+				{ "dye:dark_green", "dye:white", "dye:dark_green" },
+				{ "steel:sheet_metal", "steel:sheet_metal", "steel:sheet_metal" }
+		},
+	})
+
+	minetest.register_craft( {
+		output = "signs:sign_wall_yellow",
+		recipe = {
+				{ "dye:yellow", "dye:black", "dye:yellow" },
+				{ "", default_sign_metal, "" }
+		},
+	})
+
+	minetest.register_craft( {
+		output = "signs:sign_wall_yellow 2",
+		recipe = {
+				{ "dye:yellow", "dye:black", "dye:yellow" },
+				{ "steel:sheet_metal", "steel:sheet_metal", "steel:sheet_metal" }
+		},
+	})
+
+	minetest.register_craft( {
+		output = "signs:sign_wall_red",
+		recipe = {
+				{ "dye:red", "dye:white", "dye:red" },
+				{ "", default_sign_metal, "" }
+		},
+	})
+
+	minetest.register_craft( {
+		output = "signs:sign_wall_red 2",
+		recipe = {
+				{ "dye:red", "dye:white", "dye:red" },
+				{ "steel:sheet_metal", "steel:sheet_metal", "steel:sheet_metal" }
+		},
+	})
+
+	minetest.register_craft( {
+		output = "signs:sign_wall_white_red",
+		recipe = {
+				{ "dye:white", "dye:red", "dye:white" },
+				{ "", default_sign_metal, "" }
+		},
+	})
+
+	minetest.register_craft( {
+		output = "signs:sign_wall_white_red 2",
+		recipe = {
+				{ "dye:white", "dye:red", "dye:white" },
+				{ "steel:sheet_metal", "steel:sheet_metal", "steel:sheet_metal" }
+		},
+	})
+
+	minetest.register_craft( {
+		output = "signs:sign_wall_white_black",
+		recipe = {
+				{ "dye:white", "dye:black", "dye:white" },
+				{ "", default_sign_metal, "" }
+		},
+	})
+
+	minetest.register_craft( {
+		output = "signs:sign_wall_white_black 2",
+		recipe = {
+				{ "dye:white", "dye:black", "dye:white" },
+				{ "steel:sheet_metal", "steel:sheet_metal", "steel:sheet_metal" }
+		},
+	})
+
+	minetest.register_craft( {
+		output = "signs:sign_wall_orange",
+		recipe = {
+				{ "dye:orange", "dye:black", "dye:orange" },
+				{ "", default_sign_metal, "" }
+		},
+	})
+
+	minetest.register_craft( {
+		output = "signs:sign_wall_orange 2",
+		recipe = {
+				{ "dye:orange", "dye:black", "dye:orange" },
+				{ "steel:sheet_metal", "steel:sheet_metal", "steel:sheet_metal" }
+		},
+	})
+
+	minetest.register_craft( {
+		output = "signs:sign_wall_blue",
+		recipe = {
+				{ "dye:blue", "dye:white", "dye:blue" },
+				{ "", default_sign_metal, "" }
+		},
+	})
+
+	minetest.register_craft( {
+		output = "signs:sign_wall_blue 2",
+		recipe = {
+				{ "dye:blue", "dye:white", "dye:blue" },
+				{ "steel:sheet_metal", "steel:sheet_metal", "steel:sheet_metal" }
+		},
+	})
+
+	minetest.register_craft( {
+		output = "signs:sign_wall_brown",
+		recipe = {
+				{ "dye:brown", "dye:white", "dye:brown" },
+				{ "", default_sign_metal, "" }
+		},
+	})
+
+	minetest.register_craft( {
+		output = "signs:sign_wall_brown 2",
+		recipe = {
+				{ "dye:brown", "dye:white", "dye:brown" },
+				{ "steel:sheet_metal", "steel:sheet_metal", "steel:sheet_metal" }
+		},
+	})
+end
+
+if minetest.settings:get("log_mods") then
+	minetest.log("action", S("[MOD] signs loaded"))
 end
