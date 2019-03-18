@@ -34,9 +34,9 @@ subgames.register_on_respawnplayer(function(player, lobby)
 		local name = player:get_player_name()
 		local plobby = survivalgames.player_lobby[name]
 		if plobby ~= 0 and survivalgames.lobbys[plobby].ingame then
-      local pos = player:getpos()
+      local pos = player:get_pos()
       subgames.spectate(player)
-      player:setpos(survivalgames.lobbys[plobby].pos)
+      player:set_pos(survivalgames.lobbys[plobby].pos)
       if survivalgames.lobbys[plobby].players[name] then
 			  survivalgames.lobbys[plobby].players[name] = false
 			  survivalgames.chat_send_all_lobby(plobby, name.." died so.")
@@ -45,7 +45,7 @@ subgames.register_on_respawnplayer(function(player, lobby)
         subgames.drop_inv(player, pos)
         survivalgames.win(plobby)
       end
-		else player:setpos(survivalgames.lobbys[plobby].pos)
+		else player:set_pos(survivalgames.lobbys[plobby].pos)
 		end
 	end
 end)

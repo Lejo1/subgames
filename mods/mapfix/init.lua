@@ -15,7 +15,7 @@ minetest.register_chatcommand("mapfix", {
 	params = "<size>",
 	description = "Recalculate the flowing liquids and the light of a chunk",
 	func = function(name, param)
-		local pos = minetest.get_player_by_name(name):getpos()
+		local pos = minetest.get_player_by_name(name):get_pos()
 		local size = tonumber(param) or 40
 		local privs = minetest.check_player_privs(name, {server=true})
 		local time = os.clock()

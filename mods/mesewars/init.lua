@@ -159,14 +159,14 @@ function mesewars.join_game(player, lobby)
     return "The lobby is full !"
   elseif mesewars.lobbys[lobby].ingame == true then
     mesewars.player_lobby[name] = lobby
-    player:setpos(mesewars.lobbys[lobby].specpos)
+    player:set_pos(mesewars.lobbys[lobby].specpos)
     subgames.clear_inv(player)
     mesewars.lobbys[lobby].players[name] = false
     subgames.spectate(player)
     sfinv.set_page(player, "subgames:maps")
     return "Lobby is ingame! So you are now spectating."
   else mesewars.player_lobby[name] = lobby
-    player:setpos(mesewars.lobbys[lobby].specpos)
+    player:set_pos(mesewars.lobbys[lobby].specpos)
     subgames.clear_inv(player)
     mesewars.win(lobby)
     mesewars.lobbys[lobby].players[name] = false

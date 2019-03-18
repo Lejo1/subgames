@@ -151,13 +151,13 @@ subgames.register_on_respawnplayer(function(player, lobby)
           sfinv.set_page(player, "subgames:team")
         end
         subgames.spectate(player)
-        player:setpos(mesewars.lobbys[plobby].specpos)
+        player:set_pos(mesewars.lobbys[plobby].specpos)
 			  mesewars.win(plobby)
       else
         subgames.clear_inv(player)
-        player:setpos(mesewars.get_team_base(name))
+        player:set_pos(mesewars.get_team_base(name))
       end
-		else player:setpos(mesewars.lobbys[plobby].specpos)
+		else player:set_pos(mesewars.lobbys[plobby].specpos)
 		end
 	end
 end)

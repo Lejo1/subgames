@@ -194,14 +194,14 @@ function skywars.join_game(player, lobby)
     return "The lobby is full !"
   elseif skywars.lobbys[lobby].ingame == true then
     skywars.player_lobby[name] = lobby
-    player:setpos(skywars.lobbys[lobby].specpos)
+    player:set_pos(skywars.lobbys[lobby].specpos)
     subgames.clear_inv(player)
     skywars.lobbys[lobby].players[name] = false
     sfinv.set_page(player, "subgames:maps")
     subgames.spectate(player)
     return "Lobby is ingame! So you are now spectating."
   else skywars.player_lobby[name] = lobby
-    player:setpos(skywars.lobbys[lobby].specpos)
+    player:set_pos(skywars.lobbys[lobby].specpos)
     subgames.clear_inv(player)
     sfinv.set_page(player, "subgames:maps")
     skywars.win(lobby)

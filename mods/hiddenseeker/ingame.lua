@@ -45,7 +45,7 @@ minetest.register_globalstep(function(dtime)
 					local name = player:get_player_name()
           player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
 					if ltable.players[name] ~= "seeker" then
-						local nowpos = minetest.pos_to_string(player:getpos())
+						local nowpos = minetest.pos_to_string(player:get_pos())
 						if nowpos == hiddenseeker.disguis[name].pos then
 							if hiddenseeker.disguis[name].time > 0 then
 								hiddenseeker.disguis[name].time = hiddenseeker.disguis[name].time -1
@@ -58,7 +58,7 @@ minetest.register_globalstep(function(dtime)
 								hiddenseeker.disguis_player(player)
 							end
 						end
-						hiddenseeker.disguis[name].pos = minetest.pos_to_string(player:getpos())
+						hiddenseeker.disguis[name].pos = minetest.pos_to_string(player:get_pos())
 					end
 				end
 			end
@@ -69,7 +69,7 @@ end)
 function hiddenseeker.disguis_player(player)
 	local name = player:get_player_name()
 	if not hiddenseeker.disguis[name].enable then
-		if minetest.get_node(player:getpos()).name == "air" then
+		if minetest.get_node(player:get_pos()).name == "air" then
 			hiddenseeker.disguis[name].enable = true
 			subgames.disappear(player)
 			minetest.set_node(minetest.string_to_pos(hiddenseeker.disguis[name].pos), {name=hiddenseeker.lobbys[hiddenseeker.player_lobby[name]].players[name]})
@@ -112,15 +112,15 @@ subgames.register_on_respawnplayer(function(player, lobby)
 			hiddenseeker.chat_send_all_lobby(plobby, name.." died so he is now a seeker.")
 			hiddenseeker.chat_send_all_lobby(plobby, "There are "..hiddenseeker.get_hidder_count(plobby).." hidders left!")
 			if hiddenseeker.lobbys[plobby].hidding then
-				player:setpos(hiddenseeker.lobbys[plobby].seekerpos)
-			else player:setpos(hiddenseeker.lobbys[plobby].pos)
+				player:set_pos(hiddenseeker.lobbys[plobby].seekerpos)
+			else player:set_pos(hiddenseeker.lobbys[plobby].pos)
 				subgames.clear_inv(player)
 				subgames.add_armor(player, ItemStack("3d_armor:helmet_cactus"), ItemStack("3d_armor:chestplate_cactus"), ItemStack("3d_armor:leggings_cactus"), ItemStack("3d_armor:boots_cactus"))
 	      player:get_inventory():add_item("main", "default:sword_steel")
 			end
 			hiddenseeker.win(plobby)
 			player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
-		else player:setpos(hiddenseeker.lobbys[plobby].pos)
+		else player:set_pos(hiddenseeker.lobbys[plobby].pos)
 		end
 	end
 end)

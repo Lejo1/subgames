@@ -130,7 +130,7 @@ minetest.register_entity("xdecor:f_item", {
 	physical = false,
 	textures = {"air"},
 	on_activate = function(self, staticdata)
-		local pos = self.object:getpos()
+		local pos = self.object:get_pos()
 		if minetest.get_node(pos).name ~= "xdecor:itemframe" then
 			self.object:remove()
 		end

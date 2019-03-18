@@ -65,7 +65,7 @@ function skywars.start_game(lobby)
     skywars.lobbys[lobby].players[name] = true
     subgames.clear_inv(player)
     skywars.give_kit_items(name)
-    player:setpos(skywars.lobbys[lobby].pos[place])
+    player:set_pos(skywars.lobbys[lobby].pos[place])
     sfinv.set_page(player, "3d_armor:armor")
     local privs = minetest.get_player_privs(name)
     privs.craft = true
@@ -105,7 +105,7 @@ function skywars.win(lobby)
       minetest.after(5, function()
         for _, player in pairs(skywars.get_lobby_players(lobby)) do
           local name = player:get_player_name()
-          player:setpos(skywars.lobbys[lobby].specpos)
+          player:set_pos(skywars.lobbys[lobby].specpos)
           subgames.clear_inv(player)
           subgames.unspectate(player)
           skywars.lobbys[lobby].players[name] = true

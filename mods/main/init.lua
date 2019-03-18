@@ -65,7 +65,7 @@ local spawn = {x=(-11), y=602, z=20}
 subgames.register_on_joinplayer(function(player, lobby)
   if lobby == "main" then
     local name = player:get_player_name()
-    player:setpos(spawn)
+    player:set_pos(spawn)
     local inv = player:get_inventory()
     inv:add_item("main", "main:teleporter")
     sfinv.set_page(player, "subgames:lobbys")
@@ -113,7 +113,7 @@ end)
 --  Add chat system
 subgames.register_on_respawnplayer(function(player, lobby)
   if lobby == "main" then
-    player:setpos(spawn)
+    player:set_pos(spawn)
   end
 end)
 

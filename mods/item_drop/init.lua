@@ -4,7 +4,7 @@ minetest.register_globalstep(function(dtime)
 	for _,player in ipairs(minetest.get_connected_players()) do
 		local name = player:get_player_name()
 		if player:get_hp() > 0 and minetest.get_player_privs(name).interact then
-			local pos = player:getpos()
+			local pos = player:get_pos()
 			pos.y = pos.y+0.5
 			local inv = player:get_inventory()
 
@@ -30,7 +30,7 @@ minetest.register_globalstep(function(dtime)
 						if inv and inv:room_for_item("main", ItemStack(object:get_luaentity().itemstring)) then
 							local pos1 = pos
 							pos1.y = pos1.y+0.2
-							local pos2 = object:getpos()
+							local pos2 = object:get_pos()
 							local vec = {x=pos1.x-pos2.x, y=pos1.y-pos2.y, z=pos1.z-pos2.z}
 							vec.x = vec.x*3
 							vec.y = vec.y*3

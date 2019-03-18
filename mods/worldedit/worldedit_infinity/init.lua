@@ -20,7 +20,7 @@ end
 
 local use = function(itemstack, user, pointed_thing)
 	if pointed_thing.type == "nothing" then --pointing at nothing
-		local placepos = worldedit.raytrace(user:getpos(), user:get_look_dir(), get_pointed)
+		local placepos = worldedit.raytrace(user:get_pos(), user:get_look_dir(), get_pointed)
 		if placepos then --extended reach
 			pointed_thing.type = "node"
 			pointed_thing.under = nil --wip

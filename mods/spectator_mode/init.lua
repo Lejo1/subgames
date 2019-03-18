@@ -34,7 +34,7 @@ local function unwatching(name)
 
 		if original_pos[watcher] then
 			minetest.after(0.1, function()
-				watcher:setpos(original_pos[watcher])
+				watcher:set_pos(original_pos[watcher])
 				original_pos[watcher] = {}
 			end)
 		end
@@ -54,7 +54,7 @@ minetest.register_chatcommand("watch", {
 			if default.player_attached[name] == true then
 				unwatching(param)
 			else
-				original_pos[watcher] = watcher:getpos()
+				original_pos[watcher] = watcher:get_pos()
 			end
 		
 			default.player_attached[name] = true
@@ -80,7 +80,7 @@ minetest.register_chatcommand("watch", {
 			privs.interact = nil
 			minetest.set_player_privs(name, privs)
 
-			return true, "Watching '"..param.."' at "..minetest.pos_to_string(vector.round(target:getpos()))
+			return true, "Watching '"..param.."' at "..minetest.pos_to_string(vector.round(target:get_pos()))
 		end
 
 		return false, "Invalid parameter ('"..param.."')."

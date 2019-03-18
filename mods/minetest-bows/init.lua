@@ -86,7 +86,7 @@ minetest.register_entity("bow:arrow_ent", {
 	on_step = function(self, dtime)
 		if not self.start_timer then self.object:remove() return end
 		if not self.charge then self.object:remove() return end
-		local pos = self.object:getpos()
+		local pos = self.object:get_pos()
 		local vel = self.object:getvelocity()
 		if ((self.start_vel.x~=0 and vel.x==0) or (self.start_vel.z~=0 and vel.z==0) or vel.y==0) and self.charge>0 then
 			self.object:setvelocity({x=0, y=0, z=0})
@@ -131,7 +131,7 @@ controls.register_on_release(function(player, key, time)
 	if (wielditem:get_name()=="bow:bow_1" or wielditem:get_name()=="bow:bow_2" or wielditem:get_name()=="bow:bow_3") then
 		local yaw = player:get_look_yaw()
 		local dir = player:get_look_dir()
-		local pos = vector.add(player:getpos(),{x=dir.x*2, y=dir.y*2+1.5, z=dir.z*2})
+		local pos = vector.add(player:get_pos(),{x=dir.x*2, y=dir.y*2+1.5, z=dir.z*2})
 		local obj = minetest.add_entity(pos, "bow:arrow_ent")
 		obj:setyaw(yaw + math.pi)
 		local charge = 1

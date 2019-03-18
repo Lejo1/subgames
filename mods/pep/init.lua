@@ -66,7 +66,7 @@ function pep.moledig(playername)
 	-- TODO: Remove this code as soon as Minetest fixes this.
 	yaw = yaw - math.pi/2
 
-	local pos = vector.round(player:getpos())
+	local pos = vector.round(player:get_pos())
 
 	local v = pep.yaw_to_vector(yaw)
 

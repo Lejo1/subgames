@@ -12,7 +12,7 @@ local function check_fly(name)
   if not player then
     return
   end
-  local pos = vector.round(player:getpos())
+  local pos = vector.round(player:get_pos())
   local posbevor = pos
   local jump = player:get_physics_override().jump
   local speed = player:get_physics_override().speed

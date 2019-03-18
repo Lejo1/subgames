@@ -55,7 +55,7 @@ minetest.register_node("survivalgames:chest", {
     on_metadata_inventory_put = function(pos, listname, index, stack, player)
 	end,
     on_metadata_inventory_take = function(pos, listname, index, stack, player)
-      if vector.distance(vector.round(player:getpos()), pos) > 6 then
+      if vector.distance(vector.round(player:get_pos()), pos) > 6 then
         return 0
       end
 		local inv = minetest.get_inventory({type = "node", pos=pos})

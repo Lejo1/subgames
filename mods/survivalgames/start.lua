@@ -133,7 +133,7 @@ function survivalgames.win(lobby)
         ldata.ingame = false
         for _, player in pairs(survivalgames.get_lobby_players(lobby)) do
           local name = player:get_player_name()
-          player:setpos(survivalgames.lobbys[lobby].pos)
+          player:set_pos(survivalgames.lobbys[lobby].pos)
           subgames.clear_inv(player)
           subgames.spectate(player)
           survivalgames.lobbys[lobby].players[name] = false

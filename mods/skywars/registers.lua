@@ -155,12 +155,12 @@ subgames.register_on_respawnplayer(function(player, lobby)
 			   skywars.chat_send_all_lobby(plobby, name.." died.")
 			   skywars.chat_send_all_lobby(plobby, "There are "..skywars.get_player_count(plobby).." players left!")
          subgames.add_mithud(player, "You are now spectating!", 0xFF0000, 3)
-         subgames.drop_inv(player, player:getpos())
+         subgames.drop_inv(player, player:get_pos())
       end
       subgames.spectate(player)
-      player:setpos(skywars.lobbys[plobby].specpos)
+      player:set_pos(skywars.lobbys[plobby].specpos)
 			skywars.win(plobby)
-		else player:setpos(skywars.lobbys[plobby].specpos)
+		else player:set_pos(skywars.lobbys[plobby].specpos)
 		end
 	end
 end)

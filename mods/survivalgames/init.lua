@@ -179,7 +179,7 @@ function survivalgames.join_game(player, lobby)
     return "The lobby is full!"
   elseif survivalgames.lobbys[lobby].ingame == true then
     survivalgames.player_lobby[name] = lobby
-    player:setpos(survivalgames.lobbys[lobby].pos)
+    player:set_pos(survivalgames.lobbys[lobby].pos)
     subgames.clear_inv(player)
     survivalgames.lobbys[lobby].players[name] = false
     subgames.spectate(player)
@@ -193,7 +193,7 @@ function survivalgames.join_game(player, lobby)
       ldata.pos = pos
     end
     subgames.spectate(player)
-    player:setpos(survivalgames.lobbys[lobby].pos)
+    player:set_pos(survivalgames.lobbys[lobby].pos)
     subgames.clear_inv(player)
     survivalgames.lobbys[lobby].players[name] = false
     survivalgames.win(lobby)

@@ -64,7 +64,7 @@ function mesewars.start_game(lobby)
     subgames.clear_inv(player)
     mesewars.color_tag(player)
     mesewars.give_kit_items(name)
-    player:setpos(mesewars.lobbys[lobby].pos[team])
+    player:set_pos(mesewars.lobbys[lobby].pos[team])
     sfinv.set_page(player, "3d_armor:armor")
     mesewars.set_maxteam(lobby)
   end
@@ -107,7 +107,7 @@ function mesewars.win(lobby)
       minetest.after(5, function()
         for _, player in pairs(mesewars.get_lobby_players(lobby)) do
           local name = player:get_player_name()
-          player:setpos(mesewars.lobbys[lobby].specpos)
+          player:set_pos(mesewars.lobbys[lobby].specpos)
           subgames.clear_inv(player)
           subgames.unspectate(player)
           mesewars.lobbys[lobby].players[name] = false

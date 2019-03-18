@@ -174,15 +174,15 @@ function hiddenseeker.join_game(player, lobby)
     hiddenseeker.chat_send_all_lobby(lobby, name.." is Seeker.")
     subgames.clear_inv(player)
     if hiddenseeker.lobbys[lobby].hidding then
-      player:setpos(hiddenseeker.lobbys[lobby].seekerpos)
-    else player:setpos(hiddenseeker.lobbys[lobby].pos)
+      player:set_pos(hiddenseeker.lobbys[lobby].seekerpos)
+    else player:set_pos(hiddenseeker.lobbys[lobby].pos)
       subgames.add_armor(player, ItemStack("3d_armor:helmet_cactus"), ItemStack("3d_armor:chestplate_cactus"), ItemStack("3d_armor:leggings_cactus"), ItemStack("3d_armor:boots_cactus"))
       player:get_inventory():add_item("main", "default:sword_steel")
     end
     player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
     return "Lobby is ingame! So you are now a seeker."
   else hiddenseeker.player_lobby[name] = lobby
-    player:setpos(hiddenseeker.lobbys[lobby].pos)
+    player:set_pos(hiddenseeker.lobbys[lobby].pos)
     subgames.clear_inv(player)
     hiddenseeker.lobbys[lobby].players[name] = true
     player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})

@@ -285,13 +285,13 @@ minetest.register_craftitem("mesewars:fallprotection", {
 subgames.register_on_item_eat(function(hp_change, replace_with_item, itemstack, user, pointed_thing, lobby)
     if lobby == "mesewars" then
     local name = user:get_player_name()
-    local pos = user:getpos()
+    local pos = user:get_pos()
     local blockpos = pos ; blockpos.y = blockpos.y -2
     if minetest.get_node(blockpos).name == "air" then
       minetest.set_node(blockpos, {name="default:glass"})
       mesewars.lobbys[mesewars.player_lobby[name]].mapblocks[minetest.pos_to_string(vector.round(blockpos))] = {name="air"}
     end
-    local ent = minetest.add_entity(user:getpos(), "mesewars:temp")
+    local ent = minetest.add_entity(user:get_pos(), "mesewars:temp")
     local obj = ent:get_luaentity()
     if obj and not user:get_attach() then
       user:set_attach(ent, "", {x = 0, y = 0, z = 0}, {x = 0, y = 0, z = 0})
@@ -311,14 +311,14 @@ mesewars.baseteleportpartical = {}
 playereffects.register_effect_type("baseteleport", "Base Teleport", "pep_manaregen.png", {"meseteleport"},
 	function(player)
     local name = player:get_player_name()
-    local pos = minetest.pos_to_string(player:getpos())
+    local pos = minetest.pos_to_string(player:get_pos())
     local hp = player:get_hp()
 		if mesewars.baseteleportposes[name] and mesewars.baseteleporthps[name] then
       if mesewars.baseteleportposes[name] ~= pos or mesewars.baseteleporthps[name] > hp then
         playereffects.cancel_effect_type("baseteleport", false, name)
         minetest.delete_particlespawner(mesewars.baseteleportparticalid[name], name)
       elseif mesewars.baseteleportcount[name] >= 4 then
-        player:setpos(mesewars.get_team_base(name))
+        player:set_pos(mesewars.get_team_base(name))
       else mesewars.baseteleportcount[name] = mesewars.baseteleportcount[name] + 1
       end
     elseif not mesewars.baseteleporthps[name] then
@@ -354,7 +354,7 @@ minetest.register_craftitem("mesewars:baseteleport", {
 
 function mesewars.make_baseteleport_partical(player)
   local name = player:get_player_name()
-  local pos = player:getpos() ; pos.y = pos.y + 1
+  local pos = player:get_pos() ; pos.y = pos.y + 1
   local goal = mesewars.get_team_base(name)
   local dir = vector.direction(pos, goal)
   local dis = vector.distance(pos, goal)
@@ -384,7 +384,7 @@ minetest.register_craftitem("mesewars:bridge", {
   inventory_image = "bridge.png",
   on_use = function(itemstack, user, pointed_thing)
     local name = user:get_player_name()
-    local lastpos = vector.round(user:getpos()) ; lastpos.y = lastpos.y -1
+    local lastpos = vector.round(user:get_pos()) ; lastpos.y = lastpos.y -1
     local high = lastpos.y
     for counter=0, 5 do
       lastpos = vector.add(lastpos, user:get_look_dir()) ; lastpos.y = high
