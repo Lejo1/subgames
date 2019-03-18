@@ -10,7 +10,7 @@ function subgames.disappear(player) --  As ObjectRef
     player:set_properties({
       visual_size = {x=0, y=0},
       makes_footstep_sound = false,
-      collisionbox = {0}
+      pointable = false
     })
   end
 end
@@ -22,7 +22,7 @@ function subgames.undisappear(player) --  As ObjectRef
     player:set_properties({
 			visual_size = {x=1, y=1},
 			makes_footstep_sound = true,
-			collisionbox = {-0.3, 0.0, -0.3, 0.3, 1.7, 0.3}
+			pointable = true
 		})
 	  subgames_spectate[name]=nil
   end
