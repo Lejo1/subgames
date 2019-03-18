@@ -237,7 +237,6 @@ minetest.register_on_joinplayer(function(player)
   privs.fast = nil
   privs.noclip = nil
   minetest.set_player_privs(name, privs)
-  minetest.chat_send_player(name, minetest.get_server_status())
   subgames.call_join_callbacks(player, "main")
 end)
 
