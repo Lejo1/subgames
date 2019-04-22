@@ -7,12 +7,8 @@
 local time = 0
 local flytbl = {}
 
-local function check_fly(name)
-  local player = minetest.get_player_by_name(name)
-  if not player then
-    return
-  end
-  local pos = vector.round(player:getpos())
+local function check_fly(player, name)
+  local pos = vector.round(player:get_pos())
   local posbevor = pos
   local jump = player:get_physics_override().jump
   local speed = player:get_physics_override().speed
@@ -41,6 +37,27 @@ local function check_fly(name)
   end
 end
 
+local bevorposes = {}
+local function check_noclip(player, name)
+  if minetest.get_player_privs(name).noclip then
+    return
+  end
+  local pos = player:get_pos()
+  local fnode = minetest.registered_nodes[minetest.get_node(pos).name]
+  local hnode = minetest.registered_nodes[minetest.get_node(vector.add(pos, {x=0, y=1, z=0})).name]
+  if fnode and fnode.walkable and (not fnode.node_box or fnode.node_box.type == "regular")
+   and hnode and hnode.walkable and (not hnode.node_box or hnode.node_box.type == "regular") then
+     if not bevorposes[name] then
+       bevorposes[name] = vector.round(pos)
+     elseif vector.distance(bevorposes[name], pos) >= 2 then
+       minetest.kick_player(name, "Autokick: Please disable your noclip cheat")
+       bevorposes[name] = nil
+     end
+  else
+    bevorposes[name] = nil
+  end
+end
+
 minetest.register_globalstep(function(dtime)
     time = time + dtime
     if time < 1 then
@@ -48,7 +65,11 @@ minetest.register_globalstep(function(dtime)
     end
     time = 0
     for _, player in ipairs(minetest.get_connected_players()) do
+      if not player then
+        return
+      end
       local name = player:get_player_name()
-      check_fly(name)
+      check_fly(player, name)
+      check_noclip(player, name)
     end
 end)
