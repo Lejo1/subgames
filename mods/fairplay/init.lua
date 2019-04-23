@@ -65,11 +65,10 @@ minetest.register_globalstep(function(dtime)
     end
     time = 0
     for _, player in ipairs(minetest.get_connected_players()) do
-      if not player then
-        return
+      if player and minetest.is_player(player) then
+        local name = player:get_player_name()
+        check_fly(player, name)
+        check_noclip(player, name)
       end
-      local name = player:get_player_name()
-      check_fly(player, name)
-      check_noclip(player, name)
     end
 end)
