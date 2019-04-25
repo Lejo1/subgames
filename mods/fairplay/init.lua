@@ -8,6 +8,9 @@ local time = 0
 local flytbl = {}
 
 local function check_fly(player, name)
+  if not player then
+    return
+  end
   local pos = vector.round(player:get_pos())
   local posbevor = pos
   local jump = player:get_physics_override().jump
