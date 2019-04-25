@@ -7,7 +7,11 @@
 local time = 0
 local flytbl = {}
 
-local function check_fly(player, name)
+local function check_fly(name)
+  local player = minetest.get_player_by_name(name)
+  if not player then
+    return
+  end
   local pos = vector.round(player:get_pos())
   local posbevor = pos
   local jump = player:get_physics_override().jump
@@ -38,7 +42,11 @@ local function check_fly(player, name)
 end
 
 local bevorposes = {}
-local function check_noclip(player, name)
+local function check_noclip(name)
+  local player = minetest.get_player_by_name(name)
+  if not player then
+    return
+  end
   if minetest.get_player_privs(name).noclip then
     return
   end
@@ -65,10 +73,8 @@ minetest.register_globalstep(function(dtime)
     end
     time = 0
     for _, player in ipairs(minetest.get_connected_players()) do
-      if player and minetest.is_player(player) and minetest.get_player_by_name(player:get_player_name()) then
-        local name = player:get_player_name()
-        check_fly(player, name)
-        check_noclip(player, name)
-      end
+      local name = player:get_player_name()
+      check_fly(name)
+      check_noclip(name)
     end
 end)
