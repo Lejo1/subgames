@@ -217,6 +217,7 @@ function subgames.call_join_callbacks(player, lobby)
   sfinv.set_page(player, "3d_armor:armor")
   local privs = minetest.get_player_privs(name)
   privs.armor = true
+  privs.craft = false
   minetest.set_player_privs(name, privs)
   sfinv.set_player_inventory_formspec(player)
   for _,value in pairs(subgames.on_joinplayer) do
