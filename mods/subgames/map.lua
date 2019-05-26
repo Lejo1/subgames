@@ -1,6 +1,6 @@
 minetest.set_mapgen_params({seed=math.random(10000000000000000000, 99999999999999999999)})
 minetest.set_mapgen_params({water_level=-60})
-minetest.set_mapgen_params({flags = "nodungeons, noridges"})
+minetest.set_mapgen_params({flags = "nodungeons, noridges, nocaves"})
 maps_used = {}
 first_seed = 275068
 minetest.register_on_generated(function(minp, maxp, seed)
