@@ -51,8 +51,11 @@ minetest.register_chatcommand("pinfo", {
   params = "<name>",
   description = "Get some infos of a player.",
   privs = {ban=true},
-  func = function(name)
-    for key, value in pairs(minetest.get_player_information(name)) do
+  func = function(name, param)
+    if not minetest.get_player_by_name(param) then
+      return false, "Player is not online"
+    end
+    for key, value in pairs(minetest.get_player_information(param)) do
       minetest.chat_send_player(name, tostring(key).." is "..tostring(value))
     end
   end,
