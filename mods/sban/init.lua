@@ -30,7 +30,7 @@ local t_units = {
 	[""] = 1,
 }
 
-expiry = "90D"
+expiry = "3d"
 def_duration = "1w"
 display_max = 10
 names_per_id = 5
