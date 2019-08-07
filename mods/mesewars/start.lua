@@ -68,6 +68,20 @@ function mesewars.start_game(lobby)
     sfinv.set_page(player, "3d_armor:armor")
     mesewars.set_maxteam(lobby)
   end
+  local starttime = os.time()
+  mesewars.lobbys[lobby].starttime = starttime
+  minetest.after(1200, function() --  Time when game times out 60*20
+    if starttime == mesewars.lobbys[lobby].starttime and mesewars.lobbys[lobby].ingame then
+      -- Game timed out (was longer then 20min)
+      local msg = minetest.colorize("red", "Restarting Game (Game timed out!)")
+      mesewars.chat_send_all_lobby(lobby, msg)
+      for _,player in ipairs(mesewars.get_lobby_players(lobby)) do
+        mesewars.leave_game(player)
+        mesewars.join_game(player, lobby)
+      end
+      mesewars.win(lobby)
+    end
+  end)
 end
 
 function mesewars.get_team_count(lobby)
