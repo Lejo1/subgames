@@ -19,6 +19,10 @@ local _sql = ie.require("lsqlite3")
 if sqlite3 then sqlite3 = nil end
 
 minetest.register_privilege("ban_admin", "Bans administrator")
+minetest.register_privilege("lowban", "Allows bans only for the deafult time!")
+--  For lowban reporting!
+local storage = minetest.get_mod_storage()
+
 
 local db_version = "0.1"
 local db = _sql.open(WP.."/sban.sqlite") -- connection
@@ -1248,7 +1252,7 @@ end)
 minetest.override_chatcommand("ban", {
 	description = "Bans a player from the server",
 	params = "<player> <reason>",
-	privs = { ban = true },
+	privs = { lowban = true },
 	func = function(name, params)
 		local player_name, reason = params:match("(%S+)%s+(.+)")
 		-- check params are present
@@ -1284,6 +1288,10 @@ minetest.override_chatcommand("ban", {
 				minetest.log("error", "Failed to ban "..player_name)
 				return false, ("Failed to ban %s"):format(player_name)
 			else
+				--  Save info for the admin about this ban
+				if not minetest.get_player_privs(name).ban then
+					storage:set_string(player_name, name.."||"..reason.."||"..os.time())
+				end
 				return true, ("Banned %s."):format(player_name)
 			end
 		else
@@ -1301,6 +1309,30 @@ minetest.override_chatcommand("ban", {
 				minetest.log("error", "Failed to ban "..player_name)
 				return false, ("Failed to ban %s"):format(player_name)
 			end
+		end
+	end
+})
+
+minetest.register_chatcommand("lowbans", {
+	description = "manage the lowbans executed by mods",
+	params = "list/del",
+	privs = {ban_admin = true},
+	func = function(name, params)
+		if params == "list" then
+			local outstr = ""
+			for name, rawdata in pairs(storage:to_table().fields) do
+				local data = string.split(rawdata, "||")
+				outstr = outstr..name.." were banned by "..data[1].." at the "..os.date("%c", data[3])..
+				" for the reason:"..data[2].."\n"
+			end
+			if outstr ~= "" then
+				return true, outstr
+			else return true, "No bans listed"
+			end
+		elseif params == "del" then
+			storage:from_table(nil)
+			return true, "Cleared the ban list!"
+		else return false, "Invalid Params: list/del"
 		end
 	end
 })
