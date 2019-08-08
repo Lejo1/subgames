@@ -72,6 +72,20 @@ function skywars.start_game(lobby)
     minetest.set_player_privs(name, privs)
     subgames.add_bothud(player, "Teaming is not allowed!", 0xFF0000, 100000)
   end
+  local starttime = os.time()
+  skywars.lobbys[lobby].starttime = starttime
+  minetest.after(900, function() --  Time when game times out 60*15
+    if starttime == skywars.lobbys[lobby].starttime and skywars.lobbys[lobby].ingame then
+      -- Game timed out (was longer then 15min)
+      local msg = minetest.colorize("red", "Restarting Game (Game timed out!)")
+      skywars.chat_send_all_lobby(lobby, msg)
+      for _,player in ipairs(skywars.get_lobby_players(lobby)) do
+        skywars.leave_game(player)
+        skywars.join_game(player, lobby)
+      end
+      skywars.win(lobby)
+    end
+  end)
 end
 
 function skywars.get_player_count(lobby)

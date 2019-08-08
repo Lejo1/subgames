@@ -82,6 +82,20 @@ function survivalgames.start_game(lobby)
   ldata.protection = true
   ldata.ingame = true
   ldata.protectiontime = survivalgames.protectiontime
+  local starttime = os.time()
+  survivalgames.lobbys[lobby].starttime = starttime
+  minetest.after(900, function() --  Time when game times out 60*15
+    if starttime == survivalgames.lobbys[lobby].starttime and survivalgames.lobbys[lobby].ingame then
+      -- Game timed out (was longer then 15min)
+      local msg = minetest.colorize("red", "Restarting Game (Game timed out!)")
+      survivalgames.chat_send_all_lobby(lobby, msg)
+      for _,player in ipairs(survivalgames.get_lobby_players(lobby)) do
+        survivalgames.leave_game(player)
+        survivalgames.join_game(player, lobby)
+      end
+      survivalgames.win(lobby)
+    end
+  end)
 end
 
 function survivalgames.unprotect(lobby)
