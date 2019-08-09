@@ -66,6 +66,12 @@ function survivalgames.set_player_kit(name, kitname)
   end
 end
 
+function survivalgames.remove_player_kits(name)
+	survivalgames.load_kits(name)
+	survivalgames_kits[name] = {}
+	survivalgames.save_kits(name)
+end
+
 function survivalgames.give_kit_items(name)
   if survivalgames_kits[name].selected then
     local kitname = survivalgames_kits[name].selected

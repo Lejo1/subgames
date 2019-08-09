@@ -67,6 +67,12 @@ function hiddenseeker.set_player_kit(name, kitname)
   end
 end
 
+function hiddenseeker.remove_player_kits(name)
+	hiddenseeker.load_kits(name)
+	hiddenseeker_kits[name] = {}
+	hiddenseeker.save_kits(name)
+end
+
 --  Add a sfinv Kit Formspec
 function hiddenseeker.create_kit_form(name)
   local selected_id = 1

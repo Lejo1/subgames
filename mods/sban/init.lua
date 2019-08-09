@@ -582,6 +582,15 @@ local function del_whitelist(name_or_ip)
 	db_exec(stmt)
 end
 
+function sban_del_player(name)
+	local stmt = ([[
+		DELETE FROM bans WHERE name = '%s';
+		DELETE FROM playerdata WHERE name = '%s';
+		DELETE FROM whitelist WHERE name = '%s'
+	]]):format(name, name, name)
+	db_exec(stmt)
+end
+
 --[[
 #######################
 ###  File Handling  ###

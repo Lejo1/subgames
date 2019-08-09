@@ -110,6 +110,12 @@ function mesewars.set_player_kit(name, kitname)
   end
 end
 
+function mesewars.remove_player_kits(name)
+	mesewars.load_kits(name)
+	kits[name] = {}
+	mesewars.save_kits(name)
+end
+
 function mesewars.give_kit_items(name)
   if kits[name].selected then
     local kitname = kits[name].selected
