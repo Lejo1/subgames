@@ -66,6 +66,12 @@ function skywars.set_player_kit(name, kitname)
   end
 end
 
+function skywars.remove_player_kits(name)
+	skywars.load_kits(name)
+	skywars_kits[name] = {}
+	skywars.save_kits(name)
+end
+
 function skywars.give_kit_items(name)
   if skywars_kits[name].selected then
     local kitname = skywars_kits[name].selected

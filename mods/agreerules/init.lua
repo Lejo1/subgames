@@ -9,6 +9,10 @@ local storage = minetest.get_mod_storage()
 --default languages: english=1, spanish=2, france=3,germany=4
 -- Add "," between the rules
 
+function remove_rule_accepted(name)
+	storage:set_string(name, "")
+end
+
 local rule_version = 1.0
 function agreerules_accepted(name)
 	return rule_version <= (storage:get_float(name) or 0)

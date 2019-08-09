@@ -156,9 +156,43 @@ function subgames.drop_inv(name, pos)
 		player:set_hp(20)
 end
 
+function subgames.remove_all_player(name)
+  if minetest.get_player_by_name(name) then
+    return false
+  end
+  minetest.remove_player(name)
+  minetest.remove_player_auth(name)
+  sban_del_player(name)
+  remove_rule_accepted(name)
+  playtime.remove_playtime(name)
+  skins.remove_player(name)
+  hiddenseeker.remove_player_kits(name)
+  mesewars.remove_player_kits(name)
+  skywars.remove_player_kits(name)
+  survivalgames.remove_player_kits(name)
+  if money.get_money(name) ~= INITIAL_MONEY then
+    money.set_money(name, INITIAL_MONEY)
+  end
+  return true
+end
+
+minetest.register_chatcommand("subgames_remove_player", {
+  description = "remove all player data of a player",
+  params = "<name>",
+  privs = {server = true},
+  func = function(name, params)
+    subgames.remove_all_player(params)
+    return true, "Removed all data of "..params
+  end
+})
+
 function table_to_modstorage(s, data, key)
   if key then
-    s:set_string(key, minetest.serialize(data))
+    local ser_data = minetest.serialize(data)
+    if ser_data == "return {}" then
+      s:set_string(key, "")
+    else s:set_string(key, ser_data)
+    end
   else
     for k, v in pairs(data) do
       s:set_string(k, minetest.serialize(v))

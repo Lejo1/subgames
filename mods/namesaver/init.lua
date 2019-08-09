@@ -5,8 +5,7 @@ minetest.register_on_leaveplayer(function(player)
     local name = player:get_player_name()
     if money.get_money(name) == INITIAL_MONEY then
       minetest.after(1, function()
-        minetest.remove_player(name)
-        minetest.get_auth_handler().delete_auth(name)
+        subgames.remove_all_player(name)
       end)
     end
   end

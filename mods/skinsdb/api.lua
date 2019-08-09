@@ -10,6 +10,10 @@ function skins.get_player_skin(player)
 	return skins.get(skin) or skins.get(skins.default)
 end
 
+function skins.remove_player(name)
+	storage:set_string(name, "")
+end
+
 -- Assign skin to player
 function skins.assign_player_skin(player, skin)
 	local skin_obj
