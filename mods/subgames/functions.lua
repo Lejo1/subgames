@@ -161,7 +161,7 @@ function subgames.remove_all_player(name)
     return false
   end
   minetest.remove_player(name)
-  minetest.remove_player_auth(name)
+  minetest.get_auth_handler().delete_auth(name)
   sban_del_player(name)
   remove_rule_accepted(name)
   playtime.remove_playtime(name)
