@@ -43,6 +43,7 @@ function subgames.register_on_chat_message(func, name, message, lobby)
 end
 
 minetest.register_on_chat_message(function(name, message)
+  minetest.log("action", "Chatlog: "..name.." wrote:"..message)
   local toreturn = nil
   for _,value in pairs(subgames.on_chat_message) do
     if value(name, message, player_lobby[name]) == true then
