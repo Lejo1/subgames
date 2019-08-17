@@ -35,31 +35,8 @@ dofile(minetest.get_modpath("playereffects").."/settings.lua")
 if(playereffects.use_hud == nil) then
 	playereffects.use_hud = true
 end
-if(playereffects.use_autosave == nil) then
-	playereffects.use_autosave = true
-end
-if(playereffects.autosave_time == nil) then
-	playereffects.autosave_time = 10
-end
 if(playereffects.use_examples == nil) then
 	playereffects.use_examples = false
-end
-
---[=[ Load inactive_effects and last_effect_id from playereffects.mt, if this file exists  ]=]
-do
-	local filepath = minetest.get_worldpath().."/playereffects.mt"
-	local file = io.open(filepath, "r")
-	if file then
-		minetest.log("action", "[playereffects] playereffects.mt opened.")
-		local string = file:read()
-		io.close(file)
-		if(string ~= nil) then
-			local savetable = minetest.deserialize(string)
-			playereffects.inactive_effects = savetable.inactive_effects
-			minetest.debug("[playereffects] playereffects.mt successfully read.")
-			playereffects.last_effect_id = savetable.last_effect_id
-		end
-	end
 end
 
 function playereffects.next_effect_id()
@@ -304,60 +281,6 @@ function playereffects.has_effect_type(playername, effect_type_id)
 	return false
 end
 
---[=[ Saving all data to file ]=]
-function playereffects.save_to_file()
-	local save_time = os.time()
-	local savetable = {}
-	local inactive_effects = {}
-	for id,effecttable in pairs(playereffects.inactive_effects) do
-		local playername = id
-		if(inactive_effects[playername] == nil) then
-			inactive_effects[playername] = {}
-		end
-		for i=1,#effecttable do
-			table.insert(inactive_effects[playername], effecttable[i])
-		end
-	end
-	for id,effect in pairs(playereffects.effects) do
-		local new_duration, new_repeat_duration
-		if(playereffects.effect_types[effect.effect_type_id].repeat_interval ~= nil) then
-			new_duration = effect.time_left
-			new_repeat_duration = effect.repeat_interval_time_left - os.difftime(save_time, effect.repeat_interval_start_time)
-		else
-			new_duration = effect.time_left - os.difftime(save_time, effect.start_time)
-		end
-		local new_effect = {
-			effect_id = effect.effect_id,
-			effect_type_id = effect.effect_type_id,
-			time_left = new_duration,
-			repeat_interval_time_left = new_repeat_duration,
-			start_time = effect.start_time,
-			repeat_interval_start_time = effect.repeat_interval_start_time,
-			playername = effect.playername,
-			metadata = effect.metadata
-		}
-		if(inactive_effects[effect.playername] == nil) then
-			inactive_effects[effect.playername] = {}
-		end
-		table.insert(inactive_effects[effect.playername], new_effect)
-	end
-
-	savetable.inactive_effects = inactive_effects
-	savetable.last_effect_id = playereffects.last_effect_id
-
-	local savestring = minetest.serialize(savetable)
-
-	local filepath = minetest.get_worldpath().."/playereffects.mt"
-	local file = io.open(filepath, "w")
-	if file then
-		file:write(savestring)
-		io.close(file)
-		minetest.log("action", "[playereffects] Wrote playereffects data into "..filepath..".")
-	else
-		minetest.log("error", "[playereffects] Failed to write playereffects data into "..filepath..".")
-	end
-end
-
 --[=[ Callbacks ]=]
 --[[ Cancel all effects on player death ]]
 minetest.register_on_dieplayer(function(player)
@@ -389,11 +312,6 @@ minetest.register_on_leaveplayer(function(player)
 	end
 end)
 
-minetest.register_on_shutdown(function()
-	minetest.log("action", "[playereffects] Server shuts down. Rescuing data into playereffects.mt")
-	playereffects.save_to_file()
-end)
-
 minetest.register_on_joinplayer(function(player)
 	local playername = player:get_player_name()
 
@@ -408,10 +326,8 @@ minetest.register_on_joinplayer(function(player)
 end)
 
 playereffects.globalstep_timer = 0
-playereffects.autosave_timer = 0
 minetest.register_globalstep(function(dtime)
 	playereffects.globalstep_timer = playereffects.globalstep_timer + dtime
-	playereffects.autosave_timer = playereffects.autosave_timer + dtime
 	-- Update HUDs of all players
 	if(playereffects.globalstep_timer >= 1) then
 		playereffects.globalstep_timer = 0
@@ -420,12 +336,6 @@ minetest.register_globalstep(function(dtime)
 		for p=1,#players do
 			playereffects.hud_update(players[p])
 		end
-	end
-	-- Autosave into file
-	if(playereffects.use_autosave == true and playereffects.autosave_timer >= playereffects.autosave_time) then
-		playereffects.autosave_timer = 0
-		minetest.log("action", "[playereffects] Autosaving mod data to playereffects.mt ...")
-		playereffects.save_to_file()
 	end
 end)
 
