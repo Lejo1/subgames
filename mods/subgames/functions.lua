@@ -161,7 +161,6 @@ function subgames.remove_all_player(name)
     return false
   end
   if sban_del_player(name) then
-    minetest.chat_send_all("done")
     minetest.remove_player(name)
     minetest.get_auth_handler().delete_auth(name)
     remove_rule_accepted(name)
