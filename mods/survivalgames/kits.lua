@@ -101,7 +101,7 @@ end
 function survivalgames.create_kit_form(name)
   local selected_id = 1
 	local selected_buyid = 0
-	local defitems = ""
+	local defitems = {}
 	if not survivalgames_kits[name] then return end
 	if type(survivalgames_kits[name].kit) == "table" and #survivalgames_kits[name].kit >= 1 then
   	for kitnumb,kitname in ipairs(survivalgames_kits[name].kit) do
@@ -128,7 +128,7 @@ function survivalgames.create_kit_form(name)
 		local costbuyb = kits_register[survivalgames_kits[name].buying]
 		costbuy = costbuyb.cost
 	end
-	local itembuy = ""
+	local itembuy = {}
 	if survivalgames_kits[name].buying then
 		local itembuyb = kits_register[survivalgames_kits[name].buying]
 		itembuy = itembuyb.items
@@ -142,23 +142,23 @@ function survivalgames.create_kit_form(name)
 	end
 	local effectbuy = ""
 	if survivalgames_kits[name].buying then
-		local itembuyb = kits_register[survivalgames_kits[name].buying]
-		if itembuyb.effect then
-			itembuy = itembuyb.effect
+		local def = kits_register[survivalgames_kits[name].buying]
+		if def.effect then
+			effectbuy = def.effect
 		end
 	end
   survivalgames_kit_form[name] = (
   	"size[8,9]" ..
   	"label[0,0;Select your Kit!]" ..
   	"dropdown[0,0.5;8,1.5;kitlist;"..subgames.concatornil(survivalgames_kits[name].kit)..";"..selected_id.."]" ..
-		"label[0,1.5;Items: "..subgames.concatornil(defitems).." ]" ..
-		"label[0,2;Effect: "..defeffect.." ]" ..
+		"label[0,1.5;Items: "..subgames.concatornil(defitems).."]" ..
+		"label[0,2;Effect: "..defeffect.."]" ..
 		"label[0,2.5;Here you can buy your kits!]" ..
 		"label[0,3;Your money: "..money.get_money(name).." Coins]" ..
 		"dropdown[0,3.5;8,1.5;buylist;"..table.concat(kits_all, ",")..";"..selected_buyid.."]" ..
 		"label[0,4.5;Cost: "..costbuy.."]" ..
-		"label[0,5.5;Items: "..subgames.concatornil(itembuy).." ]" ..
-		"label[0,6;Effect: "..effectbuy.." ]" ..
+		"label[0,5.5;Items: "..subgames.concatornil(itembuy).."]" ..
+		"label[0,6;Effect: "..effectbuy.."]" ..
 		"button[4,4.5;3,1;buykit;Buy this Kit!]")
 end
 
