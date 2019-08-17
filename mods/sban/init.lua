@@ -582,13 +582,19 @@ local function del_whitelist(name_or_ip)
 	db_exec(stmt)
 end
 
+
+--  For player removing
 function sban_del_player(name)
-	local stmt = ([[
-		DELETE FROM bans WHERE name = '%s';
-		DELETE FROM playerdata WHERE name = '%s';
-		DELETE FROM whitelist WHERE name = '%s'
-	]]):format(name, name, name)
-	db_exec(stmt)
+	local id = get_id(name)
+	if not id or not active_ban(id) then
+		local stmt = ([[
+			DELETE FROM bans WHERE name = '%s';
+			DELETE FROM playerdata WHERE name = '%s';
+			DELETE FROM whitelist WHERE name = '%s'
+			]]):format(name, name, name)
+			db_exec(stmt)
+		return true
+	end
 end
 
 --[[
