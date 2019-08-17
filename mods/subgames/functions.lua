@@ -160,20 +160,20 @@ function subgames.remove_all_player(name)
   if minetest.get_player_by_name(name) then
     return false
   end
-  minetest.remove_player(name)
-  minetest.get_auth_handler().delete_auth(name)
-  sban_del_player(name)
-  remove_rule_accepted(name)
-  playtime.remove_playtime(name)
-  skins.remove_player(name)
-  hiddenseeker.remove_player_kits(name)
-  mesewars.remove_player_kits(name)
-  skywars.remove_player_kits(name)
-  survivalgames.remove_player_kits(name)
-  if money.get_money(name) ~= INITIAL_MONEY then
-    money.set_money(name, INITIAL_MONEY)
+  if sban_del_player(name) then
+    minetest.chat_send_all("done")
+    minetest.remove_player(name)
+    minetest.get_auth_handler().delete_auth(name)
+    remove_rule_accepted(name)
+    playtime.remove_playtime(name)
+    skins.remove_player(name)
+    hiddenseeker.remove_player_kits(name)
+    mesewars.remove_player_kits(name)
+    skywars.remove_player_kits(name)
+    survivalgames.remove_player_kits(name)
+    money.remove(name)
+    return true
   end
-  return true
 end
 
 minetest.register_chatcommand("subgames_remove_player", {

@@ -12,16 +12,18 @@ money = {}
 function money.save_accounts()
 end
 function money.set_money(name, amount)
-	if amount == INITIAL_MONEY then
-		storage:set_string(name, "")
-	else storage:set_int(name, amount - INITIAL_MONEY)
-	end
+	storage:set_int(name, amount - INITIAL_MONEY)
 end
 function money.get_money(name)
 	return storage:get_int(name) + INITIAL_MONEY
 end
 function money.exist(name)
-	return true
+	if storage:get_string(name) ~= "" then
+		return true
+	end
+end
+function money.remove(name)
+	storage:set_string(name, "")
 end
 --End.
 
