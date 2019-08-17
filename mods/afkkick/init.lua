@@ -43,7 +43,9 @@ minetest.register_globalstep(function(dtime)
 	for playerName,_ in pairs(players) do
 		local player = minetest.get_player_by_name(playerName)
 		if player then
-		if hiddenseeker.disguis[playerName] and hiddenseeker.disguis[playerName].enable then return end
+			if hiddenseeker.disguis[playerName] and hiddenseeker.disguis[playerName].enable then
+				players[playerName]["lastAction"] = currGameTime
+			end
 			--Check for inactivity once every CHECK_INTERVAL seconds
 			checkTimer = checkTimer + dtime
 			if checkTimer > CHECK_INTERVAL then
