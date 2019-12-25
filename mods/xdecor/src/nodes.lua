@@ -141,13 +141,7 @@ xdecor.register("chair", {
 		{3,  0, 11,   2, 16, 2}, {11, 0, 11,  2, 16, 2},
 		{5,  9, 11.5, 6,  6, 1}, {3,  0,  3,  2,  6, 2},
 		{11, 0,  3,   2,  6, 2}, {3,  6,  3, 10, 2, 8}
-	}),
-	can_dig = xdecor.sit_dig,
-	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-		pos.y = pos.y + 0  -- Sitting position
-		xdecor.sit(pos, node, clicker, pointed_thing)
-		return itemstack
-	end
+	})
 })
 
 xdecor.register("cobweb", {
@@ -217,13 +211,7 @@ xdecor.register("cushion", {
 	tiles = {"xdecor_cushion.png"},
 	groups = {snappy=3, flammable=3, fall_damage_add_percent=-50},
 	on_place = minetest.rotate_node,
-	node_box = xdecor.nodebox.slab_y(0.5),
-	can_dig = xdecor.sit_dig,
-	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-		pos.y = pos.y + 0  -- Sitting position
-		xdecor.sit(pos, node, clicker, pointed_thing)
-		return itemstack
-	end
+	node_box = xdecor.nodebox.slab_y(0.5)
 })
 
 xdecor.register("cushion_block", {
