@@ -35,7 +35,7 @@ minetest.register_globalstep(function(dtime)
                 local name = player:get_player_name()
                 if ltable.players[name] ~= "seeker" then
                   money.set_money(name, money.get_money(name)+5)
-                  minetest.chat_send_player(name, "CoinSystem: You have receive 5 Coins for playing!")
+                  minetest.chat_send_player(name, "[CoinSystem] You have receive 5 Coins for playing!")
                 end
               end
             end
@@ -109,7 +109,7 @@ subgames.register_on_respawnplayer(function(player, lobby)
 		local plobby = hiddenseeker.player_lobby[name]
 		if plobby ~= 0 and hiddenseeker.lobbys[plobby].ingame then
 			hiddenseeker.lobbys[plobby].players[name] = "seeker"
-			hiddenseeker.chat_send_all_lobby(plobby, name.." died so he is now a seeker.")
+			hiddenseeker.chat_send_all_lobby(plobby, name.." died so they are now on the seeker team.")
 			hiddenseeker.chat_send_all_lobby(plobby, "There are "..hiddenseeker.get_hidder_count(plobby).." hidders left!")
 			if hiddenseeker.lobbys[plobby].hidding then
 				player:setpos(hiddenseeker.lobbys[plobby].seekerpos)

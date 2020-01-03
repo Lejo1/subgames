@@ -129,13 +129,13 @@ function survivalgames.win(lobby)
     local count, winner = survivalgames.get_player_count(lobby)
     if count <= 1 then
       if count > 0 then
-        survivalgames.chat_send_all_lobby(lobby, winner.." Win!")
+        survivalgames.chat_send_all_lobby(lobby, winner.." has won!")
         minetest.log("warning", "Survivalgames: "..winner.." won the Game of the lobby "..lobby)
         money.set_money(winner, money.get_money(winner)+20)
-      	minetest.chat_send_player(winner, "CoinSystem: You have receive 20 Coins!")
+      	minetest.chat_send_player(winner, "[CoinSystem] You received 20 Coins!")
         survivalgames.chat_send_all_lobby(lobby, "Server Restarts in 5 sec.")
         for _,player in ipairs(survivalgames.get_lobby_players(lobby)) do
-          subgames.add_mithud(player, winner.." Win!", 0xFF0000, 3)
+          subgames.add_mithud(player, winner.." has won!", 0xFF0000, 3)
         end
       end
       minetest.after(5, function()

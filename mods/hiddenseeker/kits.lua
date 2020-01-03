@@ -130,9 +130,9 @@ subgames.register_on_kill_player(function(killer, killed, lobby)
 		local killrol = hiddenseeker.lobbys[hiddenseeker.player_lobby[killname]].players[killname]
 		if killrol == "seeker" then
   		money.set_money(killname, money.get_money(killname)+10)
-  		minetest.chat_send_player(killname, "CoinSystem: You have receive 10 Coins!")
+  		minetest.chat_send_player(killname, "[CoinSystem] You have receive 10 Coins!")
 		else money.set_money(killname, money.get_money(killname)+15)
-  		minetest.chat_send_player(killname, "CoinSystem: You have receive 15 Coins!")
+  		minetest.chat_send_player(killname, "[CoinSystem] You have receive 15 Coins!")
 		end
 	end
 end)

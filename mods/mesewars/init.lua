@@ -172,7 +172,7 @@ function mesewars.join_game(player, lobby)
     mesewars.lobbys[lobby].players[name] = false
     if mesewars.lobbys[lobby].mustcreate == true then
       mesewars.lobbys[lobby].mustcreate = false
-      minetest.chat_send_all("Creating mesewars map don't leave!, May lag")
+      minetest.chat_send_all("Creating mesewars map, don't leave!, May lag")
       local schem = minetest.get_worldpath() .. "/schems/" .. mesewars.lobbys[lobby].schem .. ".mts"
       local vm = minetest.get_voxel_manip()
       vm:read_from_map(mesewars.lobbys[lobby].mappos1, mesewars.lobbys[lobby].mappos2)

@@ -107,15 +107,15 @@ function mesewars.win(lobby)
     local count, winner, restplayers = mesewars.get_team_count(lobby)
     if count <= 1 then
       if count > 0 then
-        mesewars.chat_send_all_lobby(lobby, minetest.colorize(mesewars.get_color_from_team(winner), "Team "..mesewars.get_color_from_team(winner)).." Win!")
+        mesewars.chat_send_all_lobby(lobby, minetest.colorize(mesewars.get_color_from_team(winner), "Team "..mesewars.get_color_from_team(winner)).." has won!")
         minetest.log("warning", "mesewars: "..minetest.colorize(mesewars.get_color_from_team(winner), mesewars.get_color_from_team(winner)).." won the Game of the lobby "..lobby)
         for name,_ in pairs(restplayers) do
           money.set_money(name, money.get_money(name)+25)
-          minetest.chat_send_player(winner, "CoinSystem: You have receive 25 Coins!")
+          minetest.chat_send_player(winner, "[CoinSystem] You have receive 25 Coins!")
         end
         mesewars.chat_send_all_lobby(lobby, "Server Restarts in 5 sec.")
         for _,player in ipairs(mesewars.get_lobby_players(lobby)) do
-          subgames.add_mithud(player, "Team "..mesewars.get_color_from_team(winner).." Win!", mesewars.get_hex_from_team(winner), 3)
+          subgames.add_mithud(player, "Team "..mesewars.get_color_from_team(winner).." has won!", mesewars.get_hex_from_team(winner), 3)
         end
       end
       minetest.after(5, function()
