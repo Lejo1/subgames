@@ -195,7 +195,7 @@ minetest.register_node("mesewars:mese1", {
         end
         mesewars.lobbys[lobby].meses[1] = false
         money.set_money(name, money.get_money(name)+15)
-        minetest.chat_send_player(name, "CoinSystem: You have receive 15 Coins!")
+        minetest.chat_send_player(name, "[CoinSystem] You have receive 15 Coins!")
         mesewars.win(lobby)
       end
     end
@@ -222,7 +222,7 @@ minetest.register_node("mesewars:mese2", {
         end
         mesewars.lobbys[lobby].meses[2] = false
         money.set_money(name, money.get_money(name)+15)
-        minetest.chat_send_player(name, "CoinSystem: You have receive 15 Coins!")
+        minetest.chat_send_player(name, "[CoinSystem] You have receive 15 Coins!")
         mesewars.win(lobby)
       end
     end
@@ -249,7 +249,7 @@ minetest.register_node("mesewars:mese3", {
         end
         mesewars.lobbys[lobby].meses[3] = false
         money.set_money(name, money.get_money(name)+15)
-        minetest.chat_send_player(name, "CoinSystem: You have receive 15 Coins!")
+        minetest.chat_send_player(name, "[CoinSystem] You have receive 15 Coins!")
         mesewars.win(lobby)
       end
     end
@@ -276,7 +276,7 @@ minetest.register_node("mesewars:mese4", {
         end
         mesewars.lobbys[lobby].meses[4] = false
         money.set_money(name, money.get_money(name)+15)
-        minetest.chat_send_player(name, "CoinSystem: You have receive 15 Coins!")
+        minetest.chat_send_player(name, "[CoinSystem] You have receive 15 Coins!")
         mesewars.win(lobby)
       end
     end

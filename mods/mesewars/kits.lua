@@ -185,7 +185,7 @@ subgames.register_on_kill_player(function(killer, killed, lobby)
 		local killedname = killed:get_player_name()
   	local killname = killer:get_player_name()
   	money.set_money(killname, money.get_money(killname)+5)
-  	minetest.chat_send_player(killname, "CoinSystem: You have receive 5 Coins!")
+  	minetest.chat_send_player(killname, "[CoinSystem] You have receive 5 Coins!")
 	end
 end)
 

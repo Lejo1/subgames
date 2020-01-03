@@ -190,7 +190,7 @@ function hiddenseeker.join_game(player, lobby)
     hiddenseeker.win(lobby)
     if hiddenseeker.lobbys[lobby].mustcreate == true then
       hiddenseeker.lobbys[lobby].mustcreate = false
-      minetest.chat_send_all("Creating Hide and seek map don't leave!, May lag")
+      minetest.chat_send_all("Creating Hide and seek map, don't leave!, May lag")
       local schem = minetest.get_worldpath() .. "/schems/" .. hiddenseeker.lobbys[lobby].schem .. ".mts"
       minetest.place_schematic(hiddenseeker.lobbys[lobby].schempos, schem)
     end

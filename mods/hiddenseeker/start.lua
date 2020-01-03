@@ -143,15 +143,15 @@ end
 
 local function party_win_announce(party, lobby, ldata)
   minetest.log("warning", "Hiddenseeker: "..party.." won the Game of the lobby "..lobby)
-  hiddenseeker.chat_send_all_lobby(lobby, party .. " win! Restart in 5 seconds.")
+  hiddenseeker.chat_send_all_lobby(lobby, party .. " has won! Restart in 5 seconds.")
   for _, player in ipairs(hiddenseeker.get_lobby_players(lobby)) do
     player:set_nametag_attributes({color = {a = 255, r = 255, g = 255, b = 255}})
-    subgames.add_mithud(player, party .. " win!", 0xFF0000, 3)
+    subgames.add_mithud(player, party .. " has won!", 0xFF0000, 3)
     if party ~= "Seekers" then
       local name = player:get_player_name()
       if ldata.players[name] ~= "seeker" and hiddenseeker.get_hidder_count(lobby) + hiddenseeker.get_seeker_count(lobby) > 1 then
         money.set_money(name, money.get_money(name) + 30)
-        minetest.chat_send_player(name, "CoinSystem: You received 30 coins for winning!")
+        minetest.chat_send_player(name, "[CoinSystem] You received 30 coins for winning!")
       end
     end
   end

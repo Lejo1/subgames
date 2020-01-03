@@ -207,7 +207,7 @@ function skywars.join_game(player, lobby)
     skywars.win(lobby)
     if skywars.lobbys[lobby].mustcreate == true then
       skywars.lobbys[lobby].mustcreate = false
-      minetest.chat_send_all("Creating Skywars map don't leave!, May lag")
+      minetest.chat_send_all("Creating Skywars map, don't leave!, May lag")
       local schem = minetest.get_worldpath() .. "/schems/" .. skywars.lobbys[lobby].schem .. ".mts"
       local vm = minetest.get_voxel_manip()
       vm:read_from_map(skywars.lobbys[lobby].mappos1, skywars.lobbys[lobby].mappos2)
