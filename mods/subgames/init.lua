@@ -77,6 +77,9 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
     local name = player:get_player_name()
     if player:get_hp() - damage <= 0 and not death[name] then
   		death[name] = true
+      if damage <= 0 then
+        return true
+      end
       local killname = hitter:get_player_name()
       if player_lobby[name] == player_lobby[killname] then
         for _, func in pairs(subgames.on_kill_player) do
