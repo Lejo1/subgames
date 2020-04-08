@@ -272,7 +272,7 @@ minetest.register_node("mesewars:mese4", {
       else local msg = core.colorize("red", "Team Reds Mese has been destroyed!")
         mesewars.chat_send_all_lobby(lobby, msg)
         for _,player in ipairs(mesewars.get_lobby_players(lobby)) do
-          subgames.add_mithud(player, "Team Blues Reds has been destroyed!", 0xFF0000, 3)
+          subgames.add_mithud(player, "Team Reds Mese has been destroyed!", 0xFF0000, 3)
         end
         mesewars.lobbys[lobby].meses[4] = false
         money.set_money(name, money.get_money(name)+15)
