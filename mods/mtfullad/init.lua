@@ -20,7 +20,7 @@ local storage = minetest.get_mod_storage()
 local forkinfo = "This is a Minetest Server!\nYou play an unofficial Game!\nOnly the official Minetest Client is allowed here\nYou can download it on Minetest.net\nor on the Google Play Store, just search for Minetest."
 
 -- Stolen from https://github.com/TalkLounge/adblock/blob/master/init.lua
-local form = "size[4.1,3.9]" ..
+local form = "size[5,3.9]" ..
 				 "label[0.65,0;YOU PLAY AN UNOFFICIAL GAME]" ..
 				 "label[0,1;On this server is only the official game allowed: Minetest]" ..
 				 "label[0.35,1.5;MINETEST is FREE & has NO INGAME ADS]" ..
