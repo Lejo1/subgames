@@ -85,15 +85,6 @@ subgames.register_on_joinplayer(function(player, lobby)
 	      local inv = player:get_inventory()
     	  inv:add_item("main", "main:teleporter")
    	    sfinv.set_page(player, "subgames:lobbys")
-        local input = {
-          hud_elem_type = "text",
-          position = {x=0.8,y=0.1},
-          scale = {x=100,y=50},
-          text = "Your client is outdated!\nPlease update to minetest 5.0\nYou can find it at minetest.net\nAll stats on this server will be removed!\nSo please play on the new server!",
-          number = 0xFF0000,
-          alignment = {x=0,y=1},
-          offset = {x=0, y=-32}}
-          player:hud_add(input)
       end
     end)
   end
