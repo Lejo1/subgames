@@ -30,7 +30,7 @@ local form = "size[4.1,3.9]" ..
 
 local function forkforminfo(player)
   if player:is_player_connected() then
-    minetest.show_formspec(name, "adblock:main", form)
+    minetest.show_formspec(name:get_player_name(), "adblock:main", form)
     minetest.after(300, forkforminfo, player)
   end
 end
