@@ -13,7 +13,7 @@ function remove_rule_accepted(name)
 	storage:set_string(name, "")
 end
 
-local rule_version = 1.0
+local rule_version = 1.1
 function agreerules_accepted(name)
 	return rule_version <= (storage:get_float(name) or 0)
 end
@@ -31,7 +31,7 @@ arok_text={
 		"You have now the permission to play!",
 		"Everyone, please welcome",
 		"to the server!",
-		"Server Rules ,No ask for privs or admin stuff ,No swearing or bad names ,No hacking if you hack you will be baned for ever ,No cheating or useing of bugs! ,Don't mess up with moderators or admins ,Only Lejo is Admin! ,No Crossteaming!,no spaming!",
+		"Server Rules ,No ask for privs or admin stuff ,No swearing or bullying ,No hacking if you hack you will be baned for ever ,No cheating or using of bugs! ,Don't mess up with moderators or admins ,Only Lejo is Admin! ,No Crossteaming!,no spaming!, No spawnkilling or Coinfarming!, No trapping of Teammates!",
 		"Cancel",
 		"Welcome",
 		"type /rules to see this again",
@@ -49,7 +49,7 @@ arok_text={
 		" Usted no tiene permiso para jugar!",
 		"Todo el mundo, por favor espera",
 		"al servidor!",
-		"Reglas del servidor, no piden privs o cosas por el administrador, no jurar o malos nombres, n piratería si se le baned para siempre, No se metan con moderadores o administradores, Lejo Sólo es admin!, ¡Sin Crossteaming!, correo no deseado",
+		"Reglas del servidor, No pidas privs o cosas de administración, no insultes ni intimidas, no hackees si hackeas, serás prohibido para siempre, ¡no hagas trampa ni uses errores! , No te metas con moderadores o administradores, ¡solo Lejo es administrador! , No Crossteaming!, No spaming !, No spawnkilling o Coinfarming !, No trapping of Teammates!",
 		"Cancelar",
 		"Bienvenido",
 		"escriba para /rules ver esto de nuevo",
@@ -67,7 +67,7 @@ arok_text={
 		"Vous ne lavez pas la permission de jouer!",
 		"Jokainen, ota tervetulleita",
 		"palvelimelle!",
-		"Règles de serveur, No demandent privs ou admin stuff, Aucune prestation de serment ou de mauvais noms, Pas de piratage si vous vous baned à jamais, ne plaisante pas avec les modérateurs et admins, Seulement Lejo est admin!, Pas de Crossteaming!, pas de spam",
+		"Règles de serveur, Aucune demande de renseignements privés ou d'administration, pas de jurons ou d'intimidation, pas de piratage si vous piratez, vous serez banni à jamais, pas de tricherie ou d'utilisation de bugs! , Ne vous trompez pas avec les modérateurs ou les administrateurs, seul Lejo est administrateur! , Pas de Crossteaming!, Pas de spaming!, Pas de spawnkilling ou Coinfarming !, Pas de piégeage de coéquipiers!",
 		"Annuler",
 		"Bienvenue",
 		"Type /rules pour voir ce message",
@@ -85,7 +85,7 @@ arok_text={
 		"Sie haben eine Berechtigung zu spielen!",
 		"Jeder, bitte begruBen",
 		"an den Server!",
-		"Server-Regeln, fragen Sie nicht nach privs oder Admin-Zeug, kein Fluchen oder schlechte Namen, kein Hacken, wenn Sie hacken werden sie für immer gebannt, Verwirren Sie nicht mit Moderatoren oder Administratoren auf, Nur Lejo ist Admin!, Teame nicht über deine Teamgrenzen hinaus!, kein spam",
+		"Server-Regeln, fragen Sie nicht nach privs oder Admin-Zeug, kein Fluchen oder Mobben, kein Hacken oder werden für immer gebannt, Kein cheaten oder ausnutzen von bugs, Verwirren Sie nicht mit Moderatoren oder Administratoren, Nur Lejo ist Admin!, Teame nicht über deine Teamgrenzen hinaus!, kein spamming, Kein Spawntöten oder Coinfarming, Behindere oder töte nicht deine Mitspieler",
 		"Stornieren",
 		"Herzlich willkommen",
 		"Gebe /rules ein um dies wieder zu sehen",
