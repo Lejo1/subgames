@@ -34,6 +34,9 @@ minetest.register_chatcommand("skinsdb", {
 		else
 			return false, S("unknown command").." "..word..", "..S("see /help skinsdb for supported parameters")
 		end
+		if not parameter then
+			return false, "Please add an parameter"
+		end
 
 		if command == "set" then
 			local success = skins.set_player_skin(player, parameter)
