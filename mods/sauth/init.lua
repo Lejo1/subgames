@@ -9,8 +9,9 @@ local WP = minetest.get_worldpath()
 local ie = minetest.request_insecure_environment()
 
 if not ie then
-	error("insecure environment inaccessible"..
+	minetest.log("error", "insecure environment inaccessible"..
 		" - make sure this mod has been added to minetest.conf!")
+	return
 end
 
 -- read mt conf file settings

@@ -9,8 +9,9 @@ local hotlist = {}
 local owner_id
 
 if not ie then
-	error("insecure environment inaccessible"..
+	minetest.log("error", "insecure environment inaccessible"..
 	" - make sure this mod has been added to minetest.conf!")
+	return
 end
 
 -- requires library for db access
