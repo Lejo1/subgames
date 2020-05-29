@@ -12,18 +12,20 @@ Installing
 License
 -------
 
-Created by [Lejo](https://github.com/Lejo1)
-Textures: CC-BY-SA 3.0
-Code(except the Mods: subgames, skywars, hiddenseeker, mesewars, main, build, survivalgames): LGPL 2.1 or later
+Check the specific mod folder for the License.
 
-For the Mods: subgames, skywars, hiddenseeker, mesewars, main, build, survivalgames:
+The Mods from [minetest_game](https://github.com/minetest/minetest_game) are licensed under:  
+Textures: CC-BY-SA 3.0  
+Code: LGPL 2.1 or later
 
+The Mods: subgames, skywars, hiddenseeker, mesewars, main, build, survivalgames are created by [Lejo](https://github.com/Lejo1)  
+With the following License:
 You are not allowed to distribute any copy or work based on this programm unless the copyright holder declares his consent.
 You are not allowed to use this mods on a public server.
 THE SOFTWARE IS PROVIDED WITHOUT WARRANTY OF ANY KIND!
 
 
-Derived from [minetest_game](https://github.com/minetest/minetest_game)
+
 
 API
 ---
