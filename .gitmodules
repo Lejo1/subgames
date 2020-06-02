@@ -13,7 +13,3 @@
 [submodule "mods/reportlist"]
 	path = mods/reportlist
 	url = https://github.com/Lejo1/reportlist
-[submodule "mods/xban2"]
-	path = mods/xban2
-	url = https://github.com/Lejo1/xban2
-	branch = report
