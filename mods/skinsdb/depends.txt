@@ -1,8 +1,0 @@
-default
-intllib?
-unified_inventory?
-3d_armor?
-clothing?
-sfinv?
-3d_armor_sfinv
-subgames
