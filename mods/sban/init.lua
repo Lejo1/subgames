@@ -587,7 +587,7 @@ end
 --  For player removing
 function sban_del_player(name)
 	local id = get_id(name)
-	if not id or not active_ban(id) then
+	if id and not active_ban(id) then
 		local stmt = ([[
 			DELETE FROM bans WHERE name = '%s';
 			DELETE FROM playerdata WHERE name = '%s';
