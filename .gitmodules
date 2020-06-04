@@ -13,3 +13,6 @@
 [submodule "mods/reportlist"]
 	path = mods/reportlist
 	url = https://github.com/Lejo1/reportlist
+[submodule "mods/worldedit"]
+	path = mods/worldedit
+	url = https://github.com/Uberi/Minetest-WorldEdit
