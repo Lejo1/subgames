@@ -167,13 +167,6 @@ function skin_class:apply_skin_to_player(player)
 			armor_texture,
 			wielditem_texture,
 		})
-
-	player:set_properties({
-		visual_size = {
-			x = self:get_meta("visual_size_x") or 1,
-			y = self:get_meta("visual_size_y") or 1
-		}
-	})
 end
 
 function skin_class:set_skin(player)
