@@ -113,6 +113,7 @@ local handle_rotate = function(pos)
 	local ndef = minetest.registered_nodes[node.name]
 	if not ndef then
 		return itemstackups
+  else ndef = table.copy(minetest.registered_nodes[node.name])
 	end
 	-- can we rotate this paramtype2?
 	local fn = rotateblock[ndef.paramtype2]
