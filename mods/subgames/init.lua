@@ -1,9 +1,9 @@
 --  This is the controll mod of Subgames for all!
-subgames={}
+subgames = {}
 
 player_lobby = {}
-death = {}
-areas={
+subgames.games = {}
+subgames.areas={
   ["mesewars"] = {
     [1] = {x=(-700), y=1000, z=-700},
     [2] = {x=75, y=1302, z=(-17)}
@@ -36,16 +36,39 @@ dofile(minetest.get_modpath("subgames") .."/sfinv.lua")
 dofile(minetest.get_modpath("subgames") .."/functions.lua")
 dofile(minetest.get_modpath("subgames") .."/map.lua")
 
---  Add a register on chat message
+--[[
+Def should be:
+{
+fullname = "Mesewars"
+object = mesewars
+area = {
+  [1] = {x=(-700), y=1000, z=-700},
+  [2] = {x=75, y=1302, z=(-17)}
+}
+
+optional...
+node_dig = function(pos, node, digger)
+item_place_node = function(itemstack, placer, pointed_thing, param2)
+drop = function(pos, itemname, player)
+remove_player = function(name)
+}
+
+]]
+function subgames.register_game(name, def)
+  def.name = name
+  subgames.games[name] = def
+end
+
+--  Add a register on chat message (name, message)
 subgames.on_chat_message = {}
-function subgames.register_on_chat_message(func, name, message, lobby)
+function subgames.register_on_chat_message(func)
   table.insert(subgames.on_chat_message, func)
 end
 
 minetest.register_on_chat_message(function(name, message)
   minetest.log("action", "Chatlog: "..name.." wrote:"..message)
   local toreturn = nil
-  for _,value in pairs(subgames.on_chat_message) do
+  for _, value in pairs(subgames.on_chat_message) do
     if value(name, message, player_lobby[name]) == true then
       toreturn = true
     end
@@ -53,22 +76,25 @@ minetest.register_on_chat_message(function(name, message)
   return toreturn
 end)
 
---  Add a register on dieplayer
+--  Add a register on dieplayer (player)
 subgames.on_dieplayer = {}
-function subgames.register_on_dieplayer(func, player, lobby)
+function subgames.register_on_dieplayer(func)
   table.insert(subgames.on_dieplayer, func)
 end
 
 minetest.register_on_dieplayer(function(player)
   local name = player:get_player_name()
-  for _,value in pairs(subgames.on_dieplayer) do
+  for _, value in pairs(subgames.on_dieplayer) do
     value(player, player_lobby[name])
   end
 end)
 
---  Add a register on kill player
+local death = {}
+local redeath = {}
+
+--  Add a register on kill player (killer, killed)
 subgames.on_kill_player = {}
-function subgames.register_on_kill_player(func, killer, killed, lobby)
+function subgames.register_on_kill_player(func)
   table.insert(subgames.on_kill_player, func)
 end
 
@@ -92,10 +118,9 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
   end
 end)
 
-local redeath = {}
---  Add a register on respawn player
+--  Add a register on respawn player (player)
 subgames.on_respawnplayer = {}
-function subgames.register_on_respawnplayer(func, player, lobby)
+function subgames.register_on_respawnplayer(func)
   table.insert(subgames.on_respawnplayer, func)
 end
 
@@ -103,21 +128,21 @@ minetest.register_on_respawnplayer(function(player)
   local name = player:get_player_name()
   death[name] = nil
   redeath[name] = nil
-  for _,value in pairs(subgames.on_respawnplayer) do
+  for _, value in pairs(subgames.on_respawnplayer) do
     value(player, player_lobby[name])
   end
 end)
 
---  Add a register on dig node
+--  Add a register on dig node (pos, oldnode, digger)
 subgames.on_dignode = {}
-function subgames.register_on_dignode(func, pos, oldnode, digger, lobby)
+function subgames.register_on_dignode(func)
   table.insert(subgames.on_dignode, func)
 end
 
 minetest.register_on_dignode(function(pos, oldnode, digger)
   if digger and digger:is_player() then
     local name = digger:get_player_name()
-    for _,value in pairs(subgames.on_dignode) do
+    for _, value in pairs(subgames.on_dignode) do
       value(pos, oldnode, digger, player_lobby[name])
     end
   end
@@ -132,8 +157,8 @@ function minetest.node_dig(pos, node, digger)
   else lobby = subgames.get_lobby_from_pos(pos)
   end
   if not lobby then return end
-  if areas[lobby].dig then
-    local result = areas[lobby].dig(pos, node, digger)
+  if subgames.games[lobby].node_dig then
+    local result = subgames.games[lobby].node_dig(pos, node, digger)
     if result == true then
       return old_node_dig(pos, node, digger)
     else return
@@ -142,9 +167,9 @@ function minetest.node_dig(pos, node, digger)
   end
 end
 
---  Add a register on place node
+--  Add a register on place node (pos, newnode, placer, oldnode, itemstack, pointed_thing)
 subgames.on_placenode = {}
-function subgames.register_on_placenode(func, pos, newnode, placer, oldnode, itemstack, pointed_thing, lobby)
+function subgames.register_on_placenode(func)
   table.insert(subgames.on_placenode, func)
 end
 
@@ -176,8 +201,8 @@ function minetest.item_place_node(itemstack, placer, pointed_thing, param2)
     lobby = subgames.get_lobby_from_pos(pos)
   end
   if not lobby then return end
-  if areas[lobby].place then
-    local result = areas[lobby].place(itemstack, placer, pointed_thing, param2)
+  if subgames.games[lobby].item_place_node then
+    local result = subgames.games[lobby].item_place_node(itemstack, placer, pointed_thing, param2)
     if result == true then
       return old_node_place(itemstack, placer, pointed_thing, param2)
     else return
@@ -186,9 +211,9 @@ function minetest.item_place_node(itemstack, placer, pointed_thing, param2)
   end
 end
 
---  Add a register on punchplayer
+--  Add a register on punchplayer (player, hitter, time_from_last_punch, tool_capabilities, dir, damage)
 subgames.on_punchplayer = {}
-function subgames.register_on_punchplayer(func, player, hitter, time_from_last_punch, tool_capabilities, dir, damage, lobby)
+function subgames.register_on_punchplayer(func)
   table.insert(subgames.on_punchplayer, func)
 end
 
@@ -208,9 +233,9 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
   end
 end)
 
---  Add a register on join player
+--  Add a register on join player (player)
 subgames.on_joinplayer = {}
-function subgames.register_on_joinplayer(func, player)
+function subgames.register_on_joinplayer(func)
   table.insert(subgames.on_joinplayer, func)
 end
 
@@ -245,9 +270,9 @@ minetest.register_on_joinplayer(function(player)
   subgames.call_join_callbacks(player, "main")
 end)
 
---  Add a register on leave player
+--  Add a register on leave player (player)
 subgames.on_leaveplayer = {}
-function subgames.register_on_leaveplayer(func, player)
+function subgames.register_on_leaveplayer(func)
   table.insert(subgames.on_leaveplayer, func)
 end
 
@@ -313,9 +338,9 @@ function subgames.register_chatcommand(cname, def)
 end
 
 
---  Add a register on item eat
+--  Add a register on item eat (hp_change, replace_with_item, itemstack, user, pointed_thing)
 subgames.on_item_eat = {}
-function subgames.register_on_item_eat(func, hp_change, replace_with_item, itemstack, user, pointed_thing, lobby)
+function subgames.register_on_item_eat(func)
   table.insert(subgames.on_item_eat, func)
 end
 
@@ -326,9 +351,9 @@ minetest.register_on_item_eat(function(hp_change, replace_with_item, itemstack, 
   end
 end)
 
---  Add a register on punch node
+--  Add a register on punch node (pos, node, puncher, pointed_thing)
 subgames.on_punchnode = {}
-function subgames.register_on_punchnode(func, pos, node, puncher, pointed_thing, lobby)
+function subgames.register_on_punchnode(func)
   table.insert(subgames.on_punchnode, func)
 end
 
@@ -339,8 +364,9 @@ minetest.register_on_punchnode(function(pos, node, puncher, pointed_thing)
   end
 end)
 
+--  Add a register on drop (itemstack, dropper, pos)
 subgames.on_drop = {}
-function subgames.register_on_drop(func, itemstack, dropper, pos, lobby)
+function subgames.register_on_drop(func)
   table.insert(subgames.on_drop, func)
 end
 local dropfuncs = {}
@@ -365,9 +391,27 @@ function subgames.handle_drop(itemstack, dropper, pos)
   end
 end
 
+function subgames.check_drop(pos, itemname, player)
+  local name = player:get_player_name()
+  local lobby = player_lobby[name]
+  if not lobby then
+    lobby = subgames.get_lobby_from_pos(pos)
+    if not lobby then
+      return false
+    end
+  end
+  local func = subgames.games[lobby].drop
+  if not func then
+    return false
+  else return func(pos, itemname, player)
+  end
+end
+
 minetest.override_item("tnt:tnt_burning", {description="TNT"})
+
+--  Register on blas (pos, intensity)
 subgames.on_blast = {}
-function subgames.register_on_blast(func, pos, intensity, lobby)
+function subgames.register_on_blast(func)
   table.insert(subgames.on_blast, func)
 end
 local blastfuncs = {}
@@ -414,14 +458,7 @@ minetest.register_on_craft(function(itemstack, player, old_craft_grid, craft_inv
 end)
 
 minetest.unregister_chatcommand("me")
-minetest.register_chatcommand("crash", {
-  params = "",
-  description = "Use it to crash the server without bad followings.",
-  privs = {ban=true},
-  func = function(user)
-    crash.crash = crash.crash +1
-  end,
-})
+
 minetest.register_chatcommand("say", {
   params = "",
   description = "Use it to say something in the global chat.",
@@ -430,34 +467,8 @@ minetest.register_chatcommand("say", {
     minetest.chat_send_all(param)
   end,
 })
+
 minetest.register_on_joinplayer(function(player)
 		player:hud_set_flags({minimap = false})
     player:set_properties({zoom_fov=10})
 end)
-
-minetest.register_tool("subgames:leaver", {
-  description = "Game leaver",
-	inventory_image = "dye_red.png",
-	on_use = function(itemstack, user, pointed_thing)
-    subgames.leaver(user)
-    return ""
-  end,
-  on_secondary_use = function(itemstack, user, pointed_thing)
-    subgames.leaver(user)
-    return ""
-  end,
-})
-
-function subgames.leaver(player)
-  local name = player:get_player_name()
-  local lobby = player_lobby[name]
-  if lobby == "hiddenseeker" then
-    hiddenseeker.leave_game(player)
-    hiddenseeker.win(hiddenseeker.player_lobby[name])
-    hiddenseeker.join_game(player, 0)
-  elseif lobby == "skywars" then
-    skywars.leave_game(player)
-    skywars.win(skywars.player_lobby[name])
-    skywars.join_game(player, 0)
-  end
-end

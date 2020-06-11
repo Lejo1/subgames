@@ -21,6 +21,47 @@ survivalgames.player_lobby = {}
 survivalgames.max_players = 20
 survivalgames.protectiontime = 60
 
+subgames.register_game("survivalgames", {
+  fullname = "Survivalgames",
+  object = survivalgames,
+  area = {
+    [1] = {x=31000, y=-50, z=31000},
+    [2] = {x=(-31000), y=110, z=(-31000)}
+  },
+  node_dig = function(pos, node, digger)
+    local name = digger:get_player_name()
+    local plobby = survivalgames.player_lobby[name]
+    if name and plobby and survivalgames.lobbys[plobby].ingame then
+      return true
+    end
+  end,
+  item_place_node = function(itemstack, placer, pointed_thing, param2)
+    local plobby
+    if not placer or not placer:is_player() then
+      plobby = get_lobby_from_pos(pos)
+    else local name = placer:get_player_name()
+      plobby = survivalgames.player_lobby[name]
+    end
+    if not plobby then return end
+    if survivalgames.lobbys[plobby].protection then
+      if itemstack:get_name() == "tnt:tnt_burning" or itemstack:get_name() == "default:lava_source" then
+        return
+      end
+    end
+    if survivalgames.lobbys[plobby].ingame then
+      return true
+    end
+  end,
+  drop = function(pos, itemname, player)
+    local name = player:get_player_name()
+    local plobby = survivalgames.player_lobby[name]
+    if survivalgames.lobbys[plobby].ingame then
+      return true
+    end
+  end,
+  remove_player = survivalgames.remove_player_kits
+})
+
 function survivalgames.get_lobby_players(lobby)
   local players = {}
   for _, player in pairs(subgames.get_lobby_players("survivalgames")) do
@@ -87,39 +128,6 @@ local function get_lobby_from_pos(pos)
         return lname
       end
     end
-  end
-end
-
-function areas.survivalgames.dig(pos, node, digger)
-  local name = digger:get_player_name()
-  local plobby = survivalgames.player_lobby[name]
-  if name and plobby and survivalgames.lobbys[plobby].ingame then
-    return true
-  end
-end
-
-function areas.survivalgames.drop(pos, name, player)
-  local name = player:get_player_name()
-  local plobby = survivalgames.player_lobby[name]
-  if survivalgames.lobbys[plobby].ingame then
-    return true
-  end
-end
-function areas.survivalgames.place(itemstack, placer, pointed_thing, param2)
-  local plobby
-  if not placer or not placer:is_player() then
-    plobby = get_lobby_from_pos(pos)
-  else local name = placer:get_player_name()
-    plobby = survivalgames.player_lobby[name]
-  end
-  if not plobby then return end
-  if survivalgames.lobbys[plobby].protection then
-    if itemstack:get_name() == "tnt:tnt_burning" or itemstack:get_name() == "default:lava_source" then
-      return
-    end
-  end
-  if survivalgames.lobbys[plobby].ingame then
-    return true
   end
 end
 

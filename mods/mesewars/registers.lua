@@ -62,48 +62,11 @@ subgames.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack
   end
 end)
 
-function areas.mesewars.dig(pos, node, digger)
-  local name = digger:get_player_name()
-  local plobby = mesewars.player_lobby[name]
-  local nodename = node.name
-  if mesewars.lobbys[plobby].ingame and (mesewars.lobbys[plobby].mapblocks[minetest.pos_to_string(pos)] and (nodename == "default:sandstone" or nodename == "default:obsidian" or nodename == "default:glass" or nodename == "default:steelblock" or nodename == "default:chest")) or string.find(nodename, "mesewars:mese") then
-    return true
-  end
-end
-
-function areas.mesewars.place(itemstack, placer, pointed_thing, param2)
-  local plobby
-  if not placer or not placer:is_player() then
-    plobby = get_lobby_from_pos(pos)
-  else local name = placer:get_player_name()
-    plobby = mesewars.player_lobby[name]
-  end
-  if not plobby then return end
-  if mesewars.lobbys[plobby].ingame then
-    return true
-  end
-end
-
 subgames.register_on_drop(function(itemstack, dropper, pos, lobby)
   if lobby == "mesewars" then
     return false
   end
 end)
-
-function areas.mesewars.drop(pos, itemname, player)
-  local name = player:get_player_name()
-  local plobby = mesewars.player_lobby[name]
-  if not plobby then
-    plobby = get_lobby_from_pos(pos)
-    if not plobby then
-      return false
-    end
-  end
-  if mesewars.lobbys[plobby].ingame and itemname == "default:sandstone" or itemname == "default:obsidian" or itemname == "default:glass" or itemname == "default:steelblock" or itemname == "default:chest" then
-    return true
-  else return false
-  end
-end
 
 function mesewars.get_team_base(name)
   local lobby = mesewars.player_lobby[name]

@@ -129,6 +129,50 @@ dofile(minetest.get_modpath("mesewars") .."/spawner.lua")
 dofile(minetest.get_modpath("mesewars") .."/commands.lua")
 dofile(minetest.get_modpath("mesewars") .."/kits.lua")
 
+subgames.register_game("mesewars", {
+  fullname = "Mesewars",
+  object = mesewars,
+  area = {
+    [1] = {x=(-700), y=1000, z=-700},
+    [2] = {x=75, y=1302, z=(-17)}
+  },
+  node_dig = function(pos, node, digger)
+    local name = digger:get_player_name()
+    local plobby = mesewars.player_lobby[name]
+    local nodename = node.name
+    if mesewars.lobbys[plobby].ingame and (mesewars.lobbys[plobby].mapblocks[minetest.pos_to_string(pos)] and (nodename == "default:sandstone" or nodename == "default:obsidian" or nodename == "default:glass" or nodename == "default:steelblock" or nodename == "default:chest")) or string.find(nodename, "mesewars:mese") then
+      return true
+    end
+  end,
+  item_place_node = function(itemstack, placer, pointed_thing, param2)
+    local plobby
+    if not placer or not placer:is_player() then
+      plobby = get_lobby_from_pos(pos)
+    else local name = placer:get_player_name()
+      plobby = mesewars.player_lobby[name]
+    end
+    if not plobby then return end
+    if mesewars.lobbys[plobby].ingame then
+      return true
+    end
+  end,
+  drop = function(pos, itemname, player)
+    local name = player:get_player_name()
+    local plobby = mesewars.player_lobby[name]
+    if not plobby then
+      plobby = get_lobby_from_pos(pos)
+      if not plobby then
+        return false
+      end
+    end
+    if mesewars.lobbys[plobby].ingame and itemname == "default:sandstone" or itemname == "default:obsidian" or itemname == "default:glass" or itemname == "default:steelblock" or itemname == "default:chest" then
+      return true
+    else return false
+    end
+  end,
+  remove_player = mesewars.remove_player_kits
+})
+
 function mesewars.get_lobby_players(lobby)
   local players = {}
   for _, player in pairs(subgames.get_lobby_players("mesewars")) do

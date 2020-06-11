@@ -74,27 +74,6 @@ subgames.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack
   end
 end)
 
-function areas.skywars.dig(pos, node, digger)
-  local name = digger:get_player_name()
-  local plobby = skywars.player_lobby[name]
-  if skywars.lobbys[plobby].ingame then
-    return true
-  end
-end
-
-function areas.skywars.place(itemstack, placer, pointed_thing, param2)
-  local plobby
-  if not placer or not placer:is_player() then
-    plobby = get_lobby_from_pos(pos)
-  else local name = placer:get_player_name()
-    plobby = skywars.player_lobby[name]
-  end
-  if not plobby then return end
-  if skywars.lobbys[plobby].ingame then
-    return true
-  end
-end
-
 subgames.register_on_drop(function(itemstack, dropper, pos, lobby)
   if lobby == "skywars" then
     local name = dropper:get_player_name()
@@ -104,21 +83,6 @@ subgames.register_on_drop(function(itemstack, dropper, pos, lobby)
     end
   end
 end)
-
-function areas.skywars.drop(pos, itemname, player)
-  local name = player:get_player_name()
-  local plobby = skywars.player_lobby[name]
-  if not plobby then
-    plobby = get_lobby_from_pos(pos)
-    if not plobby then
-      return false
-    end
-  end
-  if skywars.lobbys[plobby].ingame then
-    return true
-  else return false
-  end
-end
 
 subgames.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage, lobby)
   if lobby == "skywars" and player and hitter then

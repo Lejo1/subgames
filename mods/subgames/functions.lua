@@ -13,6 +13,7 @@ function table.contains(table, element)
   else return false
   end
 end
+
 function subgames.concatornil(toconcat)
 	if type(toconcat) == "table" then
 		return table.concat(toconcat, ",")
@@ -21,6 +22,7 @@ function subgames.concatornil(toconcat)
 	else return toconcat
 	end
 end
+
 function round(num, numDecimalPlaces)
   local mult = 10^(numDecimalPlaces or 0)
   return math.floor(num * mult + 0.5) / mult
@@ -48,26 +50,10 @@ function is_inside_area(pos1, pos2, mainpos)
 end
 
 function subgames.get_lobby_from_pos(pos)
-  for lname in pairs(areas) do
-    if is_inside_area(areas[lname][1], areas[lname][2], pos) then
+  for lname, area in pairs(subgames.areas) do
+    if is_inside_area(area[1], area[2], pos) then
       return lname
     end
-  end
-end
-
-function subgames.check_drop(pos, itemname, player)
-  local name = player:get_player_name()
-  local lobby = player_lobby[name]
-  if not lobby then
-    lobby = subgames.get_lobby_from_pos(pos)
-    if not lobby then
-      return false
-    end
-  end
-  local func = areas[lobby].drop
-  if not func then
-    return false
-  else return func(pos, itemname, player)
   end
 end
 
@@ -166,10 +152,11 @@ function subgames.remove_all_player(name)
     remove_rule_accepted(name)
     playtime.remove_playtime(name)
     skins.remove_player(name)
-    hiddenseeker.remove_player_kits(name)
-    mesewars.remove_player_kits(name)
-    skywars.remove_player_kits(name)
-    survivalgames.remove_player_kits(name)
+    for _, d in pairs(subgames.games) do
+      if d.remove_player then
+        d.remove_player(name)
+      end
+    end
     money.remove(name)
     return true
   end

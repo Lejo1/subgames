@@ -164,6 +164,49 @@ dofile(minetest.get_modpath("skywars") .."/chests.lua")
 dofile(minetest.get_modpath("skywars") .."/commands.lua")
 dofile(minetest.get_modpath("skywars") .."/kits.lua")
 
+subgames.register_game("skywars", {
+  fullname = "Skywars",
+  object = skywars,
+  area = {
+    [1] = {x=10000, y=1900, z=10000},
+    [2] = {x=(-10000), y=2900, z=(-10000)}
+  },
+  node_dig = function(pos, node, digger)
+    local name = digger:get_player_name()
+    local plobby = skywars.player_lobby[name]
+    if skywars.lobbys[plobby].ingame then
+      return true
+    end
+  end,
+  item_place_node = function(itemstack, placer, pointed_thing, param2)
+    local plobby
+    if not placer or not placer:is_player() then
+      plobby = get_lobby_from_pos(pos)
+    else local name = placer:get_player_name()
+      plobby = skywars.player_lobby[name]
+    end
+    if not plobby then return end
+    if skywars.lobbys[plobby].ingame then
+      return true
+    end
+  end,
+  drop = function(pos, itemname, player)
+    local name = player:get_player_name()
+    local plobby = skywars.player_lobby[name]
+    if not plobby then
+      plobby = get_lobby_from_pos(pos)
+      if not plobby then
+        return false
+      end
+    end
+    if skywars.lobbys[plobby].ingame then
+      return true
+    else return false
+    end
+  end,
+  remove_player = skywars.remove_player_kits
+})
+
 function skywars.get_lobby_players(lobby)
   local players = {}
   for _, player in pairs(subgames.get_lobby_players("skywars")) do

@@ -12,6 +12,21 @@ minetest.register_tool("main:teleporter", {
   end,
 })
 
+subgames.register_game("main", {
+  fullname = "Main",
+  object = main,
+  area = {
+    [1] = {x=(-31), y=623, z=0},
+    [2] = {x=9, y=595, z=39}
+  },
+  node_dig = function(pos, node, digger)
+    return false
+  end,
+  item_place_node = function(itemstack, placer, pointed_thing, param2)
+    return false
+  end,
+})
+
 main.teleporter_form = ""
 function main.create_teleporter_form()
   main.teleporter_form = ("size[4,4]" ..
@@ -94,14 +109,6 @@ subgames.register_on_leaveplayer(function(player, lobby)
   if lobby == "main" then
   end
 end)
-
-function areas.main.dig(pos, node, digger)
-  return false
-end
-
-function areas.main.place(itemstack, placer, pointed_thing, param2)
-  return false
-end
 
 subgames.register_on_chat_message(function(name, message, lobby)
   if lobby == "main" and name and message then

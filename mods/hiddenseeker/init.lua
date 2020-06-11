@@ -6,6 +6,22 @@ dofile(minetest.get_modpath("hiddenseeker") .."/kits.lua")
 dofile(minetest.get_modpath("hiddenseeker") .."/ingame.lua")
 dofile(minetest.get_modpath("hiddenseeker") .."/commands.lua")
 
+subgames.register_game("hiddenseeker", {
+  fullname = "Hide and Seek",
+  object = hiddenseeker,
+  area = {
+    [1] = {x=0, y=(-10000), z=0},
+    [2] = {x=0, y=(-10000), z=0}
+  },
+  node_dig = function(pos, node, digger)
+    return false
+  end,
+  item_place_node = function(itemstack, placer, pointed_thing, param2)
+    return false
+  end,
+  remove_player = hiddenseeker.remove_player_kits
+})
+
 hiddenseeker.lobbys = {
   [1] = {
     ["string_name"] = "Hide and Seek Karsthafen",
@@ -105,14 +121,6 @@ subgames.register_on_leaveplayer(function(player, lobby)
     hiddenseeker.disguis[name] = nil
   end
 end)
-
-function areas.hiddenseeker.dig(pos, node, digger)
-  return false
-end
-
-function areas.hiddenseeker.place(itemstack, placer, pointed_thing, param2)
-  return false
-end
 
 subgames.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage, lobby)
   if lobby == "hiddenseeker" and player and hitter then

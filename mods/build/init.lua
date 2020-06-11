@@ -39,6 +39,14 @@ minetest.register_chatcommand("build", {
   end,
 })
 
+subgames.register_game("build", {
+  fullname = "Build",
+  area = {
+    [1] = {x=0, y=(-10000), z=0},
+    [2] = {x=0, y=(-10000), z=0}
+  },
+})
+
 minetest.register_privilege("invs", "Allows you to be fully invisible!")
 
 function core.send_join_message(name)
