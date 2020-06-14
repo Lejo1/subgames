@@ -47,14 +47,6 @@ subgames.register_game("build", {
   },
 })
 
-minetest.register_privilege("invs", "Allows you to be fully invisible!")
-
-function core.send_join_message(name)
-end
-
-function core.send_leave_message(name, timed_out)
-end
-
 minetest.register_chatcommand("pinfo", {
   params = "<name>",
   description = "Get some infos of a player.",
@@ -70,10 +62,10 @@ minetest.register_chatcommand("pinfo", {
 })
 
 minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage)
-  if player_lobby[hitter:get_player_name()] == "build" then
+  if minetest.get_player_privs(hitter:get_player_name()).ban then
     subgames.add_bothud(hitter, player:get_player_name(), 0xFFFFFF, 5)
-    return true
-  elseif minetest.get_player_privs(hitter:get_player_name()).ban then
-    subgames.add_bothud(hitter, player:get_player_name(), 0xFFFFFF, 5)
+    if player_lobby[hitter:get_player_name()] == "build" then
+      return true
+    end
   end
 end)

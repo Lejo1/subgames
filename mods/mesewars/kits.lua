@@ -1,7 +1,5 @@
 --  Adds kits to mesewars
 kits = {}
-mesewars_kit_form = {}
-mesewars_ability_form = {}
 local kits_all = {}
 local abilitys = {
 	speed = {
@@ -166,8 +164,7 @@ function mesewars.create_kit_form(name)
 		local itembuyb = kits.register[kits[name].buying]
 		itembuy = itembuyb.items
 	end
-  mesewars_kit_form[name] = (
-  	"size[8,9]" ..
+  	return "size[8,9]" ..
   	"label[0,0;Select your Kit!]" ..
   	"dropdown[0,0.5;8,1.5;kitlist;"..subgames.concatornil(kits[name].kit)..";"..selected_id.."]" ..
 		"label[0,1.5;Items: "..subgames.concatornil(defitems).." ]" ..
@@ -176,8 +173,48 @@ function mesewars.create_kit_form(name)
 		"dropdown[0,3.5;8,1.5;buylist;"..table.concat(kits_all, ",")..";"..selected_buyid.."]" ..
 		"label[0,4.5;Cost: "..costbuy.."]" ..
 		"label[0,5.5;Items: "..subgames.concatornil(itembuy).." ]" ..
-		"button[4,4.5;3,1;buykit;Buy this Kit!]")
+		"button[4,4.5;3,1;buykit;Buy this Kit!]"
 end
+
+function mesewars.kit_on_player_receive_fields(player, context, pressed)
+	local name = player:get_player_name()
+	if pressed.buykit then
+		if kits[name].buying then
+			mesewars.add_player_kits(name, kits[name].buying)
+		end
+	end
+	if pressed.kitlist then
+		mesewars.set_player_kit(name, pressed.kitlist)
+	end
+	if pressed.buylist then
+		kits[name].buying = pressed.buylist
+	end
+	mesewars.save_kits(name)
+end
+
+--  Add a kit tab
+sfinv.register_page("mesewars:kits", {
+	title = "Kits",
+	get = function(self, player, context)
+		local name = player:get_player_name()
+		if player_lobby[name] == "mesewars" then
+			return sfinv.make_formspec(player, context, mesewars.create_kit_form(name), false)
+		end
+  end,
+	on_player_receive_fields = function(self, player, context, pressed)
+		local name = player:get_player_name()
+		if player_lobby[name] == "mesewars" then
+			mesewars.kit_on_player_receive_fields(player, context, pressed)
+			sfinv.set_player_inventory_formspec(player)
+		end
+	end,
+	is_in_nav = function(self, player, context)
+		local name = player:get_player_name()
+		if player_lobby[name] == "mesewars" then
+			return true
+		end
+	end
+})
 
 --  Grant money when kill a player
 subgames.register_on_kill_player(function(killer, killed, lobby)
@@ -301,8 +338,7 @@ local function check_active(value, number, text)
 	end
 end
 
-function mesewars.create_ability_form(player)
-	local name = player:get_player_name()
+function mesewars.create_ability_form(name)
 	local speedontool
 	if kits[name].abilitys.speed.active == true then
 		speedontool = "Enable!"
@@ -323,8 +359,7 @@ function mesewars.create_ability_form(player)
 		carefullontool = "Enable!"
 	else carefullontool = "Disable!"
 	end
-	mesewars_ability_form[name] = (
-  	"size[8,9]" ..
+  	return "size[8,9]" ..
 		"label[0,0.5;Here you can buy abilities for your money.]" ..
 		"label[0,1;Your money: "..money.get_money(name).." Coins]" ..
 		"image_button[1,2;1,1;pep_speedplus.png;speedon;]" ..
@@ -379,7 +414,6 @@ function mesewars.create_ability_form(player)
 		"tooltip[carefull4;1600 Coins]" ..
 		"button[4,8;1,1;carefull5;"..check_active(kits[name].abilitys.carefull.level, 5, "50%").."]" ..
 		"tooltip[carefull5;3200 Coins]"
-	)
 end
 
 function mesewars.handle_buy(player, ability, level, cost)
@@ -400,3 +434,80 @@ function mesewars.handle_buy(player, ability, level, cost)
 		minetest.chat_send_player(name, "You already buyed this Level.")
 	end
 end
+
+--  Add a Abilitys tab
+sfinv.register_page("mesewars:abilitys", {
+	title = "Abilities",
+	get = function(self, player, context)
+		local name = player:get_player_name()
+    if player_lobby[name] == "mesewars" then
+		  return sfinv.make_formspec(player, context, mesewars.create_ability_form(name), false)
+		else return sfinv.make_formspec(player, context, (
+			"size[8,9]" ..
+			"label[0,0;Abilitys are not available here!]"
+		), false)
+		end
+  end,
+	on_player_receive_fields = function(self, player, context, pressed)
+		local name = player:get_player_name()
+    if player_lobby[name] == "mesewars" then
+		if pressed.speedbox then
+			if pressed.speedbox == "true" then kits[name].abilitys.speed.active = true else kits[name].abilitys.speed.active = false end
+		elseif pressed.slownessbox then
+			if pressed.slownessbox == "true" then kits[name].abilitys.slowness.active = true else kits[name].abilitys.slowness.active = false end
+		elseif pressed.killkitbox then
+			if pressed.killkitbox == "true" then kits[name].abilitys.killkit.active = true else kits[name].abilitys.killkit.active = false end
+		elseif pressed.carefullbox then
+			if pressed.carefullbox == "true" then kits[name].abilitys.carefull.active = true else kits[name].abilitys.carefull.active = false end
+		elseif pressed.speed1 then
+			mesewars.handle_buy(player, "speed", 1, 200)
+		elseif pressed.speed2 then
+			mesewars.handle_buy(player, "speed", 2, 400)
+		elseif pressed.speed3 then
+			mesewars.handle_buy(player, "speed", 3, 800)
+		elseif pressed.speed4 then
+			mesewars.handle_buy(player, "speed", 4, 1600)
+		elseif pressed.speed5 then
+			mesewars.handle_buy(player, "speed", 5, 3200)
+		elseif pressed.slowness1 then
+			mesewars.handle_buy(player, "slowness", 1, 200)
+		elseif pressed.slowness2 then
+			mesewars.handle_buy(player, "slowness", 2, 400)
+		elseif pressed.slowness3 then
+			mesewars.handle_buy(player, "slowness", 3, 800)
+		elseif pressed.slowness4 then
+			mesewars.handle_buy(player, "slowness", 4, 1600)
+		elseif pressed.slowness5 then
+			mesewars.handle_buy(player, "slowness", 5, 3200)
+		elseif pressed.killkit1 then
+			mesewars.handle_buy(player, "killkit", 1, 200)
+		elseif pressed.killkit2 then
+			mesewars.handle_buy(player, "killkit", 2, 400)
+		elseif pressed.killkit3 then
+			mesewars.handle_buy(player, "killkit", 3, 800)
+		elseif pressed.killkit4 then
+			mesewars.handle_buy(player, "killkit", 4, 1600)
+		elseif pressed.killkit5 then
+			mesewars.handle_buy(player, "killkit", 5, 3200)
+		elseif pressed.carefull1 then
+			mesewars.handle_buy(player, "carefull", 1, 200)
+		elseif pressed.carefull2 then
+			mesewars.handle_buy(player, "carefull", 2, 400)
+		elseif pressed.carefull3 then
+			mesewars.handle_buy(player, "carefull", 3, 800)
+		elseif pressed.carefull4 then
+			mesewars.handle_buy(player, "carefull", 4, 1600)
+		elseif pressed.carefull5 then
+			mesewars.handle_buy(player, "carefull", 5, 3200)
+		end
+		mesewars.save_kits(name)
+		sfinv.set_player_inventory_formspec(player)
+    end
+	end,
+	is_in_nav = function(self, player, context)
+		local name = player:get_player_name()
+    if player_lobby[name] == "mesewars" then
+			return true
+		end
+	end
+})

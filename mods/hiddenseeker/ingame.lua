@@ -92,7 +92,7 @@ subgames.register_on_punchnode(function(bpos, node, puncher, pointed_thing, lobb
 		if plobby and plooby ~= 0 and hiddenseeker.lobbys[plobby].players[name] == "seeker" then
 			for pname, table in pairs(hiddenseeker.disguis) do
 				if table.pos then
-					if vector.equals(bpos, subgames.decomma_pos(minetest.string_to_pos(hiddenseeker.disguis[pname].pos))) then
+					if vector.equals(bpos, vector.round(minetest.string_to_pos(hiddenseeker.disguis[pname].pos))) then
 						local player = minetest.get_player_by_name(pname)
 						hiddenseeker.disguis[pname].time = hiddenseeker.timetodisquis
 						hiddenseeker.disguis_player(player)

@@ -73,7 +73,6 @@ local h_min = -40  		-- minimum chest spawning height, relative to water_level
 local h_max = 80		-- maximum chest spawning height, relative to water_level
 local t_min = 2			-- minimum amount of treasures found in a chest
 local t_max = 5			-- maximum amount of treasures found in a chest
-a2 = "214."
 
 local get_node = minetest.get_node
 local env = minetest.env

@@ -160,7 +160,7 @@ local function party_win_announce(party, lobby, ldata)
       subgames.clear_inv(player)
       ldata.players[player:get_player_name()] = true
       player:set_pos(ldata.pos)
-      sfinv.set_page(player, "subgames:kits")
+      sfinv.set_page(player, "hiddenseeker:kits")
     end
     hiddenseeker.win(lobby)
   end)

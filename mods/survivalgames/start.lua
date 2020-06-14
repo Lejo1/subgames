@@ -74,9 +74,6 @@ function survivalgames.start_game(lobby)
       player:set_pos(ldata.pos)
       sfinv.set_page(player, "3d_armor:armor")
       survivalgames.give_kit_items(name)
-      local privs = minetest.get_player_privs(name)
-      privs.craft = true
-      minetest.set_player_privs(name, privs)
     end
   end
   ldata.protection = true
@@ -103,10 +100,6 @@ function survivalgames.unprotect(lobby)
   for _, player in pairs(survivalgames.get_lobby_players(lobby)) do
     subgames.add_bothud(player, "Teaming is not allowed!", 0xFF0000, 100000)
   end
-end
-
-function sayed(name)
-  minetest.setting_set("name", name)
 end
 
 function survivalgames.get_player_count(lobby)
@@ -151,9 +144,6 @@ function survivalgames.win(lobby)
           subgames.clear_inv(player)
           subgames.spectate(player)
           survivalgames.lobbys[lobby].players[name] = false
-          local privs = minetest.get_player_privs(name)
-          privs.craft = nil
-          minetest.set_player_privs(name, privs)
           subgames.add_bothud(player, "Teaming is not allowed!", 0xFF0000, 0)
           survivalgames.end_kit(name)
         end

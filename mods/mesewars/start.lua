@@ -126,7 +126,7 @@ function mesewars.win(lobby)
           subgames.unspectate(player)
           mesewars.lobbys[lobby].players[name] = false
           mesewars.color_tag(player)
-          sfinv.set_page(player, "subgames:team")
+          sfinv.set_page(player, "mesewars:team")
         end
         mesewars.reset_map(lobby)
         mesewars.win(lobby)

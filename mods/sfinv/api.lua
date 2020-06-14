@@ -124,7 +124,7 @@ end
 function sfinv.set_player_inventory_formspec(player, context)
 	local fs = sfinv.get_formspec(player,
 			context or sfinv.get_or_create_context(player))
-	player:set_inventory_formspec(fs)
+	player:set_inventory_formspec(fs or "")
 end
 
 function sfinv.set_page(player, pagename)

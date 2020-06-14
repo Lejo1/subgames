@@ -2,7 +2,6 @@ minetest.set_mapgen_params({seed=math.random(10000000000000000000, 9999999999999
 minetest.set_mapgen_params({water_level=-60})
 minetest.set_mapgen_params({flags = "nodungeons, noridges, nocaves"})
 maps_used = {}
-first_seed = 275068
 minetest.register_on_generated(function(minp, maxp, seed)
   if minp.y > 150 or maxp.y < -50 then return end
   local zpos = round(maxp.z/500)*500

@@ -171,6 +171,7 @@ subgames.register_game("skywars", {
     [1] = {x=10000, y=1900, z=10000},
     [2] = {x=(-10000), y=2900, z=(-10000)}
   },
+  crafting = true,
   node_dig = function(pos, node, digger)
     local name = digger:get_player_name()
     local plobby = skywars.player_lobby[name]
@@ -240,13 +241,13 @@ function skywars.join_game(player, lobby)
     player:set_pos(skywars.lobbys[lobby].specpos)
     subgames.clear_inv(player)
     skywars.lobbys[lobby].players[name] = false
-    sfinv.set_page(player, "subgames:maps")
+    sfinv.set_page(player, "skywars:maps")
     subgames.spectate(player)
     return "Lobby is ingame! So you are now spectating."
   else skywars.player_lobby[name] = lobby
     player:set_pos(skywars.lobbys[lobby].specpos)
     subgames.clear_inv(player)
-    sfinv.set_page(player, "subgames:maps")
+    sfinv.set_page(player, "skywars:maps")
     skywars.win(lobby)
     if skywars.lobbys[lobby].mustcreate == true then
       skywars.lobbys[lobby].mustcreate = false
@@ -270,9 +271,6 @@ function skywars.leave_game(player)
     skywars.lobbys[lobby].players[name] = nil
     subgames.unspectate(player)
     if skywars.lobbys[lobby].ingame then
-      local privs = minetest.get_player_privs(name)
-      privs.craft = nil
-      minetest.set_player_privs(name, privs)
       subgames.add_bothud(player, "Teaming is not allowed!", 0xFF0000, 0)
     end
   end

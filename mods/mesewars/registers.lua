@@ -111,7 +111,7 @@ subgames.register_on_respawnplayer(function(player, lobby)
 			    mesewars.chat_send_all_lobby(plobby, minetest.colorize(mesewars.get_color_from_team(mesewars.lobbys[plobby].players[name]) ,name).." has been eliminated.")
           mesewars.lobbys[plobby].players[name] = false
           subgames.clear_inv(player)
-          sfinv.set_page(player, "subgames:team")
+          sfinv.set_page(player, "mesewars:team")
         end
         subgames.spectate(player)
         player:set_pos(mesewars.lobbys[plobby].specpos)
@@ -244,4 +244,35 @@ minetest.register_node("mesewars:mese4", {
       end
     end
   end,
+})
+
+sfinv.register_page("mesewars:maps", {
+	title = "Maps",
+	get = function(self, player, context)
+		local name = player:get_player_name()
+		if player_lobby[name] == "mesewars" then
+			return sfinv.make_formspec(player, context, mesewars.create_teleporter_form(), false)
+		end
+  end,
+	on_player_receive_fields = function(self, player, context, pressed)
+		local name = player:get_player_name()
+		local lobby = player_lobby[name]
+		if lobby == "mesewars" then
+			if pressed.map1 then
+				mesewars.leave_game(player)
+				mesewars.win(mesewars.player_lobby[name])
+				minetest.chat_send_player(name, mesewars.join_game(player, 1))
+			elseif pressed.map2 then
+				mesewars.leave_game(player)
+				minetest.chat_send_player(name, mesewars.join_game(player, 2))
+			end
+		end
+    minetest.close_formspec(name, "")
+	end,
+	is_in_nav = function(self, player, context)
+		local name = player:get_player_name()
+    if player_lobby[name] == "mesewars" then
+			return true
+		end
+	end
 })

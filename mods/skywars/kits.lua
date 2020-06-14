@@ -1,6 +1,4 @@
 skywars_kits = {}
-skywars_kit_form = {}
-skywars_ability_form = {}
 local kits_all = {}
 local kits_register = {}
 
@@ -122,8 +120,7 @@ function skywars.create_kit_form(name)
 		local itembuyb = kits_register[skywars_kits[name].buying]
 		itembuy = itembuyb.items
 	end
-  skywars_kit_form[name] = (
-  	"size[8,9]" ..
+  	return "size[8,9]" ..
   	"label[0,0;Select your Kit!]" ..
   	"dropdown[0,0.5;8,1.5;kitlist;"..subgames.concatornil(skywars_kits[name].kit)..";"..selected_id.."]" ..
 		"label[0,1.5;Items: "..subgames.concatornil(defitems).." ]" ..
@@ -132,7 +129,7 @@ function skywars.create_kit_form(name)
 		"dropdown[0,3.5;8,1.5;buylist;"..table.concat(kits_all, ",")..";"..selected_buyid.."]" ..
 		"label[0,4.5;Cost: "..costbuy.."]" ..
 		"label[0,5.5;Items: "..subgames.concatornil(itembuy).." ]" ..
-		"button[4,4.5;3,1;buykit;Buy this Kit!]")
+		"button[4,4.5;3,1;buykit;Buy this Kit!]"
 end
 
 --  Grant money when kill a player
@@ -145,9 +142,8 @@ subgames.register_on_kill_player(function(killer, killed, lobby)
 	end
 end)
 
-function skywars.kit_on_player_receive_fields(self, player, context, pressed)
+function skywars.kit_on_player_receive_fields(player, context, pressed)
   local name = player:get_player_name()
-  if player_lobby[name] == "skywars" then
   if pressed.buykit then
     if skywars_kits[name].buying then
       skywars.add_player_kits(name, skywars_kits[name].buying)
@@ -160,10 +156,31 @@ function skywars.kit_on_player_receive_fields(self, player, context, pressed)
     skywars_kits[name].buying = pressed.buylist
   end
   skywars.save_kits(name)
-  skywars.create_kit_form(name)
-  sfinv.set_player_inventory_formspec(player)
-  end
 end
+
+--  Add a kit tab
+sfinv.register_page("skywars:kits", {
+	title = "Kits",
+	get = function(self, player, context)
+		local name = player:get_player_name()
+		if player_lobby[name] == "skywars" then
+			return sfinv.make_formspec(player, context, skywars.create_kit_form(name), false)
+		end
+  end,
+	on_player_receive_fields = function(self, player, context, pressed)
+		local name = player:get_player_name()
+		if player_lobby[name] == "skywars" then
+			skywars.kit_on_player_receive_fields(player, context, pressed)
+			sfinv.set_player_inventory_formspec(player)
+		end
+	end,
+	is_in_nav = function(self, player, context)
+		local name = player:get_player_name()
+		if player_lobby[name] == "skywars" then
+			return true
+		end
+	end
+})
 
 skywars.register_kit("Swordman", {
   cost = 500,

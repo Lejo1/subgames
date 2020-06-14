@@ -54,18 +54,6 @@ function subgames.unspectate(player)
   end
 end
 
-minetest.register_chatcommand("w", {
-  params = "<name>",
-  description = "Use it to get the Lobby where a player is.",
-  func = function(user, param)
-    local player = minetest.get_player_by_name(param)
-    if player and not minetest.get_player_privs(param).invs then
-      minetest.chat_send_player(user, "The player "..param.." is in the Lobby "..player_lobby[param]..".")
-    else minetest.chat_send_player(user, "The player is not online")
-    end
-  end,
-})
-
 function subgames.add_armor(player, stack1, stack2, stack3, stack4, stack5)
   if stack1 then
     armor:set_inventory_stack(player, 1, stack1)

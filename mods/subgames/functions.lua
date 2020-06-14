@@ -27,9 +27,6 @@ function round(num, numDecimalPlaces)
   local mult = 10^(numDecimalPlaces or 0)
   return math.floor(num * mult + 0.5) / mult
 end
-function subgames.decomma_pos(pos)
-  return {x=round(pos.x), y=round(pos.y), z=round(pos.z)}
-end
 
 function toboolean(string)
   if string == "true" then
@@ -50,8 +47,8 @@ function is_inside_area(pos1, pos2, mainpos)
 end
 
 function subgames.get_lobby_from_pos(pos)
-  for lname, area in pairs(subgames.areas) do
-    if is_inside_area(area[1], area[2], pos) then
+  for lname, d in pairs(subgames.games) do
+    if is_inside_area(d.area[1], d.area[2], pos) then
       return lname
     end
   end
@@ -143,22 +140,10 @@ function subgames.drop_inv(name, pos)
 end
 
 function subgames.remove_all_player(name)
-  if minetest.get_player_by_name(name) then
-    return false
-  end
-  if sban_del_player(name) then
-    minetest.remove_player(name)
-    minetest.remove_player_auth(name)
-    remove_rule_accepted(name)
-    playtime.remove_playtime(name)
-    skins.remove_player(name)
-    for _, d in pairs(subgames.games) do
-      if d.remove_player then
-        d.remove_player(name)
-      end
+  for _, d in pairs(subgames.games) do
+    if d.remove_player then
+      d.remove_player(name)
     end
-    money.remove(name)
-    return true
   end
 end
 

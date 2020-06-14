@@ -120,6 +120,31 @@ function mesewars.handle_teamform_input(player, pressed)
   end
 end
 
+--  Add a sfinv page for the team selector
+sfinv.register_page("mesewars:team", {
+	title = "Teams",
+	get = function(self, player, context)
+		local name = player:get_player_name()
+    if player_lobby[name] == "mesewars" then
+		  return sfinv.make_formspec(player, context, mesewars.create_team_form(name), false)
+    end
+	end,
+  on_player_receive_fields = function(self, player, context, pressed)
+    local name = player:get_player_name()
+    mesewars.handle_teamform_input(player, pressed)
+		if not pressed.quit then
+			mesewars.create_team_form(name)
+			sfinv.set_player_inventory_formspec(player)
+		end
+  end,
+	is_in_nav = function(self, player, context)
+		local name = player:get_player_name()
+    if player_lobby[name] == "mesewars" then
+			return true
+		end
+	end
+})
+
 function mesewars.teams_correct(lobby)
   local maxteam = 1
   for team=0, mesewars.lobbys[lobby].teams do

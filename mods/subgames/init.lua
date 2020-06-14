@@ -3,44 +3,20 @@ subgames = {}
 
 player_lobby = {}
 subgames.games = {}
-subgames.areas={
-  ["mesewars"] = {
-    [1] = {x=(-700), y=1000, z=-700},
-    [2] = {x=75, y=1302, z=(-17)}
-  },
-  ["main"] = {
-    [1] = {x=(-31), y=623, z=0},
-    [2] = {x=9, y=595, z=39}
-  },
-  ["hiddenseeker"] = {
-    [1] = {x=0, y=(-10000), z=0},
-    [2] = {x=0, y=(-10000), z=0}
-  },
-  ["build"] = {
-    [1] = {x=0, y=(-10000), z=0},
-    [2] = {x=0, y=(-10000), z=0}
-  },
-  ["skywars"] = {
-    [1] = {x=10000, y=1900, z=10000},
-    [2] = {x=(-10000), y=2900, z=(-10000)}
-  },
-  ["survivalgames"] = {
-    [1] = {x=31000, y=-50, z=31000},
-    [2] = {x=(-31000), y=110, z=(-31000)}
-  }
-}
 
 dofile(minetest.get_modpath("subgames") .."/spectator.lua")
 dofile(minetest.get_modpath("subgames") .."/hud.lua")
-dofile(minetest.get_modpath("subgames") .."/sfinv.lua")
 dofile(minetest.get_modpath("subgames") .."/functions.lua")
 dofile(minetest.get_modpath("subgames") .."/map.lua")
+if minetest.get_modpath("sfinv") then
+  dofile(minetest.get_modpath("subgames") .."/sfinv.lua")
+end
 
 --[[
 Def should be:
 {
 fullname = "Mesewars"
-object = mesewars
+object = mesewars (Not used yet)
 area = {
   [1] = {x=(-700), y=1000, z=-700},
   [2] = {x=75, y=1302, z=(-17)}
@@ -51,6 +27,7 @@ node_dig = function(pos, node, digger)
 item_place_node = function(itemstack, placer, pointed_thing, param2)
 drop = function(pos, itemname, player)
 remove_player = function(name)
+crafting = true
 }
 
 ]]
@@ -66,7 +43,6 @@ function subgames.register_on_chat_message(func)
 end
 
 minetest.register_on_chat_message(function(name, message)
-  minetest.log("action", "Chatlog: "..name.." wrote:"..message)
   local toreturn = nil
   for _, value in pairs(subgames.on_chat_message) do
     if value(name, message, player_lobby[name]) == true then
@@ -246,29 +222,13 @@ function subgames.call_join_callbacks(player, lobby)
   sfinv.set_page(player, "3d_armor:armor")
   local privs = minetest.get_player_privs(name)
   privs.armor = true
-  privs.craft = nil
+  privs.craft = nil --  Compatibility
   minetest.set_player_privs(name, privs)
   sfinv.set_player_inventory_formspec(player)
   for _,value in pairs(subgames.on_joinplayer) do
     value(player, lobby)
   end
 end
-
-minetest.register_on_joinplayer(function(player)
-  local name = player:get_player_name()
-  player:set_properties({
-    visual_size = {x=1, y=1},
-    makes_footstep_sound = true,
-    collisionbox = {-0.3, -1, -0.3, 0.3, 1, 0.3}
-  })
-  local privs = minetest.get_player_privs(name)
-  privs.interact = true
-  privs.fly = nil
-  privs.fast = nil
-  privs.noclip = nil
-  minetest.set_player_privs(name, privs)
-  subgames.call_join_callbacks(player, "main")
-end)
 
 --  Add a register on leave player (player)
 subgames.on_leaveplayer = {}
@@ -391,7 +351,8 @@ function subgames.handle_drop(itemstack, dropper, pos)
   end
 end
 
-function subgames.check_drop(pos, itemname, player)
+local old_node_drops = minetest.handle_node_drops
+function minetest.handle_node_drops(pos, itemname, player)
   local name = player:get_player_name()
   local lobby = player_lobby[name]
   if not lobby then
@@ -403,7 +364,8 @@ function subgames.check_drop(pos, itemname, player)
   local func = subgames.games[lobby].drop
   if not func then
     return false
-  else return func(pos, itemname, player)
+  elseif func(pos, itemname, player) then
+    old_node_drops(pos, itemname, player)
   end
 end
 
@@ -449,26 +411,9 @@ minetest.after(1, function()
   end
 end)
 
-minetest.register_privilege("craft", "Allows you to craft items.")
 minetest.register_on_craft(function(itemstack, player, old_craft_grid, craft_inv)
   local name = player:get_player_name()
-  if not minetest.get_player_privs(name).craft then
-    return ""
+  if subgames.games[lobby] and subgames.games[lobby] == false then
+    return true
   end
-end)
-
-minetest.unregister_chatcommand("me")
-
-minetest.register_chatcommand("say", {
-  params = "",
-  description = "Use it to say something in the global chat.",
-  privs = {kick=true},
-  func = function(user, param)
-    minetest.chat_send_all(param)
-  end,
-})
-
-minetest.register_on_joinplayer(function(player)
-		player:hud_set_flags({minimap = false})
-    player:set_properties({zoom_fov=10})
 end)

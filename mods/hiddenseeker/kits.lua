@@ -1,4 +1,3 @@
-hiddenseeker_kit_form = {}
 hiddenseeker_kits = {}
 local kits_register = {}
 local kits_all = {}
@@ -109,8 +108,7 @@ function hiddenseeker.create_kit_form(name)
 		local itembuyb = kits_register[hiddenseeker_kits[name].buying]
 		itembuy = itembuyb.items
 	end
-  hiddenseeker_kit_form[name] = (
-  	"size[8,9]" ..
+  	return "size[8,9]" ..
   	"label[0,0;Select your Block you want to be in the next round!]" ..
   	"dropdown[0,0.5;8,1.5;blocklist;"..subgames.concatornil(hiddenseeker_kits[name].kit)..";"..selected_id.."]" ..
 		"label[0,1.5;Block: "..subgames.concatornil(defitems).." ]" ..
@@ -119,7 +117,7 @@ function hiddenseeker.create_kit_form(name)
 		"dropdown[0,3.5;8,1.5;buylist;"..table.concat(kits_all, ",")..";"..selected_buyid.."]" ..
 		"label[0,4.5;Cost: "..costbuy.."]" ..
 		"label[0,5.5;Block: "..subgames.concatornil(itembuy).." ]" ..
-		"button[4,4.5;3,1;buyblock;Buy this Block!]")
+		"button[4,4.5;3,1;buyblock;Buy this Block!]"
 end
 
 --  Grant money when kill a player
@@ -137,25 +135,45 @@ subgames.register_on_kill_player(function(killer, killed, lobby)
 	end
 end)
 
-function hiddenseeker.kit_on_player_receive_fields(self, player, context, pressed)
+function hiddenseeker.kit_on_player_receive_fields(player, context, pressed)
 	local name = player:get_player_name()
-	if player_lobby[name] == "hiddenseeker" then
-		if pressed.buyblock then
-			if hiddenseeker_kits[name].buying then
-				hiddenseeker.add_player_kits(name, hiddenseeker_kits[name].buying)
-			end
+	if pressed.buyblock then
+		if hiddenseeker_kits[name].buying then
+			hiddenseeker.add_player_kits(name, hiddenseeker_kits[name].buying)
 		end
-		if pressed.blocklist then
-			hiddenseeker.set_player_kit(name, pressed.blocklist)
-		end
-		if pressed.buylist then
-			hiddenseeker_kits[name].buying = pressed.buylist
-		end
-		hiddenseeker.save_kits(name)
-		hiddenseeker.create_kit_form(name)
-		sfinv.set_player_inventory_formspec(player)
 	end
+	if pressed.blocklist then
+		hiddenseeker.set_player_kit(name, pressed.blocklist)
+	end
+	if pressed.buylist then
+		hiddenseeker_kits[name].buying = pressed.buylist
+	end
+	hiddenseeker.save_kits(name)
 end
+
+--  Add a kit tab
+sfinv.register_page("hiddenseeker:kits", {
+	title = "Kits",
+	get = function(self, player, context)
+		local name = player:get_player_name()
+		if player_lobby[name] == "hiddenseeker" then
+			return sfinv.make_formspec(player, context, hiddenseeker.create_kit_form(name), false)
+		end
+  end,
+	on_player_receive_fields = function(self, player, context, pressed)
+		local name = player:get_player_name()
+		if player_lobby[name] == "hiddenseeker" then
+			hiddenseeker.kit_on_player_receive_fields(player, context, pressed)
+			sfinv.set_player_inventory_formspec(player)
+		end
+	end,
+	is_in_nav = function(self, player, context)
+		local name = player:get_player_name()
+		if player_lobby[name] == "hiddenseeker" then
+			return true
+		end
+	end
+})
 
 function hiddenseeker.get_player_block(name)
 	local lobby = hiddenseeker.player_lobby[name]

@@ -16,3 +16,6 @@
 [submodule "mods/worldedit"]
 	path = mods/worldedit
 	url = https://github.com/Uberi/Minetest-WorldEdit
+[submodule "mods/item_drop"]
+	path = mods/item_drop
+	url = https://github.com/minetest-mods/item_drop

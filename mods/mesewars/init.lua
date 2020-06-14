@@ -136,6 +136,7 @@ subgames.register_game("mesewars", {
     [1] = {x=(-700), y=1000, z=-700},
     [2] = {x=75, y=1302, z=(-17)}
   },
+  crafting = false,
   node_dig = function(pos, node, digger)
     local name = digger:get_player_name()
     local plobby = mesewars.player_lobby[name]
@@ -207,7 +208,7 @@ function mesewars.join_game(player, lobby)
     subgames.clear_inv(player)
     mesewars.lobbys[lobby].players[name] = false
     subgames.spectate(player)
-    sfinv.set_page(player, "subgames:maps")
+    sfinv.set_page(player, "mesewars:maps")
     return "Lobby is ingame! So you are now spectating."
   else mesewars.player_lobby[name] = lobby
     player:set_pos(mesewars.lobbys[lobby].specpos)
@@ -225,7 +226,7 @@ function mesewars.join_game(player, lobby)
       minetest.fix_light(mesewars.lobbys[lobby].mappos1, mesewars.lobbys[lobby].mappos2)
     end
     mesewars.team_form(name)
-    sfinv.set_page(player, "subgames:team")
+    sfinv.set_page(player, "mesewars:team")
     return "You joined the map "..mesewars.lobbys[lobby].string_name.."!"
   end
 end

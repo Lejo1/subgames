@@ -1,5 +1,4 @@
 survivalgames_kits = {}
-survivalgames_kit_form = {}
 local kits_all = {}
 local kits_register = {}
 
@@ -147,8 +146,7 @@ function survivalgames.create_kit_form(name)
 			effectbuy = def.effect
 		end
 	end
-  survivalgames_kit_form[name] = (
-  	"size[8,9]" ..
+  	return "size[8,9]" ..
   	"label[0,0;Select your Kit!]" ..
   	"dropdown[0,0.5;8,1.5;kitlist;"..subgames.concatornil(survivalgames_kits[name].kit)..";"..selected_id.."]" ..
 		"label[0,1.5;Items: "..subgames.concatornil(defitems).."]" ..
@@ -159,7 +157,7 @@ function survivalgames.create_kit_form(name)
 		"label[0,4.5;Cost: "..costbuy.."]" ..
 		"label[0,5.5;Items: "..subgames.concatornil(itembuy).."]" ..
 		"label[0,6;Effect: "..effectbuy.."]" ..
-		"button[4,4.5;3,1;buykit;Buy this Kit!]")
+		"button[4,4.5;3,1;buykit;Buy this Kit!]"
 end
 
 --  Grant money when kill a player
@@ -175,9 +173,8 @@ subgames.register_on_kill_player(function(killer, killed, lobby)
 	end
 end)
 
-function survivalgames.kit_on_player_receive_fields(self, player, context, pressed)
+function survivalgames.kit_on_player_receive_fields(player, context, pressed)
   local name = player:get_player_name()
-  if player_lobby[name] == "survivalgames" then
   if pressed.buykit then
     if survivalgames_kits[name].buying then
       survivalgames.add_player_kits(name, survivalgames_kits[name].buying)
@@ -190,10 +187,31 @@ function survivalgames.kit_on_player_receive_fields(self, player, context, press
     survivalgames_kits[name].buying = pressed.buylist
   end
   survivalgames.save_kits(name)
-  survivalgames.create_kit_form(name)
-  sfinv.set_player_inventory_formspec(player)
-  end
 end
+
+--  Add a kit tab
+sfinv.register_page("survivalgames:kits", {
+	title = "Kits",
+	get = function(self, player, context)
+		local name = player:get_player_name()
+		if player_lobby[name] == "survivalgames" then
+			return sfinv.make_formspec(player, context, survivalgames.create_kit_form(name), false)
+		end
+  end,
+	on_player_receive_fields = function(self, player, context, pressed)
+		local name = player:get_player_name()
+		if player_lobby[name] == "survivalgames" then
+			survivalgames.kit_on_player_receive_fields(player, context, pressed)
+			sfinv.set_player_inventory_formspec(player)
+		end
+	end,
+	is_in_nav = function(self, player, context)
+		local name = player:get_player_name()
+		if player_lobby[name] == "survivalgames" then
+			return true
+		end
+	end
+})
 
 survivalgames.register_kit("Scaredy cat", {
   cost = 700,

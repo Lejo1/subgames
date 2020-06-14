@@ -13,6 +13,7 @@ subgames.register_game("hiddenseeker", {
     [1] = {x=0, y=(-10000), z=0},
     [2] = {x=0, y=(-10000), z=0}
   },
+  crafting = false,
   node_dig = function(pos, node, digger)
     return false
   end,
@@ -194,7 +195,7 @@ function hiddenseeker.join_game(player, lobby)
     subgames.clear_inv(player)
     hiddenseeker.lobbys[lobby].players[name] = true
     player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
-    sfinv.set_page(player, "subgames:kits")
+    sfinv.set_page(player, "hiddenseeker:kits")
     hiddenseeker.win(lobby)
     if hiddenseeker.lobbys[lobby].mustcreate == true then
       hiddenseeker.lobbys[lobby].mustcreate = false

@@ -1,6 +1,6 @@
-default
-sfinv
-3d_armor_sfinv
+3d_armor
+sfinv?
+3d_armor_sfinv?
 controls
-atchat
-antispam
+atchat?
+antispam?
