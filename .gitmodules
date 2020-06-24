@@ -19,3 +19,24 @@
 [submodule "mods/item_drop"]
 	path = mods/item_drop
 	url = https://github.com/minetest-mods/item_drop
+[submodule "mods/random_messages"]
+	path = mods/random_messages
+	url = https://github.com/arsdragonfly/random_messages
+[submodule "mods/maptools"]
+	path = mods/maptools
+	url = https://github.com/minetest-mods/maptools
+[submodule "mods/signs_lib"]
+	path = mods/signs_lib
+	url = https://gitlab.com/VanessaE/signs_lib
+[submodule "mods/moreblocks"]
+	path = mods/moreblocks
+	url = https://github.com/minetest-mods/moreblocks
+[submodule "mods/hardenedclay"]
+	path = mods/hardenedclay
+	url = https://github.com/oOChainLynxOo/hardenedclay
+[submodule "mods/controls"]
+	path = mods/controls
+	url = https://github.com/Arcelmi/minetest-controls/
+[submodule "mods/biome_lib"]
+	path = mods/biome_lib
+	url = https://gitlab.com/VanessaE/biome_lib

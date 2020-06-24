@@ -1,7 +1,7 @@
 --[[
 Map Tools: node definitions
 
-Copyright © 2012-2019 Hugo Locurcio and contributors.
+Copyright © 2012-2020 Hugo Locurcio and contributors.
 Licensed under the zlib license. See LICENSE.md for more information.
 --]]
 
@@ -128,7 +128,7 @@ minetest.register_node("maptools:ignore_like_no_clip", {
 	description = S("Ignore-like (no clip)"),
 	range = 12,
 	stack_max = 10000,
-	inventory_image = "default_steel_block.png^dye_purple.png",
+	inventory_image = "default_steel_block.png^dye_violet.png",
 	tiles = {"invisible.png"},
 	paramtype = "light",
 	walkable = false,
@@ -143,7 +143,7 @@ minetest.register_node("maptools:ignore_like_no_point", {
 	description = S("Ignore-like (no point)"),
 	range = 12,
 	stack_max = 10000,
-	inventory_image = "default_steel_block.png^dye_purple.png",
+	inventory_image = "default_steel_block.png^dye_violet.png",
 	tiles = {"invisible.png"},
 	paramtype = "light",
 	pointable = false,
@@ -283,7 +283,7 @@ minetest.register_node("maptools:nobuild", {
 	description = S("Build Prevention"),
 	range = 12,
 	stack_max = 10000,
-	inventory_image = "default_steel_block.png^bones_bones.png",
+	inventory_image = "default_steel_block.png^default_flint.png",
 	drawtype = "airlike",
 	walkable = false,
 	pointable = false,
@@ -298,7 +298,7 @@ minetest.register_node("maptools:nointeract", {
 	description = S("Interact Prevention"),
 	range = 12,
 	stack_max = 10000,
-	inventory_image = "default_steel_block.png^default_scorched_stuff.png",
+	inventory_image = "default_steel_block.png^default_bush_stem.png",
 	drawtype = "airlike",
 	walkable = false,
 	paramtype = "light",
@@ -465,5 +465,21 @@ minetest.register_node("maptools:superapple", {
 	groups = {fleshy=3, dig_immediate=3, not_in_creative_inventory = maptools.creative},
 	on_use = minetest.item_eat(20),
 	sounds = default.node_sound_defaults(),
+	on_drop = maptools.drop_msg
+})
+
+minetest.register_node("maptools:drowning", {
+	description = S("Drownable Air"),
+	range = 12,
+	stack_max = 10000,
+	inventory_image = "default_steel_block.png^dye_black.png",
+	drawtype = "airlike",
+	paramtype = "light",
+	pointable = false,
+	walkable = false,
+	drowning = 1,
+	sunlight_propagates = true,
+	drop = "",
+	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
 	on_drop = maptools.drop_msg
 })

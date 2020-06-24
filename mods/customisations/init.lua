@@ -84,7 +84,7 @@ You find the kits, skins and more in your inventory.]]
 }
 
 
-local function get_help_form(type)
+function get_help_form(type)
   local toreturn = (
   "size[8,6]"..
   "button[0,0;2,1;general;General]"..

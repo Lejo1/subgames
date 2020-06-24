@@ -68,9 +68,9 @@ minetest.register_node("survivalgames:chest", {
 
 --[[ here are some configuration variables ]]
 
-local chests_per_chunk = 1	-- number of chests per chunk. 15 is a bit high, an actual mod might have a lower number
+local chests_per_chunk = 25	-- number of chests per chunk. 15 is a bit high, an actual mod might have a lower number
 local h_min = -40  		-- minimum chest spawning height, relative to water_level
-local h_max = 80		-- maximum chest spawning height, relative to water_level
+local h_max = 140		-- maximum chest spawning height, relative to water_level
 local t_min = 2			-- minimum amount of treasures found in a chest
 local t_max = 5			-- maximum amount of treasures found in a chest
 
