@@ -40,3 +40,9 @@
 [submodule "mods/biome_lib"]
 	path = mods/biome_lib
 	url = https://gitlab.com/VanessaE/biome_lib
+[submodule "mods/unifieddyes"]
+	path = mods/unifieddyes
+	url = https://gitlab.com/VanessaE/unifieddyes
+[submodule "mods/xdecor"]
+	path = mods/xdecor
+	url = https://github.com/minetest-mods/xdecor

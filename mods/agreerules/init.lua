@@ -167,7 +167,7 @@ minetest.register_on_player_receive_fields(function(player, form, pressed)
 			storage:set_float(name, rule_version)
 			minetest.chat_send_player(name,arok_text[i][15] .." "..name.. " " .. arok_text[i][10])
 			minetest.after(0.1, function()
-				minetest.show_formspec(name, "main:info", main.get_help_form("general"))
+				minetest.show_formspec(name, "main:info", get_help_form("general"))
 			end)
 	end
 end)

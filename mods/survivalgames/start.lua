@@ -51,20 +51,12 @@ function survivalgames.start_game(lobby)
   local players = survivalgames.get_lobby_players(lobby)
   local playercount = #players
   local ldata = survivalgames.lobbys[lobby]
-  local middle = {x=ldata.pos.x, y=140, z=ldata.pos.z}
-  local node = minetest.get_node(middle)
-  while (node.name == "air" or node.name == "ignore") and middle.y > -50 do
-    middle.y = middle.y -1
-    node = minetest.get_node(middle)
-  end
-  middle.y = middle.y +1
-  if middle.y == -50 then minetest.after(5, function()
+  if ldata.pos == -50 then minetest.after(5, function()
     for _, player in pairs(survivalgames.get_lobby_players(lobby)) do
       player:set_hp(0)
     end
   end)
   end
-  ldata.pos = middle
   for name in pairs(ldata.players) do
     local player = minetest.get_player_by_name(name)
     if player then
@@ -131,12 +123,14 @@ function survivalgames.win(lobby)
           subgames.add_mithud(player, winner.." has won!", 0xFF0000, 3)
         end
       end
+      local ldata = survivalgames.lobbys[lobby]
+      local pos1, pos2, pos = subgames.get_map(function(pos)
+        survivalgames.lobbys[lobby].pos = pos
+      end)
+      ldata.mappos1 = pos1
+      ldata.mappos2 = pos2
+      ldata.pos = pos
       minetest.after(5, function()
-        local ldata = survivalgames.lobbys[lobby]
-        local pos1, pos2, pos = subgames.get_map()
-        ldata.mappos1 = pos1
-        ldata.mappos2 = pos2
-        ldata.pos = pos
         ldata.ingame = false
         for _, player in pairs(survivalgames.get_lobby_players(lobby)) do
           local name = player:get_player_name()

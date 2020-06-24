@@ -68,7 +68,7 @@ minetest.register_node("survivalgames:chest", {
 
 --[[ here are some configuration variables ]]
 
-local chests_per_chunk = 25	-- number of chests per chunk. 15 is a bit high, an actual mod might have a lower number
+local chests_per_chunk = 12	-- number of chests per chunk. 15 is a bit high, an actual mod might have a lower number
 local h_min = -40  		-- minimum chest spawning height, relative to water_level
 local h_max = 140		-- maximum chest spawning height, relative to water_level
 local t_min = 2			-- minimum amount of treasures found in a chest
@@ -160,7 +160,13 @@ end
 	the interesting part which involes treasurer comes way below
 ]]
 minetest.register_on_generated(function(minp, maxp, seed)
-  if minp.y > 100 or maxp.y < -50 or math.random(4) ~= 1 then return end
+	-- chests minimum and maximum spawn height
+	local height_min = h_min
+	local height_max = h_max
+
+	if(maxp.y < height_min or minp.y > height_max) then
+		return
+	end
   local inside = false
   for _, ldata in pairs(survivalgames.lobbys) do
     if ldata.mappos1 and ldata.mappos2 and is_inside_area(ldata.mappos1, ldata.mappos2, maxp) then
@@ -172,13 +178,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	minp = {x=minp.x, y=minp.y, z=minp.z}
 	maxp = {x=maxp.x, y=maxp.y, z=maxp.z}
 
-	-- chests minimum and maximum spawn height
-	local height_min = h_min
-	local height_max = h_max
-
-	if(maxp.y < height_min or minp.y > height_max) then
-		return
-	end
 	local y_min = math.max(minp.y, height_min)
 	local y_max = math.min(maxp.y, height_max)
 	local attempts = 0

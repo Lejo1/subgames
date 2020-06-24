@@ -396,7 +396,7 @@ function subgames.handle_blast(pos, intensity)
   end
 end
 
-minetest.after(1, function()
+minetest.register_on_mods_loaded(function()
   for name, def in pairs(minetest.registered_items) do
     if def.on_drop then
       dropfuncs[name] = def.on_drop

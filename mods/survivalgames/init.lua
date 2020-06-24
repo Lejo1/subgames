@@ -14,6 +14,7 @@ survivalgames.lobbys = {
     ["players"] = {},
     ["protectiontime"] = 0,
     ["protection"] = false,
+    ["pos"] = {}
   }
 }
 
@@ -193,9 +194,11 @@ function survivalgames.join_game(player, lobby)
     subgames.spectate(player)
     return "Lobby is ingame! So you are now spectating."
   else survivalgames.player_lobby[name] = lobby
-    if not survivalgames.lobbys[lobby].pos then
+    if not survivalgames.lobbys[lobby].pos or not survivalgames.lobbys[lobby].pos.x then
       local ldata = survivalgames.lobbys[lobby]
-      local pos1, pos2, pos = subgames.get_map()
+      local pos1, pos2, pos = subgames.get_map(function(pos)
+        survivalgames.lobbys[lobby].pos = pos
+      end)
       ldata.mappos1 = pos1
       ldata.mappos2 = pos2
       ldata.pos = pos
