@@ -14,6 +14,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
       MaxEdge = emax
     }
     local function wall(minx, miny, minz, maxx, maxy, maxz)
+      miny = math.max(miny, (-50))
+      maxy = math.min(maxy, 150)
       for i in a:iter(minx, miny, minz, maxx, maxy, maxz) do
         data[i] = c_maptools_glass
       end

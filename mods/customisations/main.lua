@@ -89,7 +89,7 @@ subgames.register_on_joinplayer(function(player, lobby)
     if mustcreate == true then
       mustcreate = false
       local param1 = "mainlobby"
-      local schem = minetest.get_worldpath() .. "/schems/" .. param1 .. ".mts"
+      local schem = minetest.get_modpath("customisations") .. "/schems/" .. param1 .. ".mts"
       minetest.place_schematic({x=-27, y=601, z=4}, schem)
     end
     minetest.after(1, function()
