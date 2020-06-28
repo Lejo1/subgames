@@ -36,8 +36,7 @@
 	url = https://github.com/oOChainLynxOo/hardenedclay
 [submodule "mods/controls"]
 	path = mods/controls
-	url = https://github.com/Lejo1/minetest-controls
-	branch = zoomkey
+	url = https://github.com/mt-mods/controls
 [submodule "mods/biome_lib"]
 	path = mods/biome_lib
 	url = https://gitlab.com/VanessaE/biome_lib
