@@ -19,9 +19,6 @@
 [submodule "mods/item_drop"]
 	path = mods/item_drop
 	url = https://github.com/minetest-mods/item_drop
-[submodule "mods/random_messages"]
-	path = mods/random_messages
-	url = https://github.com/arsdragonfly/random_messages
 [submodule "mods/maptools"]
 	path = mods/maptools
 	url = https://github.com/minetest-mods/maptools
@@ -46,3 +43,6 @@
 [submodule "mods/xdecor"]
 	path = mods/xdecor
 	url = https://github.com/minetest-mods/xdecor
+[submodule "mods/random_messages"]
+	path = mods/random_messages
+	url = https://github.com/arsdragonfly/random_messages
