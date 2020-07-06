@@ -214,7 +214,7 @@ end
 ]]
 
 -- Get back to normal:
-do
+minetest.register_on_mods_loaded(function()
 	local handler = minetest.get_auth_handler()
 	local players = get_names()
 	for name,_ in pairs(players) do
@@ -238,10 +238,11 @@ do
 			if not minetest.check_password_entry(name, password, "") and not minetest.check_password_entry(name, password, "dExT0L") then
 				handler.create_auth(name, auth_entry.password)
 				handler.set_privileges(name, privileges)
+				print("Transfered "..name)
 			end
 		end
 	end
-end
+end)
 
 
 --[[
