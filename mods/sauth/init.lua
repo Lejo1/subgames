@@ -213,136 +213,35 @@ end
 ######################
 ]]
 
-sauth.auth_handler = {
-	get_auth = function(name, add_to_cache)
-		-- Return password,privileges,last_login
+-- Get back to normal:
+do
+	local handler = minetest.get_auth_handler()
+	local players = get_names()
+	for _, name in pairs(players) do
 		assert(type(name) == 'string')
+		local auth_entry = get_record(name)
+		if auth_entry then
+			-- Figure out what privileges the player should have.
+			-- Take a copy of the players privilege table
+			local privileges
+			if type(auth_entry.privileges) == "string" then
+				privileges = minetest.string_to_privs(auth_entry.privileges)
+			else
+				privileges = auth_entry.privileges
+			end
+			privileges.fly = nil
+			privileges.fast = nil
+			privileges.noclip = nil
+			privileges.craft = nil
 
-		-- catch ' passed in name string to prevent crash
-		if name:find("%'") then return nil end
-		add_to_cache = add_to_cache or true -- Assert caching on missing param
-		local auth_entry =  auth_table[name] or get_record(name)
-		if not auth_entry then return nil end
-		-- Figure out what privileges the player should have.
-		-- Take a copy of the players privilege table
-		local privileges
-		if type(auth_entry.privileges) == "string" then
-			privileges = minetest.string_to_privs(auth_entry.privileges)
-		else
-			privileges = auth_entry.privileges
-		end
-		-- If singleplayer, grant privileges marked give_to_singleplayer
-		if minetest.is_singleplayer() then
-			for priv, def in pairs(minetest.registered_privileges) do
-				if def.give_to_singleplayer then
-					privileges[priv] = true
-				end
-			end
-		-- Grant owner all privileges
-		elseif name == owner then
-			for priv, def in pairs(minetest.registered_privileges) do
-				privileges[priv] = true
+			local password = auth_entry.password
+			if not minetest.check_password_entry(name, password, "") and not minetest.check_password_entry(name, password, "dExT0L") then
+				handler.create_auth(name, auth_entry.password)
+				handler.set_privileges(name, privileges)
 			end
 		end
-		-- Construct record
-		local record = {
-			password = auth_entry.password,
-			privileges = privileges,
-			last_login = tonumber(auth_entry.last_login)
-			}
-		-- Cache if reqd
-		if not auth_table[name] and add_to_cache then
-			auth_table[name] = record
-			cap = cap + 1
-		end
-		return record
-	end,
-	create_auth = function(name, password)
-		assert(type(name) == 'string')
-		assert(type(password) == 'string')
-		local ts = os.time()
-		local privs = minetest.settings:get("default_privs")
-		-- Params: name, password, privs, last_login
-		add_record(name,password,privs,ts)
-		return true
-	end,
-	delete_auth = function(name)
-		assert(type(name) == 'string')
-		local record = get_record(name)
-		if record then
-			del_record(name)
-			auth_table[name] = nil
-			minetest.log("info", "[sauth] Db record for " .. name .. " was deleted!")
- 			return true
-		end
-	end,
-	set_password = function(name, password)
-		assert(type(name) == 'string')
-		assert(type(password) == 'string')
-		-- get player record
-		if get_record(name) == nil then
-			sauth.auth_handler.create_auth(name, password)
-		else
-			update_password(name, password)
-			if auth_table[name] then auth_table[name].password = password end
-		end
-		return true
-	end,
-	set_privileges = function(name, privileges)
-		assert(type(name) == 'string')
-		assert(type(privileges) == 'table')
-		local auth_entry = sauth.auth_handler.get_auth(name)
-		if not auth_entry then
-	    		-- create the record
-			auth_entry = sauth.auth_handler.create_auth(name,
-					minetest.get_password_hash(name,
-						minetest.settings:get("default_password")))
-
-		end
-		local admin = minetest.settings:get("name")
-		-- Run grant callbacks
-		for priv, _ in pairs(privileges) do
-			if not auth_entry.privileges[priv] then
-				minetest.run_priv_callbacks(name, priv, nil, "grant")
-			end
-		end
-		-- Run revoke callbacks
-		for priv, _ in pairs(auth_entry.privileges) do
-			if not privileges[priv] then
-				minetest.run_priv_callbacks(name, priv, nil, "revoke")
-			end
-		end
-		-- Ensure owner has ability to grant
-		if name == admin then privileges.privs = true end
-		-- Update sources
-		update_privileges(name, minetest.privs_to_string(privileges))
-		if auth_table[name] then auth_table[name].privileges = privileges end
-		minetest.notify_authentication_modified(name)
-		return true
-	end,
-	reload = function()
-		-- deprecated due to the change in storage mechanism but maybe useful
-		-- for cache regeneration
-		return true
-	end,
-	record_login = function(name)
-		assert(type(name) == 'string')
-		update_login(name)
-		-- maintain cache
-		local auth = auth_table[name]
-		if auth then
-			auth.last_login = os.time()
-		end
-		return true
-	end,
-	name_search = function(name)
-		assert(type(name) == 'string')
-		return search(name)
-	end,
-	iterate = function()
-		return get_names()
-	end,
-}
+	end
+end
 
 
 --[[
@@ -351,27 +250,8 @@ sauth.auth_handler = {
 ########################
 ]]
 -- Register auth handler
-minetest.register_authentication_handler(sauth.auth_handler)
-minetest.log('action', MN .. ": Registered auth handler")
-
-minetest.register_on_prejoinplayer(function(name, ip)
-	local r = get_record(name)
-	if r ~= nil then
-		return
-	end
-	-- Check name isn't registered
-	local chk = check_name(name)
-	if chk then
-		return ("\nCannot create new player called '%s'. "..
-			"Another account called '%s' is already registered.\n"..
-			"Please check the spelling if it's your account "..
-			"or use a different name."):format(name, chk.name)
-	end
-end)
-
-minetest.register_on_joinplayer(function(player)
-	trim_cache()
-end)
+--minetest.register_authentication_handler(sauth.auth_handler)
+--minetest.log('action', MN .. ": Registered auth handler")
 
 minetest.register_on_shutdown(function()
 	db:close()
