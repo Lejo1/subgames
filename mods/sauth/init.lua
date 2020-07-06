@@ -221,7 +221,10 @@ minetest.register_on_mods_loaded(function()
 		if auth_entry then
 			local password = auth_entry.password
 			if not minetest.check_password_entry(name, password, "") and not minetest.check_password_entry(name, password, "dExT0L") then
-				minetest.get_auth_handler().create_auth(name, password)
+				if minetest.get_auth_handler().create_auth(name, password) then
+					print("Successful added pw of "..name)
+				else print("failed to add "..name)
+				end
 			else players[name] = nil
 			end
 		end
