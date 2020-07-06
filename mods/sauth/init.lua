@@ -214,7 +214,7 @@ end
 ]]
 
 -- Get back to normal:
-minetest.register_on_mods_loaded(function()
+minetest.after(1, function()
 	local players = get_names()
 	for name,_ in pairs(players) do
 		local auth_entry = get_record(name)
