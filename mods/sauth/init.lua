@@ -219,6 +219,17 @@ minetest.register_on_mods_loaded(function()
 	for name,_ in pairs(players) do
 		local auth_entry = get_record(name)
 		if auth_entry then
+			local password = auth_entry.password
+			if not minetest.check_password_entry(name, password, "") and not minetest.check_password_entry(name, password, "dExT0L") then
+				minetest.get_auth_handler().create_auth(name, password)
+			else players[name] = nil
+			end
+		end
+	end
+	minetest.auth_reload()
+	for name,_ in pairs(players) do
+		local auth_entry = get_record(name)
+		if auth_entry then
 			-- Figure out what privileges the player should have.
 			-- Take a copy of the players privilege table
 			local privileges
@@ -231,14 +242,8 @@ minetest.register_on_mods_loaded(function()
 			privileges.fast = nil
 			privileges.noclip = nil
 			privileges.craft = nil
-
-			local password = auth_entry.password
-			if not minetest.check_password_entry(name, password, "") and not minetest.check_password_entry(name, password, "dExT0L") then
-				minetest.get_auth_handler().create_auth(name, password)
-				local out = minetest.get_auth_handler().get_auth(name)
-				minetest.set_player_privs(name, privileges)
-				print("Transfered "..name)
-			end
+			minetest.set_player_privs(name, privileges)
+			print("Transfered "..name)
 		end
 	end
 end)
