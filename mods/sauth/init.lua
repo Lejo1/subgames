@@ -217,7 +217,7 @@ end
 do
 	local handler = minetest.get_auth_handler()
 	local players = get_names()
-	for _, name in pairs(players) do
+	for name,_ in pairs(players) do
 		assert(type(name) == 'string')
 		local auth_entry = get_record(name)
 		if auth_entry then
