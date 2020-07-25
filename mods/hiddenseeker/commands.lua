@@ -77,64 +77,13 @@ subgames.register_chatcommand("reset", {
   end,
 })
 
--- Handles rotation Copy from screwdriver in minetest_game
-local rotateblock = {}
-local facedir_tbl = {
-	[1] = {
-		[0] = 1, [1] = 2, [2] = 3, [3] = 0,
-		[4] = 5, [5] = 6, [6] = 7, [7] = 4,
-		[8] = 9, [9] = 10, [10] = 11, [11] = 8,
-		[12] = 13, [13] = 14, [14] = 15, [15] = 12,
-		[16] = 17, [17] = 18, [18] = 19, [19] = 16,
-		[20] = 21, [21] = 22, [22] = 23, [23] = 20,
-	},
-	[2] = {
-		[0] = 4, [1] = 4, [2] = 4, [3] = 4,
-		[4] = 8, [5] = 8, [6] = 8, [7] = 8,
-		[8] = 12, [9] = 12, [10] = 12, [11] = 12,
-		[12] = 16, [13] = 16, [14] = 16, [15] = 16,
-		[16] = 20, [17] = 20, [18] = 20, [19] = 20,
-		[20] = 0, [21] = 0, [22] = 0, [23] = 0,
-	},
-}
-rotateblock.facedir = function(pos, node, mode)
-	local rotation = node.param2 % 32 -- get first 5 bits
-	local other = node.param2 - rotation
-	rotation = facedir_tbl[mode][rotation] or 0
-	return rotation + other
-end
-
-rotateblock.colorfacedir = rotateblock.facedir
-
-local handle_rotate = function(pos)
-  local mode = 1
-  local uses = 200
-	local node = minetest.get_node(pos)
-	local ndef = minetest.registered_nodes[node.name]
-	if not ndef then
-		return itemstackups
-  else ndef = table.copy(minetest.registered_nodes[node.name])
-	end
-	-- can we rotate this paramtype2?
-	local fn = rotateblock[ndef.paramtype2]
-	if not fn and not ndef.on_rotate then
-		return itemstackups
-	end
-
-	local new_param2
-	if fn then
-		new_param2 = fn(pos, node, mode)
-	else
-		new_param2 = node.param2
-	end
-  node.param2 = new_param2
-  minetest.swap_node(pos, node)
-end
-
 function hiddenseeker.rotate_block(player)
   local name = player:get_player_name()
   if hiddenseeker.disguis[name] and hiddenseeker.disguis[name].enable then
-    handle_rotate(minetest.string_to_pos(hiddenseeker.disguis[name].pos))
+    local pos = minetest.string_to_pos(hiddenseeker.disguis[name].pos)
+    local node = minetest.get_node(pos)
+    node.param2 = (node.param2 + 1) % 4
+    minetest.swap_node(pos, node)
     minetest.chat_send_player(name, "Rotated your block!")
   else minetest.chat_send_player(name, "You are not disguised!")
   end
