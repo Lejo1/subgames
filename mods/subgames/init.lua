@@ -256,7 +256,8 @@ minetest.register_on_dieplayer(function(player)
   if redeath[name] then return end
   redeath[name] = true
   minetest.after(0.5, function()
-    if player:is_player_connected() == true then
+    local player = minetest.get_player_by_name(name)
+    if player then
 	    minetest.close_formspec(name, "")
       player:set_hp(20)
       death[name] = nil

@@ -318,9 +318,10 @@ end)
 
 subgames.register_on_kill_player(function(killer, killed, lobby)
 	if lobby == "mesewars" then
+	local name = killed:get_player_name()
 	minetest.after(2, function()
-		if killed:is_player_connected() then
-			local name = killed:get_player_name()
+		local killed = minetest.get_player_by_name(name)
+		if killed then
 			if kits[name].abilitys.killkit.active == true and kits[name].abilitys.killkit.level > 0 then
 				if math.random(abilitys.killkit[kits[name].abilitys.killkit.level]) == 1 then
 					mesewars.give_kit_items(name)
