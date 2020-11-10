@@ -138,17 +138,21 @@ subgames.register_game("mesewars", {
   },
   crafting = false,
   node_dig = function(pos, node, digger)
-    local name = digger:get_player_name()
-    local plobby = mesewars.player_lobby[name]
+    local plobby
+    if not digger or not digger:is_player() then
+      plobby = mesewars.get_lobby_from_pos(pos)
+    else local name = digger:get_player_name()
+      plobby = mesewars.player_lobby[name]
+    end
     local nodename = node.name
-    if mesewars.lobbys[plobby].ingame and (mesewars.lobbys[plobby].mapblocks[minetest.pos_to_string(pos)] and (nodename == "default:sandstone" or nodename == "default:obsidian" or nodename == "default:glass" or nodename == "default:steelblock" or nodename == "default:chest")) or string.find(nodename, "mesewars:mese") then
+    if plobby and mesewars.lobbys[plobby].ingame and (mesewars.lobbys[plobby].mapblocks[minetest.pos_to_string(pos)] and (nodename == "default:sandstone" or nodename == "default:obsidian" or nodename == "default:glass" or nodename == "default:steelblock" or nodename == "default:chest")) or string.find(nodename, "mesewars:mese") then
       return true
     end
   end,
   item_place_node = function(itemstack, placer, pointed_thing, param2)
     local plobby
     if not placer or not placer:is_player() then
-      plobby = get_lobby_from_pos(pos)
+      plobby = mesewars.get_lobby_from_pos(pos)
     else local name = placer:get_player_name()
       plobby = mesewars.player_lobby[name]
     end
@@ -161,7 +165,7 @@ subgames.register_game("mesewars", {
     local name = player:get_player_name()
     local plobby = mesewars.player_lobby[name]
     if not plobby then
-      plobby = get_lobby_from_pos(pos)
+      plobby = mesewars.get_lobby_from_pos(pos)
       if not plobby then
         return false
       end

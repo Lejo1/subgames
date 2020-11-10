@@ -19,7 +19,7 @@ function mesewars.create_teleporter_form()
   return toreturn
 end
 
-local function get_lobby_from_pos(pos)
+function mesewars.get_lobby_from_pos(pos)
   for lname, table in pairs(mesewars.lobbys) do
     if lname ~= 0 then
       if is_inside_area(table.mappos1, table.mappos2, pos) then
@@ -50,7 +50,7 @@ subgames.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack
   if lobby == "mesewars" then
     local plobby
     if not placer or not placer:is_player() then
-      plobby = get_lobby_from_pos(pos)
+      plobby = mesewars.get_lobby_from_pos(pos)
     else local name = placer:get_player_name()
       plobby = mesewars.player_lobby[name]
     end
@@ -129,7 +129,7 @@ subgames.register_on_blast(function(pos, intensity, lobby)
   if lobby == "mesewars" then
     local node = minetest.get_node(pos)
     local nodename = node.name
-    local plobby = get_lobby_from_pos(pos)
+    local plobby = mesewars.get_lobby_from_pos(pos)
     if not plobby or plobby == 0 or mesewars.lobbys[plobby].ingame ~= true or not mesewars.lobbys[plobby].mapblocks[minetest.pos_to_string(pos)] or not (nodename == "default:sandstone" or nodename == "default:obsidian" or nodename == "default:glass" or nodename == "default:steelblock" or nodename == "default:chest") then
       return false
     end
@@ -146,7 +146,7 @@ minetest.register_node("mesewars:mese1", {
   drop = "",
   after_dig_node = function(pos, oldnode, oldmetadata, digger)
     local name = digger:get_player_name()
-    local lobby = get_lobby_from_pos(pos)
+    local lobby = mesewars.get_lobby_from_pos(pos)
     if lobby and lobby ~= 0 then
       if mesewars.lobbys[lobby].players[name] == 1 then
         minetest.chat_send_player(name, "It's your mese!")
@@ -173,7 +173,7 @@ minetest.register_node("mesewars:mese2", {
   drop = "",
   after_dig_node = function(pos, oldnode, oldmetadata, digger)
     local name = digger:get_player_name()
-    local lobby = get_lobby_from_pos(pos)
+    local lobby = mesewars.get_lobby_from_pos(pos)
     if lobby and lobby ~= 0 then
       if mesewars.lobbys[lobby].players[name] == 2 then
         minetest.chat_send_player(name, "It's your mese!")
@@ -200,7 +200,7 @@ minetest.register_node("mesewars:mese3", {
   drop = "",
   after_dig_node = function(pos, oldnode, oldmetadata, digger)
     local name = digger:get_player_name()
-    local lobby = get_lobby_from_pos(pos)
+    local lobby = mesewars.get_lobby_from_pos(pos)
     if lobby and lobby ~= 0 then
       if mesewars.lobbys[lobby].players[name] == 3 then
         minetest.chat_send_player(name, "It's your mese!")
@@ -227,7 +227,7 @@ minetest.register_node("mesewars:mese4", {
   drop = "",
   after_dig_node = function(pos, oldnode, oldmetadata, digger)
     local name = digger:get_player_name()
-    local lobby = get_lobby_from_pos(pos)
+    local lobby = mesewars.get_lobby_from_pos(pos)
     if lobby and lobby ~= 0 then
       if mesewars.lobbys[lobby].players[name] == 4 then
         minetest.chat_send_player(name, "It's your mese!")

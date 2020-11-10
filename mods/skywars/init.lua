@@ -173,16 +173,20 @@ subgames.register_game("skywars", {
   },
   crafting = true,
   node_dig = function(pos, node, digger)
-    local name = digger:get_player_name()
-    local plobby = skywars.player_lobby[name]
-    if skywars.lobbys[plobby].ingame then
+    local plobby
+    if not digger or not digger:is_player() then
+      plobby = skywars.get_lobby_from_pos(pos)
+    else local name = digger:get_player_name()
+      plobby = skywars.player_lobby[name]
+    end
+    if plobby and skywars.lobbys[plobby].ingame then
       return true
     end
   end,
   item_place_node = function(itemstack, placer, pointed_thing, param2)
     local plobby
     if not placer or not placer:is_player() then
-      plobby = get_lobby_from_pos(pos)
+      plobby = skywars.get_lobby_from_pos(pos)
     else local name = placer:get_player_name()
       plobby = skywars.player_lobby[name]
     end
@@ -195,7 +199,7 @@ subgames.register_game("skywars", {
     local name = player:get_player_name()
     local plobby = skywars.player_lobby[name]
     if not plobby then
-      plobby = get_lobby_from_pos(pos)
+      plobby = skywars.get_lobby_from_pos(pos)
       if not plobby then
         return false
       end

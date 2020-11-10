@@ -19,7 +19,7 @@ function skywars.create_teleporter_form()
   return toreturn
 end
 
-local function get_lobby_from_pos(pos)
+function skywars.get_lobby_from_pos(pos)
   for lname, table in pairs(skywars.lobbys) do
     if lname ~= 0 then
       if is_inside_area(table.mappos1, table.mappos2, pos) then
@@ -62,7 +62,7 @@ subgames.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack
   if lobby == "skywars" then
     local plobby
     if not placer or not placer:is_player() then
-      plobby = get_lobby_from_pos(pos)
+      plobby = skywars.get_lobby_from_pos(pos)
     else local name = placer:get_player_name()
       plobby = skywars.player_lobby[name]
     end
@@ -133,7 +133,7 @@ subgames.register_on_blast(function(pos, intensity, lobby)
   if lobby == "skywars" then
     local node = minetest.get_node(pos)
     local nodename = node.name
-    local plobby = get_lobby_from_pos(pos)
+    local plobby = skywars.get_lobby_from_pos(pos)
     if not plobby or plobby == 0 or skywars.lobbys[plobby].ingame ~= true or nodename == "maptools:playerclip" or nodename == "maptools:damage_5" or nodename == "maptools:kill" then
       return false
     else local spos = minetest.pos_to_string(pos)

@@ -31,9 +31,13 @@ subgames.register_game("survivalgames", {
   },
   crafting = true,
   node_dig = function(pos, node, digger)
-    local name = digger:get_player_name()
-    local plobby = survivalgames.player_lobby[name]
-    if name and plobby and survivalgames.lobbys[plobby].ingame then
+    local plobby
+    if not digger or not digger:is_player() then
+      plobby = get_lobby_from_pos(pos)
+    else local name = digger:get_player_name()
+      plobby = survivalgames.player_lobby[name]
+    end
+    if plobby and survivalgames.lobbys[plobby].ingame then
       return true
     end
   end,
