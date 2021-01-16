@@ -151,10 +151,10 @@ minetest.register_node("mesewars:mese1", {
       if mesewars.lobbys[lobby].players[name] == 1 then
         minetest.chat_send_player(name, "It's your mese!")
         minetest.set_node(pos, oldnode)
-      else local msg = core.colorize("blue", "Team Blues Mese has been destroyed!")
+      else local msg = core.colorize("blue", "The Blue's team Mese has been destroyed!")
         mesewars.chat_send_all_lobby(lobby, msg)
         for _,player in ipairs(mesewars.get_lobby_players(lobby)) do
-          subgames.add_mithud(player, "Team Blues Mese has been destroyed!", 0x0000FF, 3)
+          subgames.add_mithud(player, "The Blue's team Mese has been destroyed!", 0x0000FF, 3)
         end
         mesewars.lobbys[lobby].meses[1] = false
         money.set_money(name, money.get_money(name)+15)
@@ -178,10 +178,10 @@ minetest.register_node("mesewars:mese2", {
       if mesewars.lobbys[lobby].players[name] == 2 then
         minetest.chat_send_player(name, "It's your mese!")
         minetest.set_node(pos, oldnode)
-      else local msg = core.colorize("yellow", "Team Yellows Mese has been destroyed!")
+      else local msg = core.colorize("yellow", "The Yellow's team Mese has been destroyed!")
         mesewars.chat_send_all_lobby(lobby, msg)
         for _,player in ipairs(mesewars.get_lobby_players(lobby)) do
-          subgames.add_mithud(player, "Team Yellows Mese has been destroyed!", 0xFFFF00, 3)
+          subgames.add_mithud(player, "The Yellow's team Mese has been destroyed!", 0xFFFF00, 3)
         end
         mesewars.lobbys[lobby].meses[2] = false
         money.set_money(name, money.get_money(name)+15)
@@ -205,10 +205,10 @@ minetest.register_node("mesewars:mese3", {
       if mesewars.lobbys[lobby].players[name] == 3 then
         minetest.chat_send_player(name, "It's your mese!")
         minetest.set_node(pos, oldnode)
-      else local msg = core.colorize("green", "Team Greens Mese has been destroyed!")
+      else local msg = core.colorize("green", "The Green's team Mese has been destroyed!")
         mesewars.chat_send_all_lobby(lobby, msg)
         for _,player in ipairs(mesewars.get_lobby_players(lobby)) do
-          subgames.add_mithud(player, "Team Greens Mese has been destroyed!", 0x00FF00, 3)
+          subgames.add_mithud(player, "The Green's team Mese has been destroyed!", 0x00FF00, 3)
         end
         mesewars.lobbys[lobby].meses[3] = false
         money.set_money(name, money.get_money(name)+15)
@@ -232,10 +232,10 @@ minetest.register_node("mesewars:mese4", {
       if mesewars.lobbys[lobby].players[name] == 4 then
         minetest.chat_send_player(name, "It's your mese!")
         minetest.set_node(pos, oldnode)
-      else local msg = core.colorize("red", "Team Reds Mese has been destroyed!")
+      else local msg = core.colorize("red", "The Red's team Mese has been destroyed!")
         mesewars.chat_send_all_lobby(lobby, msg)
         for _,player in ipairs(mesewars.get_lobby_players(lobby)) do
-          subgames.add_mithud(player, "Team Reds Mese has been destroyed!", 0xFF0000, 3)
+          subgames.add_mithud(player, "The Red's team Mese has been destroyed!", 0xFF0000, 3)
         end
         mesewars.lobbys[lobby].meses[4] = false
         money.set_money(name, money.get_money(name)+15)
