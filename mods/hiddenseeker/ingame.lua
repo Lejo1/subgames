@@ -35,7 +35,7 @@ minetest.register_globalstep(function(dtime)
                 local name = player:get_player_name()
                 if ltable.players[name] ~= "seeker" then
                   money.set_money(name, money.get_money(name)+5)
-                  minetest.chat_send_player(name, "[CoinSystem] You have receive 5 Coins for playing!")
+                  minetest.chat_send_player(name, "[CoinSystem] You have received 5 Coins for playing!")
                 end
               end
             end
