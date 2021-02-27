@@ -354,14 +354,13 @@ end
 
 local old_node_drops = minetest.handle_node_drops
 function minetest.handle_node_drops(pos, itemname, player)
-  local name = player:get_player_name()
-  local lobby = player_lobby[name]
-  if not lobby then
-    lobby = subgames.get_lobby_from_pos(pos)
-    if not lobby then
-      return false
-    end
+  local lobby
+  if player then
+    local name = player:get_player_name()
+    lobby = player_lobby[name]
+  else lobby = subgames.get_lobby_from_pos(pos)
   end
+  if not lobby then return end
   local func = subgames.games[lobby].drop
   if not func then
     return false
