@@ -17,6 +17,7 @@ local item = {
 		-- disappear in a smoke puff
 		self.object:remove()
 		local p = self.object:get_pos()
+		if not p then return end
 		minetest.sound_play("default_item_smoke", {
 			pos = p,
 			max_hear_distance = 8,
