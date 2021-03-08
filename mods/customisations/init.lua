@@ -217,9 +217,9 @@ end)
 -- aktuell 173000
 minetest.after(5, function()
   minetest.log("warning", "Starting sorting db")
-  local function r(name)
+  local function r(name, stage)
     remove_whole_player_data(name)
-    minetest.log("action", "Removed player "..name)
+    minetest.log("action", "Removed player "..name.." at stage "..stage)
   end
 
   local handle = minetest.get_auth_handler()
@@ -227,11 +227,11 @@ minetest.after(5, function()
     if type(name) ~= "string" then
       minetest.log("warning", "Name not string found")
     elseif not money.exist(name) then
-      r(name)
+      r(name, "1")
     else
       local auth = handle:get_auth(name)
       if not auth or auth.last_login < 1577833200 or minetest.check_password_entry(name, auth.password, "dExT0L") then
-        r(name)
+        r(name, "2")
       else minetest.log("action", "Player "..name.." survived!")
       end
     end
