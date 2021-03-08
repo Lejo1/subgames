@@ -223,17 +223,17 @@ minetest.after(5, function()
   end
 
   local handle = minetest.get_auth_handler()
-  for name, v in handle:iterate() do
-    minetest.log("action", "handling name "..tostring(name))
-    if type(name) ~= "string" then
+  for iname, v in handle:iterate() do
+    minetest.log("action", "handling name "..tostring(iname))
+    if type(iname) ~= "string" then
       minetest.log("warning", "Name not string found")
-    elseif not money.exist(name) then
-      r(name, "1")
+    elseif not money.exist(iname) then
+      r(iname, "1")
     else
-      local auth = handle:get_auth(tostring(name))
-      if not auth or auth.last_login < 1577833200 or minetest.check_password_entry(name, auth.password, "dExT0L") then
-        r(name, "2")
-      else minetest.log("action", "Player "..name.." survived!")
+      local auth = handle:get_auth(iname)
+      if not auth or auth.last_login < 1577833200 or minetest.check_password_entry(iname, auth.password, "dExT0L") then
+        r(iname, "2")
+      else minetest.log("action", "Player "..iname.." survived!")
       end
     end
   end
