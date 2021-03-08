@@ -3,3 +3,9 @@ hiddenseeker
 mesewars
 skywars
 survivalgames
+sban
+agreerules
+money
+reportlist
+playtime
+skinsdb

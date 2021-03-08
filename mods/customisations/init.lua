@@ -121,8 +121,29 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
  end
 end)
 
---  Delete player accounts if they doesn't earn any money
+local function remove_whole_player_data(name)
+  minetest.remove_player(name)
+  minetest.remove_player_auth(name)
+  sban_del_player(name)
+  remove_rule_accepted(name)
+  playtime.remove_playtime(name)
+  skins.remove_player(name)
+  subgames.remove_all_player(name)
+  money.remove(name)
+  reportlist.remove_data(name)
+end
 
+minetest.register_chatcommand("remove_whole_player_data", {
+  description = "remove all player data of a player",
+  params = "<name>",
+  privs = {server = true},
+  func = function(name, params)
+    remove_whole_player_data(params)
+    return true, "Removed all data of "..params
+  end
+})
+
+--  Delete player accounts if they doesn't earn any money
 minetest.register_on_leaveplayer(function(player)
   if player then
     local name = player:get_player_name()
@@ -131,16 +152,7 @@ minetest.register_on_leaveplayer(function(player)
         if minetest.get_player_by_name(name) then
           return false
         end
-        if sban_del_player(name) then
-          minetest.remove_player(name)
-          minetest.remove_player_auth(name)
-          remove_rule_accepted(name)
-          playtime.remove_playtime(name)
-          skins.remove_player(name)
-          subgames.remove_all_player(name)
-          money.remove(name)
-          return true
-        end
+        remove_whole_player_data(name)
       end)
     end
   end

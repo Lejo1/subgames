@@ -147,16 +147,6 @@ function subgames.remove_all_player(name)
   end
 end
 
-minetest.register_chatcommand("subgames_remove_player", {
-  description = "remove all player data of a player",
-  params = "<name>",
-  privs = {server = true},
-  func = function(name, params)
-    subgames.remove_all_player(params)
-    return true, "Removed all data of "..params
-  end
-})
-
 function table_to_modstorage(s, data, key)
   if key then
     local ser_data = minetest.serialize(data)
