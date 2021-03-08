@@ -211,3 +211,24 @@ end)
 minetest.register_on_chat_message(function(name, message)
   minetest.log("action", "Chatlog: "..name.." wrote:"..message)
 end)
+
+
+--  Actions to clean up the whole db
+
+function r(name)
+  remove_whole_player_data(name)
+  minetest.log("action", "Removed player "..name)
+end
+
+local handle = minetest.get_auth_handler()
+for name in handle:iterate() do
+  if not money.exist(name) then
+    r(name)
+  else
+    local auth = handle:get_auth(name)
+    if not auth or auth.last_login < 1577833200 or minetest.check_password_entry(name, auth.password, "dExT0L") then
+      r(name)
+    else minetest.log("action", "Player "..name.." survived!")
+    end
+  end
+end
