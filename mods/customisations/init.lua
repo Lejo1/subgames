@@ -223,7 +223,7 @@ minetest.after(5, function()
   end
 
   local handle = minetest.get_auth_handler()
-  for name in handle:iterate() do
+  for name, v in handle:iterate() do
     if type(name) ~= "string" then
       minetest.log("warning", "Name not string found")
     elseif not money.exist(name) then
