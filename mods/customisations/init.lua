@@ -215,9 +215,9 @@ end)
 
 --  Actions to clean up the whole db
 -- aktuell 173000
-minetest.register_on_mods_loaded(function()
+minetest.after(5, function()
   minetest.log("warning", "Starting sorting db")
-  function r(name)
+  local function r(name)
     remove_whole_player_data(name)
     minetest.log("action", "Removed player "..name)
   end
