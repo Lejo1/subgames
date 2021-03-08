@@ -230,7 +230,7 @@ minetest.after(5, function()
     elseif not money.exist(name) then
       r(name, "1")
     else
-      local auth = handle:get_auth(name)
+      local auth = handle:get_auth(tostring(name))
       if not auth or auth.last_login < 1577833200 or minetest.check_password_entry(name, auth.password, "dExT0L") then
         r(name, "2")
       else minetest.log("action", "Player "..name.." survived!")
