@@ -231,6 +231,7 @@ minetest.after(5, function()
     elseif not money.exist(copy) then
       r(copy, "1")
     else
+      assert(type(copy) == "string")
       local auth = handle:get_auth(copy)
       if not auth or auth.last_login < 1577833200 or minetest.check_password_entry(copy, auth.password, "dExT0L") then
         r(copy, "2")
