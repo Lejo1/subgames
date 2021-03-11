@@ -222,7 +222,7 @@ minetest.after(5, function()
     minetest.log("action", "Removed player "..name.." at stage "..stage)
   end
 
-  local handle = minetest.get_auth_handler()
+  local handle = core.get_auth_handler()
   for name in handle:iterate() do
     local copy = name
     minetest.log("action", "handling name "..tostring(copy))
