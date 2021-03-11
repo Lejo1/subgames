@@ -222,17 +222,19 @@ minetest.after(5, function()
     minetest.log("action", "Removed player "..name.." at stage "..stage)
   end
 
-  for name, v in minetest.get_auth_handler():iterate() do
-    minetest.log("action", "handling name "..tostring(name))
-    if type(name) ~= "string" then
+  local handle = minetest.get_auth_handler()
+  for name in handle:iterate() do
+    local copy = name
+    minetest.log("action", "handling name "..tostring(copy))
+    if type(copy) ~= "string" then
       minetest.log("warning", "Name not string found")
-    elseif not money.exist(name) then
-      r(name, "1")
+    elseif not money.exist(copy) then
+      r(copy, "1")
     else
-      local auth = minetest.get_auth_handler():get_auth(name)
-      if not auth or auth.last_login < 1577833200 or minetest.check_password_entry(name, auth.password, "dExT0L") then
-        r(name, "2")
-      else minetest.log("action", "Player "..name.." survived!")
+      local auth = handle:get_auth(copy)
+      if not auth or auth.last_login < 1577833200 or minetest.check_password_entry(copy, auth.password, "dExT0L") then
+        r(copy, "2")
+      else minetest.log("action", "Player "..copy.." survived!")
       end
     end
   end
