@@ -194,11 +194,6 @@ end
 
 minetest.register_on_joinplayer(function(player)
   local name = player:get_player_name()
-  player:set_properties({
-    visual_size = {x=1, y=1},
-    makes_footstep_sound = true,
-    collisionbox = {-0.3, -1, -0.3, 0.3, 1, 0.3}
-  })
   local privs = minetest.get_player_privs(name)
   privs.interact = true
   privs.fly = nil
