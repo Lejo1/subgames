@@ -28,7 +28,7 @@ function mesewars.may_start_game(lobby)
             end
             mesewars.start_game(lobby)
           else start[lobby] = false
-            mesewars.chat_send_all_lobby(lobby)
+            mesewars.chat_send_all_lobby(lobby) ..
             minetest.colorize("#d49a08", "Game start stopped, because there are not enough players.")
           end
         end)
