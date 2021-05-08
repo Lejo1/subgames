@@ -196,14 +196,13 @@ subgames.register_game("skywars", {
     end
   end,
   drop = function(pos, itemname, player)
-    local name = player:get_player_name()
-    local plobby = skywars.player_lobby[name]
-    if not plobby then
+    local plobby
+    if not player or not player:is_player() then
       plobby = skywars.get_lobby_from_pos(pos)
-      if not plobby then
-        return false
-      end
+    else local name = player:get_player_name()
+      plobby = skywars.player_lobby[name]
     end
+    if not plobby then return false end
     if skywars.lobbys[plobby].ingame then
       return true
     else return false

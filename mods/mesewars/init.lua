@@ -162,14 +162,13 @@ subgames.register_game("mesewars", {
     end
   end,
   drop = function(pos, itemname, player)
-    local name = player:get_player_name()
-    local plobby = mesewars.player_lobby[name]
-    if not plobby then
+    local plobby
+    if not player or not player:is_player() then
       plobby = mesewars.get_lobby_from_pos(pos)
-      if not plobby then
-        return false
-      end
+    else local name = player:get_player_name()
+      plobby = mesewars.player_lobby[name]
     end
+    if not plobby then return false end
     if mesewars.lobbys[plobby].ingame and itemname == "default:sandstone" or itemname == "default:obsidian" or itemname == "default:glass" or itemname == "default:steelblock" or itemname == "default:chest" then
       return true
     else return false

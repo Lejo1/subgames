@@ -59,8 +59,13 @@ subgames.register_game("survivalgames", {
     end
   end,
   drop = function(pos, itemname, player)
-    local name = player:get_player_name()
-    local plobby = survivalgames.player_lobby[name]
+    local plobby
+    if not player or not player:is_player() then
+      plobby = survivalgames.get_lobby_from_pos(pos)
+    else local name = player:get_player_name()
+      plobby = survivalgames.player_lobby[name]
+    end
+    if not plobby then return false end
     if survivalgames.lobbys[plobby].ingame then
       return true
     end
