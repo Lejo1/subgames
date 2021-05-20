@@ -81,7 +81,7 @@ function hiddenseeker.disguis_player(player)
 		subgames.undisappear(player)
 		minetest.remove_node(minetest.string_to_pos(hiddenseeker.disguis[name].pos))
 		player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}})
-		minetest.chat_send_player(name, "You moved or get punched so you don't are a block anymore.")
+		minetest.chat_send_player(name, "You moved or get punched so you are not a block anymore.")
 	end
 end
 
