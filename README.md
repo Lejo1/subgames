@@ -16,5 +16,5 @@ The Mods from [minetest_game](https://github.com/minetest/minetest_game) are lic
 Textures: CC-BY-SA 3.0  
 Code: LGPL 2.1 or later
 
-The Mods: skywars, hiddenseeker, mesewars, customisations, survivalgames are created by [Lejo](https://github.com/Lejo1)  
+The Mods: skywars, hiddenseeker, mesewars, customisations, survivalgames are created by [Lejo](https://github.com/Lejo1) and are licensed under MIT.
 These mods contain map information which must be fitted on the map.
